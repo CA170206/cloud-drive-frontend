@@ -124,7 +124,7 @@ function Login({ onLogin, theme, setTheme }) {
         <button
           type="button"
           className="theme-toggle login-theme-toggle"
-          onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); closeMobileMenu(); }}
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           aria-label="Toggle theme"
         >
           <span className="theme-toggle-icon">{theme === "dark" ? "☀" : "☾"}</span>
@@ -179,6 +179,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name-asc");
+  const [filterOpen, setFilterOpen] = useState(false);
+  const [fileTypeFilter, setFileTypeFilter] = useState("all");
+  const [ownerFilter, setOwnerFilter] = useState("all");
   const [viewMode, setViewMode] = useState("list");
 
   const [uploading, setUploading] = useState(false);
@@ -191,6 +194,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [previewUrl, setPreviewUrl] = useState("");
   const [previewText, setPreviewText] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewPptxBuffer, setPreviewPptxBuffer] = useState(null);
 
   const [detailsTarget, setDetailsTarget] = useState(null);
 
@@ -949,6 +953,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       shared: isShared,
     });
     setPreviewText("");
+    setPreviewPptxBuffer(null);
 
     if (previewUrl) {
       window.URL.revokeObjectURL(previewUrl);
@@ -978,9 +983,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
        * This intentionally avoids an iframe so the file's own
        * HTML/background styling cannot affect our preview UI.
        */
-      if (getPreviewType(file.name) === "text") {
+      const previewType = getPreviewType(file.name);
+
+      if (previewType === "text") {
         const text = await blob.text();
         setPreviewText(text);
+      } else if (previewType === "powerpoint") {
+        const buffer = await blob.arrayBuffer();
+        setPreviewPptxBuffer(buffer);
       } else {
         const objectUrl = window.URL.createObjectURL(blob);
         setPreviewUrl(objectUrl);
@@ -1002,6 +1012,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
     setPreviewUrl("");
     setPreviewText("");
+    setPreviewPptxBuffer(null);
     setPreviewFileData(null);
     setPreviewLoading(false);
   };
@@ -1688,23 +1699,56 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const normalizedSearch =
     searchQuery.trim().toLowerCase();
 
+  const ownerOptions = Array.from(
+    new Map(
+      files.map((file) => {
+        const ownerId = String(file.owner_id || user?.id || "current");
+        const ownerLabel =
+          file.owner_name ||
+          file.owner_email ||
+          user?.name ||
+          user?.email ||
+          "Current user";
+        return [ownerId, { id: ownerId, label: ownerLabel }];
+      })
+    ).values()
+  );
+
+  const activeFilterCount =
+    (fileTypeFilter !== "all" ? 1 : 0) +
+    (ownerFilter !== "all" ? 1 : 0);
+
+  const clearAdvancedFilters = () => {
+    setFileTypeFilter("all");
+    setOwnerFilter("all");
+  };
+
   const filteredFolders = sortItems(
-    folders.filter(
-      (folder) =>
-        folder.name
-          .toLowerCase()
-          .includes(normalizedSearch)
-    ),
+    folders.filter((folder) => {
+      const matchesSearch = folder.name
+        .toLowerCase()
+        .includes(normalizedSearch);
+      const matchesOwner =
+        ownerFilter === "all" ||
+        String(folder.owner_id || user?.id || "current") === ownerFilter;
+      return matchesSearch && matchesOwner;
+    }),
     sortOption
   );
 
   const filteredFiles = sortItems(
-    files.filter(
-      (file) =>
-        file.name
-          .toLowerCase()
-          .includes(normalizedSearch)
-    ),
+    files.filter((file) => {
+      const matchesSearch = file.name
+        .toLowerCase()
+        .includes(normalizedSearch);
+      const matchesType =
+        fileTypeFilter === "all" ||
+        getAdvancedFileType(file) === fileTypeFilter;
+      const matchesOwner =
+        ownerFilter === "all" ||
+        String(file.owner_id || user?.id || "current") === ownerFilter;
+      return matchesSearch && matchesType && matchesOwner;
+    }),
     sortOption
   );
 
@@ -2249,7 +2293,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     >
                       {filteredRecentFiles.map((file) => (
                         <div
-                          className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
+                          className={`file-row shared-resource-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                           key={file.id}
                           style={
                             viewMode === "grid"
@@ -2781,7 +2825,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     Loading shared files...
                   </div>
                 ) : filteredSharedResources.length > 0 ? (
-                  <section>
+                  <section className="shared-items-section">
                     <h3 className="section-title">
                       Shared items
                     </h3>
@@ -2839,7 +2883,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               </span>
                             </div>
 
-                            <div className="shared-owner">
+                            <div className="shared-owner shared-meta-box">
                               <span className="shared-owner-label">
                                 Shared by
                               </span>
@@ -2850,9 +2894,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               </span>
                             </div>
 
-                            <span className="shared-role">
-                              {resource.role}
-                            </span>
+                            <div className={`shared-role shared-meta-box ${String(resource.role || "viewer").toLowerCase()}`}>
+                              <span className="shared-role-label">Role</span>
+                              <span className="shared-role-value">{resource.role || "viewer"}</span>
+                            </div>
 
                             {resource.resource_type ===
                             "folder" ? (
@@ -3318,6 +3363,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 }
               />
 
+              <button
+                type="button"
+                className={`advanced-filter-button ${filterOpen || activeFilterCount ? "active" : ""}`}
+                onClick={() => setFilterOpen((value) => !value)}
+                aria-expanded={filterOpen}
+              >
+                Filters{activeFilterCount > 0 ? ` (${activeFilterCount})` : ""}
+              </button>
+
               <select
                 className="sort-select"
                 value={sortOption}
@@ -3364,6 +3418,56 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 </button>
               )}
             </div>
+
+            {filterOpen && (
+              <div className="advanced-filter-panel">
+                <div className="advanced-filter-field">
+                  <label htmlFor="file-type-filter">File type</label>
+                  <select
+                    id="file-type-filter"
+                    value={fileTypeFilter}
+                    onChange={(e) => setFileTypeFilter(e.target.value)}
+                  >
+                    <option value="all">All types</option>
+                    <option value="image">Images</option>
+                    <option value="pdf">PDF</option>
+                    <option value="document">Documents</option>
+                    <option value="presentation">Presentations</option>
+                    <option value="spreadsheet">Spreadsheets</option>
+                    <option value="video">Videos</option>
+                    <option value="audio">Audio</option>
+                    <option value="text">Text</option>
+                    <option value="archive">Archives</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div className="advanced-filter-field">
+                  <label htmlFor="owner-filter">Owner</label>
+                  <select
+                    id="owner-filter"
+                    value={ownerFilter}
+                    onChange={(e) => setOwnerFilter(e.target.value)}
+                  >
+                    <option value="all">All owners</option>
+                    {ownerOptions.map((owner) => (
+                      <option key={owner.id} value={owner.id}>
+                        {owner.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  className="advanced-filter-clear"
+                  onClick={clearAdvancedFilters}
+                  disabled={!activeFilterCount}
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
 
             <StorageCard stats={storageStats} />
 
@@ -4347,16 +4451,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   <p>Preparing your file preview...</p>
                 </div>
               ) : (
-                previewUrl || getPreviewType(previewFileData.name) === "text"
+                previewUrl ||
+                getPreviewType(previewFileData.name) === "text" ||
+                getPreviewType(previewFileData.name) === "powerpoint"
               ) ? (
                 <div className="constant-preview-viewer">
-                  {previewFileData.mime_type?.startsWith("image/") ? (
+                  {getPreviewType(previewFileData.name) === "image" ? (
                     <img
                       src={previewUrl}
                       alt={previewFileData.name}
                       className="constant-preview-media"
                     />
-                  ) : previewFileData.mime_type === "application/pdf" ? (
+                  ) : getPreviewType(previewFileData.name) === "pdf" ? (
                     <iframe
                       src={previewUrl}
                       title={previewFileData.name}
@@ -4366,13 +4472,27 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     <pre className="constant-preview-text">
                       {previewText}
                     </pre>
-                  ) : previewFileData.mime_type?.startsWith("video/") ? (
+                  ) : getPreviewType(previewFileData.name) === "powerpoint" ? (
+                    <div className="pptx-preview-shell">
+                      {previewPptxBuffer ? (
+                        <PptxPreviewPane arrayBuffer={previewPptxBuffer} />
+                      ) : (
+                        <div className="constant-preview-placeholder">
+                          <div className="constant-preview-icon">
+                            <FileIcon fileName={previewFileData.name} size={64} />
+                          </div>
+                          <h3>Loading Presentation</h3>
+                          <p>Preparing the PowerPoint preview...</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : getPreviewType(previewFileData.name) === "video" ? (
                     <video
                       src={previewUrl}
                       controls
                       className="constant-preview-media"
                     />
-                  ) : previewFileData.mime_type?.startsWith("audio/") ? (
+                  ) : getPreviewType(previewFileData.name) === "audio" ? (
                     <div className="constant-preview-audio">
                       <div className="constant-preview-icon">
                         <FileIcon
@@ -4704,6 +4824,72 @@ function LogoutIcon({ size = 20 }) {
   );
 }
 
+function PptxPreviewPane({ arrayBuffer }) {
+  const containerRef = useRef(null);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+    let viewer = null;
+
+    const renderPresentation = async () => {
+      setError("");
+
+      if (!containerRef.current || !arrayBuffer) return;
+
+      containerRef.current.innerHTML = "";
+
+      try {
+        const module = await import("pptx-preview");
+
+        if (cancelled || !containerRef.current) return;
+
+        const init = module.init || module.default?.init;
+
+        if (typeof init !== "function") {
+          throw new Error("PowerPoint preview library could not be loaded.");
+        }
+
+        viewer = init(containerRef.current, {
+          width: 960,
+          height: 540,
+        });
+
+        await viewer.preview(arrayBuffer);
+      } catch (error) {
+        console.error("PPTX preview failed:", error);
+        if (!cancelled) {
+          setError("This PowerPoint file could not be previewed.");
+        }
+      }
+    };
+
+    renderPresentation();
+
+    return () => {
+      cancelled = true;
+      if (containerRef.current) {
+        containerRef.current.innerHTML = "";
+      }
+      viewer = null;
+    };
+  }, [arrayBuffer]);
+
+  if (error) {
+    return (
+      <div className="constant-preview-placeholder">
+        <div className="constant-preview-icon">
+          <FileIcon fileName="presentation.pptx" size={64} />
+        </div>
+        <h3>Preview Unavailable</h3>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  return <div ref={containerRef} className="pptx-preview-container" />;
+}
+
 function FileIcon({
   fileName,
   size = 32,
@@ -4841,6 +5027,22 @@ function getFileExtension(fileName) {
     .toLowerCase();
 }
 
+function getAdvancedFileType(file) {
+  const extension = getFileExtension(file?.name || "");
+  const mime = (file?.mime_type || "").toLowerCase();
+
+  if (mime.startsWith("image/") || ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg", "ico", "tif", "tiff"].includes(extension)) return "image";
+  if (mime === "application/pdf" || extension === "pdf") return "pdf";
+  if (mime.includes("presentation") || ["ppt", "pptx", "odp"].includes(extension)) return "presentation";
+  if (mime.includes("spreadsheet") || ["xls", "xlsx", "csv", "ods"].includes(extension)) return "spreadsheet";
+  if (mime.includes("word") || mime.includes("document") || ["doc", "docx", "odt", "rtf"].includes(extension)) return "document";
+  if (mime.startsWith("video/") || ["mp4", "webm", "ogg", "mov", "avi", "mkv"].includes(extension)) return "video";
+  if (mime.startsWith("audio/") || ["mp3", "wav", "m4a", "aac", "flac", "oga"].includes(extension)) return "audio";
+  if (mime.startsWith("text/") || ["txt", "md", "json", "xml", "html", "css", "js", "jsx", "ts", "tsx"].includes(extension)) return "text";
+  if (["zip", "rar", "7z", "tar", "gz", "bz2"].includes(extension)) return "archive";
+  return "other";
+}
+
 function getPreviewType(fileName) {
   const extension = getFileExtension(fileName);
 
@@ -4860,6 +5062,10 @@ function getPreviewType(fileName) {
 
   if (extension === "pdf") {
     return "pdf";
+  }
+
+  if (["ppt", "pptx"].includes(extension)) {
+    return "powerpoint";
   }
 
   if (
