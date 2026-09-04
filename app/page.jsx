@@ -144,9 +144,35 @@ function Dashboard({ user, onLogout }) {
     storageUsed: 0,
   });
 
+  const [activeView, setActiveView] = useState("my-files");
+
+  const [sharedResources, setSharedResources] = useState([]);
+  const [sharedLoading, setSharedLoading] = useState(false);
+
+  /* Shared folder state */
+  const [sharedFolder, setSharedFolder] = useState(null);
+  const [sharedFolderFolders, setSharedFolderFolders] = useState([]);
+  const [sharedFolderFiles, setSharedFolderFiles] = useState([]);
+  const [sharedFolderStack, setSharedFolderStack] = useState([]);
+  const [sharedFolderLoading, setSharedFolderLoading] = useState(false);
+
+  /* Share modal state */
+  const [shareTarget, setShareTarget] = useState(null);
+  const [shareEmail, setShareEmail] = useState("");
+  const [shareRole, setShareRole] = useState("viewer");
+  const [shareLoading, setShareLoading] = useState(false);
+  const [shareMessage, setShareMessage] = useState("");
+
+  /* Stars */
+  const [starredResources, setStarredResources] = useState([]);
+  const [starredLoading, setStarredLoading] = useState(false);
+  const [starLoading, setStarLoading] = useState({});
+
   useEffect(() => {
     loadContents(null);
     loadStorageStats();
+    loadSharedWithMe();
+    loadStarredResources();
   }, []);
 
   const loadStorageStats = async () => {
@@ -170,6 +196,154 @@ function Dashboard({ user, onLogout }) {
       console.error("Failed to load storage stats:", error);
     }
   };
+
+  const loadSharedWithMe = async () => {
+    setSharedLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/shares/shared-with-me`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setSharedResources(data.shared || []);
+      }
+    } catch (error) {
+      console.error("Failed to load shared resources:", error);
+    } finally {
+      setSharedLoading(false);
+    }
+  };
+
+  /* =========================
+     Stars
+  ========================= */
+
+  const loadStarredResources = async () => {
+    setStarredLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/stars`, {
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setStarredResources(data.starred || []);
+      }
+    } catch (error) {
+      console.error("Failed to load starred resources:", error);
+    } finally {
+      setStarredLoading(false);
+    }
+  };
+
+  const isStarred = (resourceType, resourceId) => {
+    return starredResources.some(
+      (resource) =>
+        resource.resource_type === resourceType &&
+        resource.resource_id === resourceId
+    );
+  };
+
+  const toggleStar = async (resourceType, resourceId) => {
+    const key = `${resourceType}-${resourceId}`;
+
+    if (starLoading[key]) return;
+
+    setStarLoading((previous) => ({
+      ...previous,
+      [key]: true,
+    }));
+
+    const currentlyStarred = isStarred(
+      resourceType,
+      resourceId
+    );
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/stars`,
+        {
+          method: currentlyStarred ? "DELETE" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            resourceType,
+            resourceId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(
+          data.error?.message ||
+            "Unable to update star"
+        );
+        return;
+      }
+
+      await loadStarredResources();
+    } catch (error) {
+      console.error("Toggle star failed:", error);
+      alert("Unable to update star");
+    } finally {
+      setStarLoading((previous) => ({
+        ...previous,
+        [key]: false,
+      }));
+    }
+  };
+
+  const openStarred = () => {
+    setActiveView("starred");
+    setSearchQuery("");
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    loadStarredResources();
+  };
+
+  const openStarredFolder = (folder) => {
+    setActiveView("my-files");
+    setSearchQuery("");
+    setFolderStack([]);
+    setCurrentFolder(folder);
+    loadContents(folder.id);
+  };
+
+  const getStarredFiles = () =>
+    starredResources.filter(
+      (resource) => resource.resource_type === "file"
+    );
+
+  const getStarredFolders = () =>
+    starredResources.filter(
+      (resource) => resource.resource_type === "folder"
+    );
+
+  const filteredStarredFiles = getStarredFiles().filter(
+    (resource) =>
+      resource.name
+        ?.toLowerCase()
+        .includes(searchQuery.trim().toLowerCase())
+  );
+
+  const filteredStarredFolders = getStarredFolders().filter(
+    (resource) =>
+      resource.name
+        ?.toLowerCase()
+        .includes(searchQuery.trim().toLowerCase())
+  );
 
   const loadContents = async (folderId) => {
     setLoading(true);
@@ -202,6 +376,28 @@ function Dashboard({ user, onLogout }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const openMyFiles = () => {
+    setActiveView("my-files");
+    setSearchQuery("");
+    setFolderStack([]);
+    setCurrentFolder(null);
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    loadContents(null);
+  };
+
+  const openSharedWithMe = () => {
+    setActiveView("shared");
+    setSearchQuery("");
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    loadSharedWithMe();
   };
 
   const openFolder = (folder) => {
@@ -249,6 +445,113 @@ function Dashboard({ user, onLogout }) {
     loadContents(newCurrentFolder?.id || null);
   };
 
+  /* =========================
+     Shared folder functions
+  ========================= */
+
+  const loadSharedFolder = async (folderId, stack = []) => {
+    setSharedFolderLoading(true);
+    setSearchQuery("");
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/shares/shared-with-me/folder/${folderId}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(
+          data.error?.message ||
+            "Unable to open shared folder"
+        );
+        return;
+      }
+
+      setSharedFolder(data.folder || null);
+      setSharedFolderFolders(data.folders || []);
+      setSharedFolderFiles(data.files || []);
+      setSharedFolderStack(stack);
+    } catch (error) {
+      console.error("Failed to load shared folder:", error);
+      alert("Unable to open shared folder");
+    } finally {
+      setSharedFolderLoading(false);
+    }
+  };
+
+  const openSharedFolder = async (folder) => {
+    const nextStack = [
+      ...sharedFolderStack,
+      sharedFolder,
+    ];
+
+    await loadSharedFolder(folder.id, nextStack);
+  };
+
+  const goBackSharedFolder = async () => {
+    if (sharedFolderStack.length === 0) {
+      setSharedFolder(null);
+      setSharedFolderFolders([]);
+      setSharedFolderFiles([]);
+      setSharedFolderStack([]);
+      return;
+    }
+
+    const previousFolder =
+      sharedFolderStack[sharedFolderStack.length - 1];
+
+    const newStack = sharedFolderStack.slice(0, -1);
+
+    if (!previousFolder) {
+      setSharedFolder(null);
+      setSharedFolderFolders([]);
+      setSharedFolderFiles([]);
+      setSharedFolderStack([]);
+      return;
+    }
+
+    await loadSharedFolder(previousFolder.id, newStack);
+  };
+
+  const exitSharedFolder = () => {
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    setSearchQuery("");
+    loadSharedWithMe();
+  };
+
+  const goToSharedFolderBreadcrumb = async (index) => {
+    if (index === 0) {
+      exitSharedFolder();
+      return;
+    }
+
+    const target =
+      sharedFolderStack[index - 1];
+
+    if (!target) {
+      exitSharedFolder();
+      return;
+    }
+
+    const newStack = sharedFolderStack.slice(
+      0,
+      index - 1
+    );
+
+    await loadSharedFolder(target.id, newStack);
+  };
+
+  /* =========================
+     My Files
+  ========================= */
+
   const createFolder = async (e) => {
     e.preventDefault();
 
@@ -270,10 +573,16 @@ function Dashboard({ user, onLogout }) {
       if (response.ok) {
         setNewFolderName("");
         setShowFolderInput(false);
+
         loadContents(currentFolder?.id || null);
+        loadStorageStats();
       } else {
         const data = await response.json();
-        alert(data.error?.message || "Unable to create folder");
+
+        alert(
+          data.error?.message ||
+            "Unable to create folder"
+        );
       }
     } catch (error) {
       console.error("Create folder failed:", error);
@@ -312,10 +621,19 @@ function Dashboard({ user, onLogout }) {
 
       if (response.ok) {
         cancelRename();
-        loadContents(currentFolder?.id || null);
+
+        loadContents(
+          currentFolder?.id || null
+        );
+
+        loadStarredResources();
       } else {
         const data = await response.json();
-        alert(data.error?.message || "Unable to rename folder");
+
+        alert(
+          data.error?.message ||
+            "Unable to rename folder"
+        );
       }
     } catch (error) {
       console.error("Rename folder failed:", error);
@@ -323,7 +641,9 @@ function Dashboard({ user, onLogout }) {
   };
 
   const deleteFolder = async (folder) => {
-    const confirmed = window.confirm(`Delete "${folder.name}"?`);
+    const confirmed = window.confirm(
+      `Delete "${folder.name}"?`
+    );
 
     if (!confirmed) return;
 
@@ -337,10 +657,19 @@ function Dashboard({ user, onLogout }) {
       );
 
       if (response.ok) {
-        loadContents(currentFolder?.id || null);
+        loadContents(
+          currentFolder?.id || null
+        );
+
+        loadStorageStats();
+        loadStarredResources();
       } else {
         const data = await response.json();
-        alert(data.error?.message || "Unable to delete folder");
+
+        alert(
+          data.error?.message ||
+            "Unable to delete folder"
+        );
       }
     } catch (error) {
       console.error("Delete folder failed:", error);
@@ -360,7 +689,10 @@ function Dashboard({ user, onLogout }) {
       formData.append("file", file);
 
       if (currentFolder?.id) {
-        formData.append("folderId", currentFolder.id);
+        formData.append(
+          "folderId",
+          currentFolder.id
+        );
       }
 
       const response = await fetch(
@@ -373,11 +705,18 @@ function Dashboard({ user, onLogout }) {
       );
 
       if (response.ok) {
-        loadContents(currentFolder?.id || null);
+        loadContents(
+          currentFolder?.id || null
+        );
+
         loadStorageStats();
       } else {
         const data = await response.json();
-        alert(data.error?.message || "Upload failed");
+
+        alert(
+          data.error?.message ||
+            "Upload failed"
+        );
       }
     } catch (error) {
       console.error("Upload failed:", error);
@@ -388,9 +727,20 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
-  const previewFile = async (file) => {
+  /* =========================
+     Preview
+  ========================= */
+
+  const previewFile = async (
+    file,
+    isShared = false
+  ) => {
     setPreviewLoading(true);
-    setPreviewFileData(file);
+
+    setPreviewFileData({
+      ...file,
+      shared: isShared,
+    });
 
     try {
       if (previewUrl) {
@@ -398,12 +748,13 @@ function Dashboard({ user, onLogout }) {
         setPreviewUrl("");
       }
 
-      const response = await fetch(
-        `${API_URL}/api/files/${file.id}/download`,
-        {
-          credentials: "include",
-        }
-      );
+      const url = isShared
+        ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
+        : `${API_URL}/api/files/${file.id}/download`;
+
+      const response = await fetch(url, {
+        credentials: "include",
+      });
 
       if (!response.ok) {
         alert("Unable to preview file");
@@ -412,11 +763,14 @@ function Dashboard({ user, onLogout }) {
       }
 
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
 
-      setPreviewUrl(url);
+      const objectUrl =
+        window.URL.createObjectURL(blob);
+
+      setPreviewUrl(objectUrl);
     } catch (error) {
       console.error("Preview failed:", error);
+
       alert("Unable to preview file");
       setPreviewFileData(null);
     } finally {
@@ -434,6 +788,10 @@ function Dashboard({ user, onLogout }) {
     setPreviewLoading(false);
   };
 
+  /* =========================
+     Downloads
+  ========================= */
+
   const downloadFile = async (file) => {
     try {
       const response = await fetch(
@@ -449,26 +807,78 @@ function Dashboard({ user, onLogout }) {
       }
 
       const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
 
-      const link = document.createElement("a");
+      const url =
+        window.URL.createObjectURL(blob);
+
+      const link =
+        document.createElement("a");
 
       link.href = url;
       link.download = file.name;
 
       document.body.appendChild(link);
+
       link.click();
       link.remove();
 
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Download failed:", error);
+
       alert("Unable to download file");
     }
   };
 
+  const downloadSharedFile = async (file) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/shares/shared-with-me/${file.id}/download`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        alert("Download failed");
+        return;
+      }
+
+      const blob = await response.blob();
+
+      const url =
+        window.URL.createObjectURL(blob);
+
+      const link =
+        document.createElement("a");
+
+      link.href = url;
+      link.download = file.name;
+
+      document.body.appendChild(link);
+
+      link.click();
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(
+        "Shared download failed:",
+        error
+      );
+
+      alert("Unable to download shared file");
+    }
+  };
+
+  /* =========================
+     Delete
+  ========================= */
+
   const deleteFile = async (file) => {
-    const confirmed = window.confirm(`Delete "${file.name}"?`);
+    const confirmed = window.confirm(
+      `Delete "${file.name}"?`
+    );
 
     if (!confirmed) return;
 
@@ -482,23 +892,167 @@ function Dashboard({ user, onLogout }) {
       );
 
       if (response.ok) {
-        loadContents(currentFolder?.id || null);
+        loadContents(
+          currentFolder?.id || null
+        );
+
         loadStorageStats();
+        loadStarredResources();
       } else {
         const data = await response.json();
-        alert(data.error?.message || "Unable to delete file");
+
+        alert(
+          data.error?.message ||
+            "Unable to delete file"
+        );
       }
     } catch (error) {
       console.error("Delete failed:", error);
     }
   };
 
+  /* =========================
+     Shared resources
+  ========================= */
+
+  const removeSharedResource = async (
+    resource
+  ) => {
+    const confirmed = window.confirm(
+      `Remove "${resource.resource_name}" from Shared with me?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/shares/shared-with-me/${resource.share_id}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        if (
+          sharedFolder &&
+          sharedFolder.id === resource.resource_id
+        ) {
+          exitSharedFolder();
+        } else {
+          loadSharedWithMe();
+        }
+      } else {
+        const data = await response.json();
+
+        alert(
+          data.error?.message ||
+            "Unable to remove shared resource"
+        );
+      }
+    } catch (error) {
+      console.error(
+        "Remove shared resource failed:",
+        error
+      );
+
+      alert(
+        "Unable to remove shared resource"
+      );
+    }
+  };
+
+  /* =========================
+     Sharing
+  ========================= */
+
+  const openShareModal = (resourceType, resource) => {
+    setShareTarget({
+      resourceType,
+      resourceId: resource.id,
+      name: resource.name,
+    });
+    setShareEmail("");
+    setShareRole("viewer");
+    setShareMessage("");
+  };
+
+  const closeShareModal = () => {
+    if (shareLoading) return;
+
+    setShareTarget(null);
+    setShareEmail("");
+    setShareRole("viewer");
+    setShareMessage("");
+  };
+
+  const shareResource = async (e) => {
+    e.preventDefault();
+
+    const email = shareEmail.trim().toLowerCase();
+
+    if (!shareTarget || !email) {
+      setShareMessage(
+        "Enter the email address of a registered user."
+      );
+      return;
+    }
+
+    setShareLoading(true);
+    setShareMessage("");
+
+    try {
+      const response = await fetch(`${API_URL}/api/shares`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          resourceType: shareTarget.resourceType,
+          resourceId: shareTarget.resourceId,
+          email,
+          role: shareRole,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setShareMessage(
+          data.error?.message ||
+            "Unable to share resource"
+        );
+        return;
+      }
+
+      setShareMessage(
+        data.message ||
+          "Resource shared successfully"
+      );
+
+      setShareEmail("");
+
+      setTimeout(() => {
+        closeShareModal();
+      }, 700);
+    } catch (error) {
+      console.error("Share resource failed:", error);
+      setShareMessage("Unable to connect to server");
+    } finally {
+      setShareLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
-      await fetch(`${API_URL}/api/auth/logout`, {
-        method: "POST",
-        credentials: "include",
-      });
+      await fetch(
+        `${API_URL}/api/auth/logout`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -506,32 +1060,93 @@ function Dashboard({ user, onLogout }) {
     onLogout();
   };
 
-  const normalizedSearch = searchQuery.trim().toLowerCase();
+  /* =========================
+     Search
+  ========================= */
 
-  const filteredFolders = folders.filter((folder) =>
-    folder.name.toLowerCase().includes(normalizedSearch)
+  const normalizedSearch =
+    searchQuery.trim().toLowerCase();
+
+  const filteredFolders = folders.filter(
+    (folder) =>
+      folder.name
+        .toLowerCase()
+        .includes(normalizedSearch)
   );
 
-  const filteredFiles = files.filter((file) =>
-    file.name.toLowerCase().includes(normalizedSearch)
+  const filteredFiles = files.filter(
+    (file) =>
+      file.name
+        .toLowerCase()
+        .includes(normalizedSearch)
   );
+
+  const filteredSharedResources =
+    sharedResources.filter((resource) =>
+      resource.resource_name
+        ?.toLowerCase()
+        .includes(normalizedSearch)
+    );
+
+  const filteredSharedFolders =
+    sharedFolderFolders.filter((folder) =>
+      folder.name
+        .toLowerCase()
+        .includes(normalizedSearch)
+    );
+
+  const filteredSharedFiles =
+    sharedFolderFiles.filter((file) =>
+      file.name
+        .toLowerCase()
+        .includes(normalizedSearch)
+    );
+
+  /* =========================
+     Breadcrumbs
+  ========================= */
 
   const breadcrumbs = [
     {
       name: "My Files",
       folder: null,
     },
+
     ...folderStack
       .filter(Boolean)
       .map((folder) => ({
         name: folder.name,
         folder,
       })),
+
     ...(currentFolder
       ? [
           {
             name: currentFolder.name,
             folder: currentFolder,
+          },
+        ]
+      : []),
+  ];
+
+  const sharedBreadcrumbs = [
+    {
+      name: "Shared with me",
+      folder: null,
+    },
+
+    ...sharedFolderStack
+      .filter(Boolean)
+      .map((folder) => ({
+        name: folder.name,
+        folder,
+      })),
+
+    ...(sharedFolder
+      ? [
+          {
+            name: sharedFolder.name,
+            folder: sharedFolder,
           },
         ]
       : []),
@@ -544,12 +1159,15 @@ function Dashboard({ user, onLogout }) {
           <div className="brand-icon">
             <CloudIcon />
           </div>
+
           <span>Cloud Drive</span>
         </div>
 
         <div className="sidebar-user">
           <div className="avatar">
-            {user.name?.charAt(0).toUpperCase()}
+            {user.name
+              ?.charAt(0)
+              .toUpperCase()}
           </div>
 
           <div>
@@ -558,289 +1176,1384 @@ function Dashboard({ user, onLogout }) {
           </div>
         </div>
 
-        <button className="sidebar-item active">
+        <button
+          className={`sidebar-item ${
+            activeView === "my-files"
+              ? "active"
+              : ""
+          }`}
+          onClick={openMyFiles}
+        >
           <FolderIcon size={18} />
           <span>My Files</span>
         </button>
 
-        <button className="sidebar-item" onClick={logout}>
+        <button
+          className={`sidebar-item ${
+            activeView === "shared"
+              ? "active"
+              : ""
+          }`}
+          onClick={openSharedWithMe}
+        >
+          <UsersIcon size={18} />
+          <span>Shared with me</span>
+        </button>
+
+        <button
+          className={`sidebar-item ${
+            activeView === "starred"
+              ? "active"
+              : ""
+          }`}
+          onClick={openStarred}
+        >
+          <StarIcon size={18} filled />
+          <span>Starred</span>
+        </button>
+
+        <button
+          className="sidebar-item"
+          onClick={logout}
+        >
           <LogoutIcon size={18} />
           <span>Logout</span>
         </button>
       </aside>
 
       <section className="content">
-        <header className="topbar">
-          <div>
-            <h2>
-              {currentFolder ? currentFolder.name : "My Files"}
-            </h2>
+        {/* ==================================
+            STARRED
+        ================================== */}
 
-            <p>
-              {currentFolder
-                ? "Files inside this folder"
-                : "Your cloud storage"}
-            </p>
-          </div>
+        {activeView === "starred" ? (
+          <>
+            <header className="topbar">
+              <div>
+                <h2>Starred</h2>
 
-          <div className="actions">
-            <label className="upload-button">
-              <UploadIcon size={17} />
-              {uploading ? "Uploading..." : "Upload File"}
+                <p>
+                  Your favorite files and folders
+                </p>
+              </div>
+            </header>
+
+            <div className="search-bar">
+              <SearchIcon size={18} />
 
               <input
-                type="file"
-                onChange={uploadFile}
-                disabled={uploading}
+                type="text"
+                placeholder="Search starred files and folders..."
+                value={searchQuery}
+                onChange={(e) =>
+                  setSearchQuery(e.target.value)
+                }
               />
-            </label>
 
-            <button
-              className="new-folder-button"
-              onClick={() => setShowFolderInput(true)}
-            >
-              <PlusIcon size={17} />
-              New Folder
-            </button>
-          </div>
-        </header>
-
-        <div className="breadcrumbs">
-          {breadcrumbs.map((breadcrumb, index) => {
-            const isLast = index === breadcrumbs.length - 1;
-
-            return (
-              <div
-                className="breadcrumb-item"
-                key={`${breadcrumb.name}-${index}`}
-              >
+              {searchQuery && (
                 <button
-                  className={isLast ? "breadcrumb-current" : ""}
-                  onClick={() => goToBreadcrumb(index)}
-                  disabled={isLast}
+                  onClick={() =>
+                    setSearchQuery("")
+                  }
+                  className="clear-search"
                 >
-                  {index === 0 && <FolderIcon size={15} />}
-                  {breadcrumb.name}
+                  ×
                 </button>
+              )}
+            </div>
 
-                {!isLast && (
-                  <span className="breadcrumb-separator">
-                    /
-                  </span>
-                )}
+            {starredLoading ? (
+              <div className="empty-state">
+                Loading starred items...
               </div>
-            );
-          })}
-        </div>
+            ) : (
+              <div className="file-area">
+                {filteredStarredFolders.length > 0 && (
+                  <section>
+                    <h3 className="section-title">
+                      Folders
+                    </h3>
 
-        <div className="search-bar">
-          <SearchIcon size={18} />
+                    <div className="items-grid">
+                      {filteredStarredFolders.map(
+                        (folder) => {
+                          const key = `folder-${folder.resource_id}`;
 
-          <input
-            type="text"
-            placeholder="Search files and folders..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery("")}
-              className="clear-search"
-            >
-              ×
-            </button>
-          )}
-        </div>
-
-        <StorageCard stats={storageStats} />
-
-        {currentFolder && (
-          <button className="back-button" onClick={goBack}>
-            <ArrowLeftIcon size={16} />
-            Back
-          </button>
-        )}
-
-        {showFolderInput && (
-          <form className="new-folder-form" onSubmit={createFolder}>
-            <input
-              autoFocus
-              type="text"
-              placeholder="Folder name"
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-            />
-
-            <button type="submit">Create</button>
-
-            <button
-              type="button"
-              onClick={() => {
-                setShowFolderInput(false);
-                setNewFolderName("");
-              }}
-            >
-              Cancel
-            </button>
-          </form>
-        )}
-
-        {loading ? (
-          <div className="empty-state">Loading...</div>
-        ) : (
-          <div className="file-area">
-            {filteredFolders.length > 0 && (
-              <section>
-                <h3 className="section-title">Folders</h3>
-
-                <div className="items-grid">
-                  {filteredFolders.map((folder) => (
-                    <div className="item-card" key={folder.id}>
-                      {renamingFolder?.id === folder.id ? (
-                        <form
-                          className="rename-form"
-                          onSubmit={renameFolder}
-                        >
-                          <input
-                            autoFocus
-                            value={renameValue}
-                            onChange={(e) =>
-                              setRenameValue(e.target.value)
-                            }
-                          />
-
-                          <div className="rename-actions">
-                            <button type="submit">Save</button>
-
-                            <button
-                              type="button"
-                              onClick={cancelRename}
+                          return (
+                            <div
+                              className="item-card"
+                              key={folder.resource_id}
                             >
-                              Cancel
-                            </button>
-                          </div>
-                        </form>
-                      ) : (
-                        <>
-                          <div
-                            className="item-main"
-                            onDoubleClick={() => openFolder(folder)}
-                          >
-                            <div className="item-icon">
-                              <FolderIcon size={32} />
+                              <div
+                                className="item-main"
+                                onClick={() =>
+                                  openStarredFolder(
+                                    folder
+                                  )
+                                }
+                                style={{
+                                  cursor: "pointer",
+                                }}
+                              >
+                                <div className="item-icon">
+                                  <FolderIcon
+                                    size={32}
+                                  />
+                                </div>
+
+                                <div className="item-info">
+                                  <strong>
+                                    {folder.name}
+                                  </strong>
+
+                                  <span>
+                                    Folder
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="folder-actions">
+                                <button
+                                  className="folder-action"
+                                  onClick={() =>
+                                    openStarredFolder(
+                                      folder
+                                    )
+                                  }
+                                >
+                                  <FolderIcon
+                                    size={14}
+                                  />
+                                  Open
+                                </button>
+
+                                <button
+                                  className="folder-action"
+                                  onClick={() =>
+                                    toggleStar(
+                                      "folder",
+                                      folder.resource_id
+                                    )
+                                  }
+                                  disabled={
+                                    starLoading[key]
+                                  }
+                                >
+                                  <StarIcon
+                                    size={14}
+                                    filled
+                                  />
+                                  {starLoading[key]
+                                    ? "..."
+                                    : "Unstar"}
+                                </button>
+                              </div>
                             </div>
-
-                            <div className="item-info">
-                              <strong>{folder.name}</strong>
-                              <span>Folder</span>
-                            </div>
-                          </div>
-
-                          <div className="folder-actions">
-                            <button
-                              className="folder-action"
-                              onClick={() =>
-                                startRenameFolder(folder)
-                              }
-                            >
-                              <EditIcon size={14} />
-                              Rename
-                            </button>
-
-                            <button
-                              className="folder-action delete"
-                              onClick={() =>
-                                deleteFolder(folder)
-                              }
-                            >
-                              <TrashIcon size={14} />
-                              Delete
-                            </button>
-                          </div>
-                        </>
+                          );
+                        }
                       )}
                     </div>
-                  ))}
-                </div>
-              </section>
-            )}
+                  </section>
+                )}
 
-            {filteredFiles.length > 0 && (
-              <section>
-                <h3 className="section-title">Files</h3>
+                {filteredStarredFiles.length > 0 && (
+                  <section>
+                    <h3 className="section-title">
+                      Files
+                    </h3>
 
-                <div className="items-list">
-                  {filteredFiles.map((file) => (
-                    <div className="file-row" key={file.id}>
-                      <div className="file-icon">
-                        <FileIcon fileName={file.name} />
-                      </div>
+                    <div className="items-list">
+                      {filteredStarredFiles.map(
+                        (file) => {
+                          const key = `file-${file.resource_id}`;
 
-                      <div className="file-info">
-                        <strong>{file.name}</strong>
+                          return (
+                            <div
+                              className="file-row"
+                              key={file.resource_id}
+                            >
+                              <div className="file-icon">
+                                <FileIcon
+                                  fileName={file.name}
+                                />
+                              </div>
 
-                        <span>
-                          {formatFileSize(file.size_bytes)}
-                        </span>
-                      </div>
+                              <div className="file-info">
+                                <strong>
+                                  {file.name}
+                                </strong>
 
-                      <button
-                        className="file-action"
-                        onClick={() => previewFile(file)}
-                      >
-                        <EyeIcon size={15} />
-                        Preview
-                      </button>
+                                <span>
+                                  {formatFileSize(
+                                    file.size_bytes
+                                  )}
+                                </span>
+                              </div>
 
-                      <button
-                        className="file-action"
-                        onClick={() => downloadFile(file)}
-                      >
-                        <DownloadIcon size={15} />
-                        Download
-                      </button>
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  previewFile({
+                                    id: file.resource_id,
+                                    name: file.name,
+                                    size_bytes:
+                                      file.size_bytes,
+                                  })
+                                }
+                              >
+                                <EyeIcon size={15} />
+                                Preview
+                              </button>
 
-                      <button
-                        className="file-action delete"
-                        onClick={() => deleteFile(file)}
-                      >
-                        <TrashIcon size={15} />
-                        Delete
-                      </button>
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  downloadFile({
+                                    id: file.resource_id,
+                                    name: file.name,
+                                  })
+                                }
+                              >
+                                <DownloadIcon
+                                  size={15}
+                                />
+                                Download
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  toggleStar(
+                                    "file",
+                                    file.resource_id
+                                  )
+                                }
+                                disabled={
+                                  starLoading[key]
+                                }
+                              >
+                                <StarIcon
+                                  size={15}
+                                  filled
+                                />
+                                {starLoading[key]
+                                  ? "..."
+                                  : "Unstar"}
+                              </button>
+                            </div>
+                          );
+                        }
+                      )}
                     </div>
-                  ))}
+                  </section>
+                )}
+
+                {filteredStarredFolders.length === 0 &&
+                  filteredStarredFiles.length === 0 && (
+                    <div className="empty-state">
+                      <div className="empty-icon">
+                        <StarIcon
+                          size={48}
+                          filled
+                        />
+                      </div>
+
+                      <h3>
+                        {normalizedSearch
+                          ? "No results found"
+                          : "No starred items"}
+                      </h3>
+
+                      <p>
+                        {normalizedSearch
+                          ? `Nothing matches "${searchQuery}"`
+                          : "Star files or folders to find them quickly here."}
+                      </p>
+                    </div>
+                  )}
+              </div>
+            )}
+          </>
+        ) : activeView === "shared" ? (
+          /* ==================================
+             SHARED WITH ME
+          ================================== */
+
+          <>
+            {!sharedFolder ? (
+              <>
+                <header className="topbar">
+                  <div>
+                    <h2>Shared with me</h2>
+
+                    <p>
+                      Files and folders shared
+                      with you
+                    </p>
+                  </div>
+                </header>
+
+                <div className="search-bar">
+                  <SearchIcon size={18} />
+
+                  <input
+                    type="text"
+                    placeholder="Search shared files and folders..."
+                    value={searchQuery}
+                    onChange={(e) =>
+                      setSearchQuery(
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  {searchQuery && (
+                    <button
+                      onClick={() =>
+                        setSearchQuery("")
+                      }
+                      className="clear-search"
+                    >
+                      ×
+                    </button>
+                  )}
                 </div>
-              </section>
+
+                {sharedLoading ? (
+                  <div className="empty-state">
+                    Loading shared files...
+                  </div>
+                ) : filteredSharedResources.length >
+                  0 ? (
+                  <section>
+                    <h3 className="section-title">
+                      Shared items
+                    </h3>
+
+                    <div className="items-list">
+                      {filteredSharedResources.map(
+                        (resource) => (
+                          <div
+                            className="file-row"
+                            key={resource.share_id}
+                          >
+                            <div className="file-icon">
+                              {resource.resource_type ===
+                              "folder" ? (
+                                <FolderIcon
+                                  size={30}
+                                />
+                              ) : (
+                                <FileIcon
+                                  fileName={
+                                    resource.resource_name
+                                  }
+                                  size={30}
+                                />
+                              )}
+                            </div>
+
+                            <div
+                              className="file-info"
+                              onDoubleClick={() => {
+                                if (
+                                  resource.resource_type ===
+                                  "folder"
+                                ) {
+                                  openSharedFolder(
+                                    resource
+                                  );
+                                }
+                              }}
+                              style={{
+                                cursor:
+                                  resource.resource_type ===
+                                  "folder"
+                                    ? "pointer"
+                                    : "default",
+                              }}
+                            >
+                              <strong>
+                                {
+                                  resource.resource_name
+                                }
+                              </strong>
+
+                              <span>
+                                {resource.resource_type ===
+                                "folder"
+                                  ? "Folder"
+                                  : formatFileSize(
+                                      resource.size_bytes
+                                    )}
+                              </span>
+                            </div>
+
+                            <div className="shared-owner">
+                              <span className="shared-owner-label">
+                                Shared by
+                              </span>
+
+                              <span className="shared-owner-name">
+                                {resource.owner_name ||
+                                  resource.owner_email}
+                              </span>
+                            </div>
+
+                            <span className="shared-role">
+                              {resource.role}
+                            </span>
+
+                            {resource.resource_type ===
+                            "folder" ? (
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openSharedFolder(
+                                    resource
+                                  )
+                                }
+                              >
+                                <FolderIcon
+                                  size={15}
+                                />
+                                Open
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  className="file-action"
+                                  onClick={() =>
+                                    previewFile(
+                                      {
+                                        id: resource.resource_id,
+                                        name: resource.resource_name,
+                                        size_bytes:
+                                          resource.size_bytes,
+                                      },
+                                      true
+                                    )
+                                  }
+                                >
+                                  <EyeIcon
+                                    size={15}
+                                  />
+                                  Preview
+                                </button>
+
+                                <button
+                                  className="file-action"
+                                  onClick={() =>
+                                    downloadSharedFile(
+                                      {
+                                        id: resource.resource_id,
+                                        name: resource.resource_name,
+                                      }
+                                    )
+                                  }
+                                >
+                                  <DownloadIcon
+                                    size={15}
+                                  />
+                                  Download
+                                </button>
+                              </>
+                            )}
+
+                            <button
+                              className="file-action delete"
+                              onClick={() =>
+                                removeSharedResource(
+                                  resource
+                                )
+                              }
+                            >
+                              <TrashIcon size={15} />
+                              Remove
+                            </button>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </section>
+                ) : (
+                  <div className="empty-state">
+                    <div className="empty-icon">
+                      <UsersIcon size={48} />
+                    </div>
+
+                    <h3>
+                      {normalizedSearch
+                        ? "No results found"
+                        : "Nothing shared with you"}
+                    </h3>
+
+                    <p>
+                      {normalizedSearch
+                        ? `Nothing matches "${searchQuery}"`
+                        : "Files and folders shared with you will appear here."}
+                    </p>
+                  </div>
+                )}
+              </>
+            ) : (
+              /* ==================================
+                 INSIDE SHARED FOLDER
+              ================================== */
+
+              <>
+                <header className="topbar">
+                  <div>
+                    <h2>
+                      {sharedFolder.name}
+                    </h2>
+
+                    <p>
+                      Shared folder ·{" "}
+                      {sharedFolder.role}
+                    </p>
+                  </div>
+                </header>
+
+                <div className="breadcrumbs">
+                  {sharedBreadcrumbs.map(
+                    (breadcrumb, index) => {
+                      const isLast =
+                        index ===
+                        sharedBreadcrumbs.length -
+                          1;
+
+                      return (
+                        <div
+                          className="breadcrumb-item"
+                          key={`${breadcrumb.name}-${index}`}
+                        >
+                          <button
+                            className={
+                              isLast
+                                ? "breadcrumb-current"
+                                : ""
+                            }
+                            onClick={() =>
+                              goToSharedFolderBreadcrumb(
+                                index
+                              )
+                            }
+                            disabled={isLast}
+                          >
+                            {index === 0 && (
+                              <UsersIcon
+                                size={15}
+                              />
+                            )}
+
+                            {breadcrumb.name}
+                          </button>
+
+                          {!isLast && (
+                            <span className="breadcrumb-separator">
+                              /
+                            </span>
+                          )}
+                        </div>
+                      );
+                    }
+                  )}
+                </div>
+
+                <div className="search-bar">
+                  <SearchIcon size={18} />
+
+                  <input
+                    type="text"
+                    placeholder="Search this shared folder..."
+                    value={searchQuery}
+                    onChange={(e) =>
+                      setSearchQuery(
+                        e.target.value
+                      )
+                    }
+                  />
+
+                  {searchQuery && (
+                    <button
+                      onClick={() =>
+                        setSearchQuery("")
+                      }
+                      className="clear-search"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+
+                <button
+                  className="back-button"
+                  onClick={goBackSharedFolder}
+                >
+                  <ArrowLeftIcon size={16} />
+                  Back
+                </button>
+
+                {sharedFolderLoading ? (
+                  <div className="empty-state">
+                    Loading shared folder...
+                  </div>
+                ) : (
+                  <>
+                    {filteredSharedFolders.length >
+                      0 && (
+                      <section>
+                        <h3 className="section-title">
+                          Folders
+                        </h3>
+
+                        <div className="items-grid">
+                          {filteredSharedFolders.map(
+                            (folder) => (
+                              <div
+                                className="item-card"
+                                key={folder.id}
+                              >
+                                <div
+                                  className="item-main"
+                                  onDoubleClick={() =>
+                                    openSharedFolder(
+                                      folder
+                                    )
+                                  }
+                                  onClick={() =>
+                                    openSharedFolder(
+                                      folder
+                                    )
+                                  }
+                                >
+                                  <div className="item-icon">
+                                    <FolderIcon
+                                      size={32}
+                                    />
+                                  </div>
+
+                                  <div className="item-info">
+                                    <strong>
+                                      {folder.name}
+                                    </strong>
+
+                                    <span>
+                                      Shared folder
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="folder-actions">
+                                  <button
+                                    className="folder-action"
+                                    onClick={() =>
+                                      openSharedFolder(
+                                        folder
+                                      )
+                                    }
+                                  >
+                                    <FolderIcon
+                                      size={14}
+                                    />
+                                    Open
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </section>
+                    )}
+
+                    {filteredSharedFiles.length >
+                      0 && (
+                      <section>
+                        <h3 className="section-title">
+                          Files
+                        </h3>
+
+                        <div className="items-list">
+                          {filteredSharedFiles.map(
+                            (file) => (
+                              <div
+                                className="file-row"
+                                key={file.id}
+                              >
+                                <div className="file-icon">
+                                  <FileIcon
+                                    fileName={
+                                      file.name
+                                    }
+                                  />
+                                </div>
+
+                                <div className="file-info">
+                                  <strong>
+                                    {file.name}
+                                  </strong>
+
+                                  <span>
+                                    {formatFileSize(
+                                      file.size_bytes
+                                    )}
+                                  </span>
+                                </div>
+
+                                <button
+                                  className="file-action"
+                                  onClick={() =>
+                                    previewFile(
+                                      file,
+                                      true
+                                    )
+                                  }
+                                >
+                                  <EyeIcon
+                                    size={15}
+                                  />
+                                  Preview
+                                </button>
+
+                                <button
+                                  className="file-action"
+                                  onClick={() =>
+                                    downloadSharedFile(
+                                      file
+                                    )
+                                  }
+                                >
+                                  <DownloadIcon
+                                    size={15}
+                                  />
+                                  Download
+                                </button>
+                              </div>
+                            )
+                          )}
+                        </div>
+                      </section>
+                    )}
+
+                    {filteredSharedFolders.length ===
+                      0 &&
+                      filteredSharedFiles.length ===
+                        0 && (
+                        <div className="empty-state">
+                          <div className="empty-icon">
+                            <FolderIcon size={48} />
+                          </div>
+
+                          <h3>
+                            {normalizedSearch
+                              ? "No results found"
+                              : "This shared folder is empty"}
+                          </h3>
+
+                          <p>
+                            {normalizedSearch
+                              ? `Nothing matches "${searchQuery}"`
+                              : "There are no files or folders here."}
+                          </p>
+                        </div>
+                      )}
+                  </>
+                )}
+              </>
+            )}
+          </>
+        ) : (
+          /* ==================================
+             MY FILES
+          ================================== */
+
+          <>
+            <header className="topbar">
+              <div>
+                <h2>
+                  {currentFolder
+                    ? currentFolder.name
+                    : "My Files"}
+                </h2>
+
+                <p>
+                  {currentFolder
+                    ? "Files inside this folder"
+                    : "Your cloud storage"}
+                </p>
+              </div>
+
+              <div className="actions">
+                <label className="upload-button">
+                  <UploadIcon size={17} />
+
+                  {uploading
+                    ? "Uploading..."
+                    : "Upload File"}
+
+                  <input
+                    type="file"
+                    onChange={uploadFile}
+                    disabled={uploading}
+                  />
+                </label>
+
+                <button
+                  className="new-folder-button"
+                  onClick={() =>
+                    setShowFolderInput(true)
+                  }
+                >
+                  <PlusIcon size={17} />
+                  New Folder
+                </button>
+              </div>
+            </header>
+
+            <div className="breadcrumbs">
+              {breadcrumbs.map(
+                (breadcrumb, index) => {
+                  const isLast =
+                    index ===
+                    breadcrumbs.length - 1;
+
+                  return (
+                    <div
+                      className="breadcrumb-item"
+                      key={`${breadcrumb.name}-${index}`}
+                    >
+                      <button
+                        className={
+                          isLast
+                            ? "breadcrumb-current"
+                            : ""
+                        }
+                        onClick={() =>
+                          goToBreadcrumb(index)
+                        }
+                        disabled={isLast}
+                      >
+                        {index === 0 && (
+                          <FolderIcon size={15} />
+                        )}
+
+                        {breadcrumb.name}
+                      </button>
+
+                      {!isLast && (
+                        <span className="breadcrumb-separator">
+                          /
+                        </span>
+                      )}
+                    </div>
+                  );
+                }
+              )}
+            </div>
+
+            <div className="search-bar">
+              <SearchIcon size={18} />
+
+              <input
+                type="text"
+                placeholder="Search files and folders..."
+                value={searchQuery}
+                onChange={(e) =>
+                  setSearchQuery(
+                    e.target.value
+                  )
+                }
+              />
+
+              {searchQuery && (
+                <button
+                  onClick={() =>
+                    setSearchQuery("")
+                  }
+                  className="clear-search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            <StorageCard
+              stats={storageStats}
+            />
+
+            {currentFolder && (
+              <button
+                className="back-button"
+                onClick={goBack}
+              >
+                <ArrowLeftIcon size={16} />
+                Back
+              </button>
             )}
 
-            {filteredFolders.length === 0 &&
-              filteredFiles.length === 0 && (
-                <div className="empty-state">
-                  <div className="empty-icon">
-                    {normalizedSearch ? (
-                      <SearchIcon size={48} />
-                    ) : (
-                      <CloudIcon size={48} />
-                    )}
-                  </div>
+            {showFolderInput && (
+              <form
+                className="new-folder-form"
+                onSubmit={createFolder}
+              >
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="Folder name"
+                  value={newFolderName}
+                  onChange={(e) =>
+                    setNewFolderName(
+                      e.target.value
+                    )
+                  }
+                />
 
-                  <h3>
-                    {normalizedSearch
-                      ? "No results found"
-                      : "This folder is empty"}
-                  </h3>
+                <button type="submit">
+                  Create
+                </button>
 
-                  <p>
-                    {normalizedSearch
-                      ? `Nothing matches "${searchQuery}"`
-                      : "Upload a file or create a folder to get started."}
-                  </p>
-                </div>
-              )}
-          </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowFolderInput(false);
+                    setNewFolderName("");
+                  }}
+                >
+                  Cancel
+                </button>
+              </form>
+            )}
+
+            {loading ? (
+              <div className="empty-state">
+                Loading...
+              </div>
+            ) : (
+              <div className="file-area">
+                {filteredFolders.length >
+                  0 && (
+                  <section>
+                    <h3 className="section-title">
+                      Folders
+                    </h3>
+
+                    <div className="items-grid">
+                      {filteredFolders.map(
+                        (folder) => {
+                          const starKey = `folder-${folder.id}`;
+
+                          return (
+                            <div
+                              className="item-card"
+                              key={folder.id}
+                            >
+                              {renamingFolder?.id ===
+                              folder.id ? (
+                                <form
+                                  className="rename-form"
+                                  onSubmit={
+                                    renameFolder
+                                  }
+                                >
+                                  <input
+                                    autoFocus
+                                    value={
+                                      renameValue
+                                    }
+                                    onChange={(e) =>
+                                      setRenameValue(
+                                        e.target
+                                          .value
+                                      )
+                                    }
+                                  />
+
+                                  <div className="rename-actions">
+                                    <button type="submit">
+                                      Save
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={
+                                        cancelRename
+                                      }
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </form>
+                              ) : (
+                                <>
+                                  <div
+                                    className="item-main"
+                                    onDoubleClick={() =>
+                                      openFolder(
+                                        folder
+                                      )
+                                    }
+                                  >
+                                    <div className="item-icon">
+                                      <FolderIcon
+                                        size={32}
+                                      />
+                                    </div>
+
+                                    <div className="item-info">
+                                      <strong>
+                                        {folder.name}
+                                      </strong>
+
+                                      <span>
+                                        Folder
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="folder-actions">
+                                    <button
+                                      className="folder-action"
+                                      onClick={() =>
+                                        startRenameFolder(
+                                          folder
+                                        )
+                                      }
+                                    >
+                                      <EditIcon
+                                        size={14}
+                                      />
+                                      Rename
+                                    </button>
+
+                                    <button
+                                      className="folder-action"
+                                      onClick={() =>
+                                        openShareModal(
+                                          "folder",
+                                          folder
+                                        )
+                                      }
+                                    >
+                                      <UsersIcon
+                                        size={14}
+                                      />
+                                      Share
+                                    </button>
+
+                                    <button
+                                      className="folder-action"
+                                      onClick={() =>
+                                        toggleStar(
+                                          "folder",
+                                          folder.id
+                                        )
+                                      }
+                                      disabled={
+                                        starLoading[
+                                          starKey
+                                        ]
+                                      }
+                                    >
+                                      <StarIcon
+                                        size={14}
+                                        filled={isStarred(
+                                          "folder",
+                                          folder.id
+                                        )}
+                                      />
+                                      {starLoading[
+                                        starKey
+                                      ]
+                                        ? "..."
+                                        : isStarred(
+                                            "folder",
+                                            folder.id
+                                          )
+                                        ? "Unstar"
+                                        : "Star"}
+                                    </button>
+
+                                    <button
+                                      className="folder-action delete"
+                                      onClick={() =>
+                                        deleteFolder(
+                                          folder
+                                        )
+                                      }
+                                    >
+                                      <TrashIcon
+                                        size={14}
+                                      />
+                                      Delete
+                                    </button>
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  </section>
+                )}
+
+                {filteredFiles.length >
+                  0 && (
+                  <section>
+                    <h3 className="section-title">
+                      Files
+                    </h3>
+
+                    <div className="items-list">
+                      {filteredFiles.map(
+                        (file) => {
+                          const starKey = `file-${file.id}`;
+
+                          return (
+                            <div
+                              className="file-row"
+                              key={file.id}
+                            >
+                              <div className="file-icon">
+                                <FileIcon
+                                  fileName={file.name}
+                                />
+                              </div>
+
+                              <div className="file-info">
+                                <strong>
+                                  {file.name}
+                                </strong>
+
+                                <span>
+                                  {formatFileSize(
+                                    file.size_bytes
+                                  )}
+                                </span>
+                              </div>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  previewFile(file)
+                                }
+                              >
+                                <EyeIcon size={15} />
+                                Preview
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  downloadFile(file)
+                                }
+                              >
+                                <DownloadIcon
+                                  size={15}
+                                />
+                                Download
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openShareModal(
+                                    "file",
+                                    file
+                                  )
+                                }
+                              >
+                                <UsersIcon size={15} />
+                                Share
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  toggleStar(
+                                    "file",
+                                    file.id
+                                  )
+                                }
+                                disabled={
+                                  starLoading[
+                                    starKey
+                                  ]
+                                }
+                              >
+                                <StarIcon
+                                  size={15}
+                                  filled={isStarred(
+                                    "file",
+                                    file.id
+                                  )}
+                                />
+                                {starLoading[starKey]
+                                  ? "..."
+                                  : isStarred(
+                                      "file",
+                                      file.id
+                                    )
+                                  ? "Unstar"
+                                  : "Star"}
+                              </button>
+
+                              <button
+                                className="file-action delete"
+                                onClick={() =>
+                                  deleteFile(file)
+                                }
+                              >
+                                <TrashIcon size={15} />
+                                Delete
+                              </button>
+                            </div>
+                          );
+                        }
+                      )}
+                    </div>
+                  </section>
+                )}
+
+                {filteredFolders.length ===
+                  0 &&
+                  filteredFiles.length ===
+                    0 && (
+                    <div className="empty-state">
+                      <div className="empty-icon">
+                        {normalizedSearch ? (
+                          <SearchIcon size={48} />
+                        ) : (
+                          <CloudIcon size={48} />
+                        )}
+                      </div>
+
+                      <h3>
+                        {normalizedSearch
+                          ? "No results found"
+                          : "This folder is empty"}
+                      </h3>
+
+                      <p>
+                        {normalizedSearch
+                          ? `Nothing matches "${searchQuery}"`
+                          : "Upload a file or create a folder to get started."}
+                      </p>
+                    </div>
+                  )}
+              </div>
+            )}
+          </>
         )}
       </section>
+
+      {/* ==================================
+          SHARE MODAL
+      ================================== */}
+
+      {shareTarget && (
+        <div
+          className="preview-overlay"
+          onClick={closeShareModal}
+        >
+          <div
+            className="share-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="share-modal-header">
+              <div>
+                <strong>Share</strong>
+                <span>{shareTarget.name}</span>
+              </div>
+
+              <button
+                className="preview-close"
+                onClick={closeShareModal}
+                disabled={shareLoading}
+              >
+                ×
+              </button>
+            </div>
+
+            <form
+              className="share-form"
+              onSubmit={shareResource}
+            >
+              <label>Email address</label>
+
+              <input
+                type="email"
+                placeholder="Enter registered user's email"
+                value={shareEmail}
+                onChange={(e) =>
+                  setShareEmail(e.target.value)
+                }
+                autoFocus
+                required
+                disabled={shareLoading}
+              />
+
+              <label>Permission</label>
+
+              <select
+                value={shareRole}
+                onChange={(e) =>
+                  setShareRole(e.target.value)
+                }
+                disabled={shareLoading}
+              >
+                <option value="viewer">
+                  Viewer — can preview and download
+                </option>
+
+                <option value="editor">
+                  Editor — can modify and delete
+                </option>
+              </select>
+
+              {shareMessage && (
+                <p
+                  className={`message ${
+                    shareMessage
+                      .toLowerCase()
+                      .includes("success")
+                      ? "success"
+                      : "error"
+                  }`}
+                >
+                  {shareMessage}
+                </p>
+              )}
+
+              <div className="share-modal-actions">
+                <button
+                  type="button"
+                  className="file-action"
+                  onClick={closeShareModal}
+                  disabled={shareLoading}
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  className="new-folder-button"
+                  disabled={shareLoading}
+                >
+                  {shareLoading
+                    ? "Sharing..."
+                    : "Share"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================
+          PREVIEW MODAL
+      ================================== */}
 
       {previewFileData && (
         <div
@@ -849,11 +2562,15 @@ function Dashboard({ user, onLogout }) {
         >
           <div
             className="preview-modal"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) =>
+              e.stopPropagation()
+            }
           >
             <div className="preview-header">
               <div>
-                <strong>{previewFileData.name}</strong>
+                <strong>
+                  {previewFileData.name}
+                </strong>
 
                 <span>
                   {formatFileSize(
@@ -875,22 +2592,25 @@ function Dashboard({ user, onLogout }) {
                 <div className="preview-loading">
                   Loading preview...
                 </div>
-              ) : getPreviewType(previewFileData.name) ===
-                "image" ? (
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "image" ? (
                 <img
                   src={previewUrl}
                   alt={previewFileData.name}
                   className="image-preview"
                 />
-              ) : getPreviewType(previewFileData.name) ===
-                "pdf" ? (
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "pdf" ? (
                 <iframe
                   src={previewUrl}
                   title={previewFileData.name}
                   className="pdf-preview"
                 />
-              ) : getPreviewType(previewFileData.name) ===
-                "text" ? (
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "text" ? (
                 <iframe
                   src={previewUrl}
                   title={previewFileData.name}
@@ -900,22 +2620,32 @@ function Dashboard({ user, onLogout }) {
                 <div className="unsupported-preview">
                   <div className="empty-icon">
                     <FileIcon
-                      fileName={previewFileData.name}
+                      fileName={
+                        previewFileData.name
+                      }
                       size={55}
                     />
                   </div>
 
-                  <h3>Preview not available</h3>
+                  <h3>
+                    Preview not available
+                  </h3>
 
                   <p>
-                    This file type cannot be previewed in
-                    the browser.
+                    This file type cannot be
+                    previewed in the browser.
                   </p>
 
                   <button
                     className="file-action"
                     onClick={() =>
-                      downloadFile(previewFileData)
+                      previewFileData.shared
+                        ? downloadSharedFile(
+                            previewFileData
+                          )
+                        : downloadFile(
+                            previewFileData
+                          )
                     }
                   >
                     <DownloadIcon size={15} />
@@ -931,9 +2661,18 @@ function Dashboard({ user, onLogout }) {
   );
 }
 
+/* =========================
+   Storage Card
+========================= */
+
 function StorageCard({ stats }) {
-  const STORAGE_LIMIT = 15 * 1024 * 1024 * 1024;
-  const usedBytes = Number(stats.storageUsed || 0);
+  const STORAGE_LIMIT =
+    15 * 1024 * 1024 * 1024;
+
+  const usedBytes = Number(
+    stats.storageUsed || 0
+  );
+
   const percentage = Math.min(
     (usedBytes / STORAGE_LIMIT) * 100,
     100
@@ -954,25 +2693,37 @@ function StorageCard({ stats }) {
         </div>
 
         <strong className="storage-percentage">
-          {percentage < 0.01 ? "<0.01%" : `${percentage.toFixed(1)}%`}
+          {percentage < 0.01
+            ? "<0.01%"
+            : `${percentage.toFixed(1)}%`}
         </strong>
       </div>
 
       <div className="storage-progress">
         <div
           className="storage-progress-fill"
-          style={{ width: `${percentage}%` }}
+          style={{
+            width: `${percentage}%`,
+          }}
         />
       </div>
 
       <div className="storage-details">
         <span>
-          <strong>{formatFileSize(usedBytes)}</strong> used of 15 GB
+          <strong>
+            {formatFileSize(usedBytes)}
+          </strong>{" "}
+          used of 15 GB
         </span>
 
         <div className="storage-stats">
-          <span>{stats.fileCount || 0} files</span>
-          <span>{stats.folderCount || 0} folders</span>
+          <span>
+            {stats.fileCount || 0} files
+          </span>
+
+          <span>
+            {stats.folderCount || 0} folders
+          </span>
         </div>
       </div>
     </div>
@@ -983,7 +2734,11 @@ function StorageCard({ stats }) {
    Icons
 ========================= */
 
-function Icon({ children, size = 20, className = "" }) {
+function Icon({
+  children,
+  size = 20,
+  className = "",
+}) {
   return (
     <svg
       className={`icon ${className}`}
@@ -1016,6 +2771,28 @@ function FolderIcon({ size = 20 }) {
   return (
     <Icon size={size}>
       <path d="M3 6.5A2.5 2.5 0 0 1 5.5 4H10l2 2h6.5A2.5 2.5 0 0 1 21 8.5v8A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5z" />
+    </Icon>
+  );
+}
+
+function UsersIcon({ size = 20 }) {
+  return (
+    <Icon size={size}>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3 19a6 6 0 0 1 12 0" />
+      <path d="M16 5.5a3 3 0 0 1 0 5.8" />
+      <path d="M18 13a5 5 0 0 1 3 4.5" />
+    </Icon>
+  );
+}
+
+function StarIcon({ size = 20, filled = false }) {
+  return (
+    <Icon size={size}>
+      <path
+        d="m12 3 2.78 5.63 6.22.9-4.5 4.38 1.06 6.19L12 17.18l-5.56 2.92 1.06-6.19L3 9.53l6.22-.9L12 3Z"
+        fill={filled ? "currentColor" : "none"}
+      />
     </Icon>
   );
 }
@@ -1107,35 +2884,69 @@ function LogoutIcon({ size = 20 }) {
   );
 }
 
-function FileIcon({ fileName, size = 32 }) {
-  const extension = getFileExtension(fileName);
+/* =========================
+   File Icon
+========================= */
+
+function FileIcon({
+  fileName,
+  size = 32,
+}) {
+  const extension =
+    getFileExtension(fileName);
 
   let type = "default";
 
   if (
-    ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(
-      extension
-    )
+    [
+      "jpg",
+      "jpeg",
+      "png",
+      "gif",
+      "webp",
+      "bmp",
+      "svg",
+    ].includes(extension)
   ) {
     type = "image";
   } else if (extension === "pdf") {
     type = "pdf";
-  } else if (["doc", "docx"].includes(extension)) {
+  } else if (
+    ["doc", "docx"].includes(extension)
+  ) {
     type = "word";
-  } else if (["xls", "xlsx", "csv"].includes(extension)) {
+  } else if (
+    ["xls", "xlsx", "csv"].includes(
+      extension
+    )
+  ) {
     type = "excel";
-  } else if (["ppt", "pptx"].includes(extension)) {
+  } else if (
+    ["ppt", "pptx"].includes(
+      extension
+    )
+  ) {
     type = "powerpoint";
   } else if (
-    ["zip", "rar", "7z", "tar", "gz"].includes(extension)
+    ["zip", "rar", "7z", "tar", "gz"].includes(
+      extension
+    )
   ) {
     type = "archive";
   } else if (
-    ["mp3", "wav", "ogg", "m4a"].includes(extension)
+    ["mp3", "wav", "ogg", "m4a"].includes(
+      extension
+    )
   ) {
     type = "audio";
   } else if (
-    ["mp4", "webm", "mov", "avi", "mkv"].includes(extension)
+    [
+      "mp4",
+      "webm",
+      "mov",
+      "avi",
+      "mkv",
+    ].includes(extension)
   ) {
     type = "video";
   } else if (
@@ -1164,6 +2975,7 @@ function FileIcon({ fileName, size = 32 }) {
       }}
     >
       <FileShape />
+
       <span className="drive-file-label">
         {type === "image"
           ? "IMG"
@@ -1200,6 +3012,7 @@ function FileShape() {
         d="M7 1h17l9 9v35a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Z"
         fill="currentColor"
       />
+
       <path
         d="M24 1v8a2 2 0 0 0 2 2h7"
         fill="none"
@@ -1211,17 +3024,31 @@ function FileShape() {
   );
 }
 
+/* =========================
+   Helpers
+========================= */
+
 function getFileExtension(fileName) {
-  return fileName.split(".").pop().toLowerCase();
+  return fileName
+    .split(".")
+    .pop()
+    .toLowerCase();
 }
 
 function getPreviewType(fileName) {
-  const extension = getFileExtension(fileName);
+  const extension =
+    getFileExtension(fileName);
 
   if (
-    ["jpg", "jpeg", "png", "gif", "webp", "bmp", "svg"].includes(
-      extension
-    )
+    [
+      "jpg",
+      "jpeg",
+      "png",
+      "gif",
+      "webp",
+      "bmp",
+      "svg",
+    ].includes(extension)
   ) {
     return "image";
   }
@@ -1253,13 +3080,21 @@ function getPreviewType(fileName) {
 function formatFileSize(bytes) {
   if (!bytes) return "0 B";
 
-  const units = ["B", "KB", "MB", "GB"];
+  const units = [
+    "B",
+    "KB",
+    "MB",
+    "GB",
+  ];
 
   const index = Math.floor(
     Math.log(bytes) / Math.log(1024)
   );
 
   return `${(
-    bytes / Math.pow(1024, index)
-  ).toFixed(index === 0 ? 0 : 1)} ${units[index]}`;
+    bytes /
+    Math.pow(1024, index)
+  ).toFixed(index === 0 ? 0 : 1)} ${
+    units[index]
+  }`;
 }
