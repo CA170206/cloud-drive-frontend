@@ -2267,3 +2267,1532 @@ html[data-theme="light"] ::-webkit-scrollbar-thumb {
 html[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
+
+
+/* =========================================================
+   VERSION HISTORY — CLEAN MODAL UI
+========================================================= */
+
+.version-modal-overlay {
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 24px !important;
+  background: rgba(5, 8, 12, .72) !important;
+  backdrop-filter: blur(6px);
+}
+
+.version-modal {
+  width: min(560px, calc(100vw - 48px)) !important;
+  max-width: 560px !important;
+  max-height: min(680px, calc(100vh - 48px)) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  margin: auto !important;
+  border: 1px solid #303947 !important;
+  border-radius: 16px !important;
+  background: #1a212a !important;
+  color: #e7edf5 !important;
+  box-shadow: 0 28px 90px rgba(0,0,0,.48) !important;
+}
+
+/* Header */
+.version-modal-header {
+  min-height: 62px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  padding: 0 18px !important;
+  border-bottom: 1px solid #2a333f !important;
+  background: #1a212a !important;
+}
+
+.version-modal-header > div:first-child {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+.version-modal-header strong {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: #f1f5f9 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 20px !important;
+}
+
+.version-modal-header span {
+  flex: 0 0 auto !important;
+  color: #7f8b9b !important;
+  font-size: 10px !important;
+  white-space: nowrap !important;
+}
+
+/* Close */
+.version-modal-header .preview-close,
+.version-modal-header button {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: #7f8b9b !important;
+  font-size: 21px !important;
+  line-height: 1 !important;
+}
+
+.version-modal-header .preview-close:hover,
+.version-modal-header button:hover {
+  background: #252e39 !important;
+  color: #eef2f7 !important;
+}
+
+/* Tabs / actions */
+.version-tabs {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0 !important;
+  padding: 0 12px !important;
+  border-bottom: 1px solid #2a333f !important;
+  background: #171e27 !important;
+}
+
+.version-tabs button {
+  height: 42px !important;
+  padding: 0 15px !important;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  color: #7f8b9b !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+.version-tabs button:hover {
+  color: #cbd5e1 !important;
+  background: #1d252f !important;
+}
+
+.version-tabs button.active,
+.version-tabs button[aria-selected="true"] {
+  color: #60a5fa !important;
+  border-bottom-color: #3b82f6 !important;
+  background: transparent !important;
+}
+
+/* Version content */
+.version-content {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  padding: 16px !important;
+  background: #1a212a !important;
+}
+
+.version-empty {
+  min-height: 180px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 30px 20px !important;
+  text-align: center !important;
+}
+
+.version-empty-icon {
+  width: 46px !important;
+  height: 46px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-bottom: 12px !important;
+  border: 1px solid #303947 !important;
+  border-radius: 11px !important;
+  background: #202933 !important;
+  color: #6f8299 !important;
+}
+
+.version-empty h3 {
+  margin: 0 0 5px !important;
+  color: #dce4ed !important;
+  font-size: 13px !important;
+  font-weight: 650 !important;
+}
+
+.version-empty p {
+  margin: 0 !important;
+  color: #748093 !important;
+  font-size: 10px !important;
+  line-height: 1.5 !important;
+}
+
+/* Existing version rows */
+.version-row {
+  min-height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 7px !important;
+  padding: 9px 11px !important;
+  border: 1px solid #2d3743 !important;
+  border-radius: 9px !important;
+  background: #202731 !important;
+}
+
+.version-row:last-child {
+  margin-bottom: 0 !important;
+}
+
+.version-row:hover {
+  border-color: #3a4655 !important;
+  background: #252e39 !important;
+}
+
+.version-row > div:first-child {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.version-row strong {
+  display: block !important;
+  color: #dce4ed !important;
+  font-size: 11px !important;
+}
+
+.version-row span {
+  display: block !important;
+  margin-top: 3px !important;
+  color: #718096 !important;
+  font-size: 9px !important;
+}
+
+.version-row button {
+  flex: 0 0 auto !important;
+  height: 29px !important;
+  padding: 0 9px !important;
+  border: 1px solid #303947 !important;
+  border-radius: 7px !important;
+  background: #252e39 !important;
+  color: #aab5c4 !important;
+  font-size: 9px !important;
+}
+
+.version-row button:hover {
+  background: #303b49 !important;
+  color: #eef2f7 !important;
+}
+
+/* Upload section */
+.version-upload {
+  padding: 4px 0 !important;
+}
+
+.version-upload input[type="file"] {
+  width: 100% !important;
+  margin-bottom: 10px !important;
+}
+
+.version-upload button {
+  height: 36px !important;
+  padding: 0 13px !important;
+  border: 1px solid #2563eb !important;
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #fff !important;
+  font-size: 10px !important;
+  font-weight: 650 !important;
+}
+
+.version-upload button:hover {
+  background: #3b82f6 !important;
+}
+
+/* Light mode */
+html[data-theme="light"] .version-modal {
+  background: #ffffff !important;
+  color: #172033 !important;
+  border-color: #e0e7ef !important;
+  box-shadow: 0 28px 80px rgba(15,23,42,.18) !important;
+}
+
+html[data-theme="light"] .version-modal-header {
+  background: #ffffff !important;
+  border-bottom-color: #edf1f5 !important;
+}
+
+html[data-theme="light"] .version-modal-header strong {
+  color: #172033 !important;
+}
+
+html[data-theme="light"] .version-modal-header span {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="light"] .version-tabs {
+  background: #f8fafc !important;
+  border-bottom-color: #e2e8f0 !important;
+}
+
+html[data-theme="light"] .version-tabs button {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .version-tabs button:hover {
+  color: #334155 !important;
+  background: #f1f5f9 !important;
+}
+
+html[data-theme="light"] .version-tabs button.active,
+html[data-theme="light"] .version-tabs button[aria-selected="true"] {
+  color: #2563eb !important;
+  border-bottom-color: #2563eb !important;
+}
+
+html[data-theme="light"] .version-content {
+  background: #ffffff !important;
+}
+
+html[data-theme="light"] .version-empty-icon {
+  background: #f1f5f9 !important;
+  border-color: #e2e8f0 !important;
+  color: #94a3b8 !important;
+}
+
+html[data-theme="light"] .version-empty h3 {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .version-empty p {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .version-row {
+  background: #f8fafc !important;
+  border-color: #e0e7ef !important;
+}
+
+html[data-theme="light"] .version-row:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+html[data-theme="light"] .version-row strong {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .version-row span {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .version-row button {
+  background: #ffffff !important;
+  border-color: #dbe3ec !important;
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .version-row button:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+@media (max-width: 600px) {
+  .version-modal-overlay {
+    padding: 12px !important;
+  }
+
+  .version-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+  }
+
+  .version-modal-header {
+    min-height: 56px !important;
+    padding: 0 12px !important;
+  }
+
+  .version-modal-header strong {
+    font-size: 13px !important;
+  }
+
+  .version-tabs button {
+    padding: 0 11px !important;
+  }
+}
+
+
+/* =========================================================
+   VERSION HISTORY — PREVIEW-STYLE POPUP
+   The JSX uses preview-overlay + share-modal for this modal.
+========================================================= */
+
+.preview-overlay > .share-modal[style*="650px"] {
+  width: min(560px, calc(100vw - 40px)) !important;
+  max-width: 560px !important;
+  max-height: min(620px, calc(100vh - 40px)) !important;
+  margin: auto !important;
+  overflow: hidden !important;
+  border: 1px solid #303947 !important;
+  border-radius: 15px !important;
+  background: #1a212a !important;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, .48) !important;
+}
+
+/* Header behaves exactly like the file preview header */
+.preview-overlay > .share-modal[style*="650px"] .share-modal-header {
+  min-height: 58px !important;
+  padding: 0 14px 0 18px !important;
+  gap: 12px !important;
+  background: #1a212a !important;
+  border-bottom: 1px solid #2a333f !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-modal-header > div {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-modal-header strong {
+  flex: 0 0 auto !important;
+  color: #f1f5f9 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-modal-header span {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: #8b98aa !important;
+  font-size: 11px !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .preview-close {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Content */
+.preview-overlay > .share-modal[style*="650px"] .share-form {
+  padding: 18px !important;
+  max-height: calc(100vh - 100px) !important;
+  overflow-y: auto !important;
+}
+
+/* Upload New Version button */
+.preview-overlay > .share-modal[style*="650px"] .share-form > .new-folder-button {
+  width: auto !important;
+  min-width: 150px !important;
+  height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0 18px !important;
+  padding: 0 14px !important;
+  border: 1px solid #3b82f6 !important;
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-form > .new-folder-button:hover {
+  background: #3b82f6 !important;
+}
+
+/* "Versions" label */
+.preview-overlay > .share-modal[style*="650px"] .share-form > label {
+  display: block !important;
+  margin: 0 0 9px !important;
+  color: #8490a1 !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+  letter-spacing: .07em !important;
+  text-transform: uppercase !important;
+}
+
+/* Empty state */
+.preview-overlay > .share-modal[style*="650px"] .share-form > .empty-state,
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="textAlign"] {
+  min-height: 150px !important;
+  margin: 0 !important;
+  padding: 24px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #2d3743 !important;
+  border-radius: 10px !important;
+  background: #202731 !important;
+  color: #8794a6 !important;
+  font-size: 12px !important;
+}
+
+/* Archived version list */
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] {
+  max-height: 340px !important;
+  overflow-y: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+}
+
+/* Archived version cards */
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div {
+  min-height: 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  margin: 0 !important;
+  padding: 9px 10px !important;
+  border: 1px solid #2d3743 !important;
+  border-radius: 9px !important;
+  background: #202731 !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div:hover {
+  background: #252e39 !important;
+  border-color: #3a4655 !important;
+}
+
+/* Version number badge */
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:first-child {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  flex: 0 0 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 1px solid #30404f !important;
+  border-radius: 9px !important;
+  background: #263442 !important;
+  color: #60a5fa !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+}
+
+/* Version information */
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:nth-child(2) {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:nth-child(2) strong {
+  color: #dce4ed !important;
+  font-size: 11px !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:nth-child(2) span {
+  margin-top: 3px !important;
+  color: #718096 !important;
+  font-size: 9px !important;
+}
+
+/* Download / Restore buttons */
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:last-child {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] .file-action {
+  width: auto !important;
+  min-width: 72px !important;
+  height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 9px !important;
+  border: 1px solid #303947 !important;
+  border-radius: 7px !important;
+  background: #252e39 !important;
+  color: #aab5c4 !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+}
+
+.preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] .file-action:hover {
+  background: #303b49 !important;
+  color: #eef2f7 !important;
+  border-color: #465363 !important;
+}
+
+/* Light mode */
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] {
+  background: #fff !important;
+  border-color: #e0e7ef !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-modal-header {
+  background: #fff !important;
+  border-bottom-color: #edf1f5 !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-modal-header strong {
+  color: #172033 !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-modal-header span {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > label {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > .empty-state,
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="textAlign"] {
+  background: #f8fafc !important;
+  border-color: #e0e7ef !important;
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div {
+  background: #f8fafc !important;
+  border-color: #e0e7ef !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div:hover {
+  background: #f1f5f9 !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:first-child {
+  background: #eef5ff !important;
+  border-color: #dbe7f5 !important;
+  color: #2563eb !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:nth-child(2) strong {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:nth-child(2) span {
+  color: #64748b !important;
+}
+
+html[data-theme="light"] .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] .file-action {
+  background: #fff !important;
+  border-color: #dbe3ec !important;
+  color: #475569 !important;
+}
+
+@media (max-width: 600px) {
+  .preview-overlay > .share-modal[style*="650px"] {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+  }
+
+  .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div {
+    align-items: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+
+  .preview-overlay > .share-modal[style*="650px"] .share-form > div[style*="maxHeight"] > div > div:last-child {
+    width: 100% !important;
+    margin-left: 51px !important;
+  }
+}
+
+
+/* =========================================================
+   VERSION HISTORY — COMPACT PREVIEW-STYLE POPUP
+   IMPORTANT: This targets Version History ONLY.
+   The actual Preview modal is untouched.
+========================================================= */
+
+.version-history-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1200 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  padding: 20px !important;
+  margin: 0 !important;
+  background: rgba(15, 23, 42, .55) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.version-history-modal {
+  width: min(560px, calc(100vw - 40px)) !important;
+  max-width: 560px !important;
+  max-height: min(620px, calc(100vh - 40px)) !important;
+  margin: 0 auto !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
+  color: #172033 !important;
+  box-shadow: 0 25px 70px rgba(15, 23, 42, .22) !important;
+}
+
+/* Header matches Preview */
+.version-history-modal .share-modal-header {
+  min-height: 58px !important;
+  flex: 0 0 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 14px !important;
+  margin: 0 !important;
+  padding: 0 14px 0 20px !important;
+  border-bottom: 1px solid #edf1f5 !important;
+  background: #ffffff !important;
+}
+
+.version-history-modal .share-modal-header > div {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+.version-history-modal .share-modal-header strong {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  color: #172033 !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  line-height: 20px !important;
+  white-space: nowrap !important;
+}
+
+.version-history-modal .share-modal-header span {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: #94a3b8 !important;
+  font-size: 11px !important;
+  line-height: 20px !important;
+}
+
+.version-history-modal .preview-close {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 30px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-size: 21px !important;
+  line-height: 1 !important;
+}
+
+.version-history-modal .preview-close:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+/* Content */
+.version-history-modal .share-form {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 18px 20px 20px !important;
+  background: #ffffff !important;
+}
+
+/* Upload button */
+.version-history-modal .share-form > .new-folder-button {
+  width: auto !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 0 18px !important;
+  padding: 0 14px !important;
+  border: 1px solid #2563eb !important;
+  border-radius: 8px !important;
+  background: #2563eb !important;
+  color: #ffffff !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+}
+
+.version-history-modal .share-form > .new-folder-button:hover {
+  background: #3b82f6 !important;
+}
+
+/* Versions label */
+.version-history-modal .share-form > label {
+  display: block !important;
+  margin: 0 0 9px !important;
+  color: #718096 !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+  letter-spacing: .08em !important;
+  text-transform: uppercase !important;
+}
+
+/* Empty version state */
+.version-history-modal .share-form > div[style*="textAlign"] {
+  min-height: 120px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 20px !important;
+  border: 1px solid #e0e7ef !important;
+  border-radius: 10px !important;
+  background: #f8fafc !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+}
+
+/* Archived version list */
+.version-history-modal .share-form > div[style*="maxHeight"] {
+  max-height: 330px !important;
+  margin: 0 !important;
+  gap: 8px !important;
+  padding: 0 !important;
+}
+
+/* Archived version card */
+.version-history-modal .share-form > div[style*="maxHeight"] > div {
+  min-height: 58px !important;
+  margin: 0 !important;
+  padding: 9px 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  border: 1px solid #e0e7ef !important;
+  border-radius: 9px !important;
+  background: #f8fafc !important;
+}
+
+.version-history-modal .share-form > div[style*="maxHeight"] > div:hover {
+  background: #f1f5f9 !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Version badge */
+.version-history-modal .share-form > div[style*="maxHeight"] > div > div:first-child {
+  width: 40px !important;
+  min-width: 40px !important;
+  height: 40px !important;
+  flex: 0 0 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 9px !important;
+  background: #eef5ff !important;
+  color: #2563eb !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+}
+
+/* Version text */
+.version-history-modal .share-form > div[style*="maxHeight"] > div > div:nth-child(2) {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.version-history-modal .share-form > div[style*="maxHeight"] > div > div:nth-child(2) strong {
+  display: block !important;
+  color: #334155 !important;
+  font-size: 11px !important;
+}
+
+.version-history-modal .share-form > div[style*="maxHeight"] > div > div:nth-child(2) span {
+  display: block !important;
+  margin-top: 3px !important;
+  color: #64748b !important;
+  font-size: 9px !important;
+}
+
+/* Download + Restore */
+.version-history-modal .share-form > div[style*="maxHeight"] > div > div:last-child {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  flex: 0 0 auto !important;
+}
+
+.version-history-modal .share-form > div[style*="maxHeight"] .file-action {
+  width: auto !important;
+  min-width: 72px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 9px !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 7px !important;
+  background: #ffffff !important;
+  color: #475569 !important;
+  font-size: 9px !important;
+  font-weight: 600 !important;
+}
+
+.version-history-modal .share-form > div[style*="maxHeight"] .file-action:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+/* Dark mode */
+html[data-theme="dark"] .version-history-overlay {
+  background: rgba(5, 8, 12, .72) !important;
+}
+
+html[data-theme="dark"] .version-history-modal {
+  border-color: #303947 !important;
+  background: #1a212a !important;
+  color: #e7edf5 !important;
+  box-shadow: 0 25px 80px rgba(0,0,0,.48) !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-modal-header {
+  background: #1a212a !important;
+  border-bottom-color: #2a333f !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-modal-header strong {
+  color: #f1f5f9 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-modal-header span {
+  color: #8b98aa !important;
+}
+
+html[data-theme="dark"] .version-history-modal .preview-close {
+  color: #7f8b9b !important;
+}
+
+html[data-theme="dark"] .version-history-modal .preview-close:hover {
+  background: #252e39 !important;
+  color: #eef2f7 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form {
+  background: #1a212a !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > label {
+  color: #8490a1 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="textAlign"] {
+  border-color: #2d3743 !important;
+  background: #202731 !important;
+  color: #8794a6 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="maxHeight"] > div {
+  border-color: #2d3743 !important;
+  background: #202731 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="maxHeight"] > div:hover {
+  background: #252e39 !important;
+  border-color: #3a4655 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="maxHeight"] > div > div:first-child {
+  background: #263442 !important;
+  color: #60a5fa !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="maxHeight"] > div > div:nth-child(2) strong {
+  color: #dce4ed !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="maxHeight"] > div > div:nth-child(2) span {
+  color: #718096 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="maxHeight"] .file-action {
+  border-color: #303947 !important;
+  background: #252e39 !important;
+  color: #aab5c4 !important;
+}
+
+html[data-theme="dark"] .version-history-modal .share-form > div[style*="maxHeight"] .file-action:hover {
+  background: #303b49 !important;
+  color: #eef2f7 !important;
+}
+
+@media (max-width: 600px) {
+  .version-history-overlay {
+    padding: 12px !important;
+  }
+
+  .version-history-modal {
+    width: calc(100vw - 24px) !important;
+    max-height: calc(100vh - 24px) !important;
+  }
+
+  .version-history-modal .share-modal-header {
+    padding-left: 14px !important;
+  }
+
+  .version-history-modal .share-modal-header strong {
+    font-size: 13px !important;
+  }
+
+  .version-history-modal .share-form > div[style*="maxHeight"] > div {
+    flex-wrap: wrap !important;
+  }
+
+  .version-history-modal .share-form > div[style*="maxHeight"] > div > div:last-child {
+    width: 100% !important;
+    margin-left: 50px !important;
+  }
+}
+
+
+/* =========================================================
+   ACTUAL FILE PREVIEW — RESTORE PREVIOUS UI
+   IMPORTANT: Preview only. Version History is untouched.
+========================================================= */
+
+.preview-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 20px !important;
+  background: rgba(5, 8, 12, .72) !important;
+  backdrop-filter: blur(5px) !important;
+}
+
+.preview-modal {
+  width: min(520px, calc(100vw - 40px)) !important;
+  max-width: 520px !important;
+  height: min(640px, calc(100vh - 40px)) !important;
+  max-height: calc(100vh - 40px) !important;
+  min-height: 0 !important;
+  margin: auto !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  border: 1px solid #dbe3ec !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 25px 70px rgba(15, 23, 42, .22) !important;
+}
+
+/* Preview header */
+.preview-modal .preview-header {
+  width: 100% !important;
+  min-height: 62px !important;
+  height: 62px !important;
+  flex: 0 0 62px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 0 16px 0 20px !important;
+  border-bottom: 1px solid #edf1f5 !important;
+  background: #ffffff !important;
+}
+
+.preview-modal .preview-header > div {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+.preview-modal .preview-header strong {
+  min-width: 0 !important;
+  max-width: 100% !important;
+  flex: 1 1 auto !important;
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: #172033 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 20px !important;
+}
+
+.preview-modal .preview-header span {
+  flex: 0 0 auto !important;
+  display: block !important;
+  margin: 0 !important;
+  color: #94a3b8 !important;
+  font-size: 11px !important;
+  line-height: 20px !important;
+  white-space: nowrap !important;
+}
+
+.preview-modal .preview-close {
+  width: 30px !important;
+  min-width: 30px !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  flex: 0 0 30px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: #718096 !important;
+  font-size: 22px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
+.preview-modal .preview-close:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+/* Actual preview area */
+.preview-modal .preview-content {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  padding: 12px !important;
+  background: #f3f4f6 !important;
+}
+
+/* Keep the actual browser PDF viewer large and consistent */
+.preview-modal .pdf-preview,
+.preview-modal .text-preview {
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  display: block !important;
+  border: 0 !important;
+  background: #ffffff !important;
+}
+
+/* Images */
+.preview-modal .image-preview {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+}
+
+/* Video */
+.preview-modal .video-preview {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+}
+
+/* Audio / unsupported */
+.preview-modal .audio-preview,
+.preview-modal .unsupported-preview {
+  width: 100% !important;
+  min-height: 260px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+}
+
+/* Dark mode — keep the same viewer proportions */
+html[data-theme="dark"] .preview-modal {
+  border-color: #303947 !important;
+  background: #ffffff !important;
+}
+
+html[data-theme="dark"] .preview-modal .preview-header {
+  background: #ffffff !important;
+  border-bottom-color: #e5e7eb !important;
+}
+
+html[data-theme="dark"] .preview-modal .preview-header strong {
+  color: #172033 !important;
+}
+
+html[data-theme="dark"] .preview-modal .preview-header span {
+  color: #94a3b8 !important;
+}
+
+html[data-theme="dark"] .preview-modal .preview-close {
+  color: #718096 !important;
+}
+
+html[data-theme="dark"] .preview-modal .preview-close:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+@media (max-width: 600px) {
+  .preview-overlay {
+    padding: 10px !important;
+  }
+
+  .preview-modal {
+    width: calc(100vw - 20px) !important;
+    max-width: none !important;
+    height: calc(100vh - 20px) !important;
+    max-height: none !important;
+  }
+
+  .preview-modal .preview-header {
+    min-height: 56px !important;
+    height: 56px !important;
+    flex-basis: 56px !important;
+    padding-left: 14px !important;
+  }
+
+  .preview-modal .preview-header strong {
+    font-size: 12px !important;
+  }
+
+  .preview-modal .preview-header span {
+    font-size: 10px !important;
+  }
+
+  .preview-modal .preview-content {
+    padding: 8px !important;
+  }
+}
+
+
+/* =========================================================
+   PREVIEW — MATCH REFERENCE UI EXACTLY
+========================================================= */
+
+.preview-overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 12px !important;
+  background: rgba(20, 24, 29, .76) !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+.preview-modal {
+  width: 436px !important;
+  max-width: calc(100vw - 24px) !important;
+  height: 586px !important;
+  max-height: calc(100vh - 24px) !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 1px solid #dfe4ea !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  box-shadow: 0 18px 55px rgba(0, 0, 0, .28) !important;
+}
+
+/* Header */
+.preview-modal .preview-header {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 58px !important;
+  min-height: 58px !important;
+  flex: 0 0 58px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 15px 0 17px !important;
+  border-bottom: 1px solid #e7ebef !important;
+  background: #ffffff !important;
+}
+
+.preview-modal .preview-header > div {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  overflow: hidden !important;
+}
+
+.preview-modal .preview-header strong {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: #172033 !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 18px !important;
+}
+
+.preview-modal .preview-header span {
+  flex: 0 0 auto !important;
+  display: block !important;
+  margin: 0 !important;
+  color: #94a3b8 !important;
+  font-size: 10px !important;
+  line-height: 18px !important;
+  white-space: nowrap !important;
+}
+
+.preview-modal .preview-close {
+  width: 28px !important;
+  min-width: 28px !important;
+  height: 28px !important;
+  min-height: 28px !important;
+  flex: 0 0 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  color: #718096 !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
+.preview-modal .preview-close:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+/* Main viewer */
+.preview-modal .preview-content {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 454px !important;
+  flex: 1 1 auto !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+  padding: 18px 18px 10px !important;
+  background: #ffffff !important;
+}
+
+/* PDF viewer — dark browser-like frame */
+.preview-modal .preview-content iframe,
+.preview-modal .preview-content embed,
+.preview-modal .pdf-preview {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: block !important;
+  flex: 1 1 auto !important;
+  border: 0 !important;
+  border-radius: 9px !important;
+  background: #292929 !important;
+}
+
+/* Image preview */
+.preview-modal .preview-content img,
+.preview-modal .image-preview {
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  border-radius: 0 !important;
+}
+
+/* Text preview */
+.preview-modal .text-preview {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 14px !important;
+  overflow: auto !important;
+  border: 1px solid #e0e7ef !important;
+  border-radius: 9px !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+  font-size: 11px !important;
+  line-height: 1.55 !important;
+  text-align: left !important;
+}
+
+/* Bottom information row */
+.preview-modal .preview-footer,
+.preview-modal .preview-actions {
+  box-sizing: border-box !important;
+  min-height: 72px !important;
+  height: 72px !important;
+  flex: 0 0 72px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 8px 17px 14px !important;
+  background: #ffffff !important;
+}
+
+/* Filename + size pill */
+.preview-modal .preview-footer > div:first-child,
+.preview-modal .preview-actions > div:first-child {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  height: 38px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 9px !important;
+  padding: 0 11px !important;
+  border: 1px solid #dfe7ef !important;
+  border-radius: 8px !important;
+  background: #f8fafc !important;
+  overflow: hidden !important;
+}
+
+.preview-modal .preview-footer > div:first-child span:first-child,
+.preview-modal .preview-actions > div:first-child span:first-child {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+}
+
+.preview-modal .preview-footer > div:first-child span:last-child,
+.preview-modal .preview-actions > div:first-child span:last-child {
+  flex: 0 0 auto !important;
+  color: #94a3b8 !important;
+  font-size: 10px !important;
+  white-space: nowrap !important;
+}
+
+/* Download button */
+.preview-modal .preview-footer .file-action,
+.preview-modal .preview-actions .file-action {
+  width: auto !important;
+  min-width: 104px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  margin: 0 !important;
+  padding: 0 10px !important;
+  border: 0 !important;
+  border-radius: 7px !important;
+  background: transparent !important;
+  color: #64748b !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  white-space: nowrap !important;
+}
+
+.preview-modal .preview-footer .file-action:hover,
+.preview-modal .preview-actions .file-action:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+/* Don't let any old preview placeholder styling enlarge the viewer */
+.preview-modal .constant-preview-placeholder {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .preview-overlay {
+    padding: 8px !important;
+  }
+
+  .preview-modal {
+    width: calc(100vw - 16px) !important;
+    height: calc(100vh - 16px) !important;
+    max-width: none !important;
+    max-height: none !important;
+  }
+
+  .preview-modal .preview-content {
+    padding: 12px 10px 8px !important;
+  }
+
+  .preview-modal .preview-footer,
+  .preview-modal .preview-actions {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+}
+
+/* TEXT PREVIEW ONLY — force white background */
+.preview-modal .text-preview {
+  background: #ffffff !important;
+  color: #111827 !important;
+  border-color: #dfe5eb !important;
+  color-scheme: light !important;
+}

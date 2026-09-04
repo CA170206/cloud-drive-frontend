@@ -1,3 +1,5 @@
+// app/page.jsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,15 +9,15 @@ const API_URL = "http://localhost:5000";
 export default function Home() {
   const [user, setUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
-  const [theme, setTheme] = useState("dark");
+
+  const [theme, setTheme] = useState(() => {
+    if (typeof window === "undefined") return "dark";
+    const savedTheme = window.localStorage.getItem("cloud-drive-theme");
+    return savedTheme === "light" || savedTheme === "dark" ? savedTheme : "dark";
+  });
 
   useEffect(() => {
     checkAuth();
-
-    const savedTheme = window.localStorage.getItem("cloud-drive-theme");
-    if (savedTheme === "light" || savedTheme === "dark") {
-      setTheme(savedTheme);
-    }
   }, []);
 
   useEffect(() => {
@@ -45,23 +47,10 @@ export default function Home() {
   }
 
   if (!user) {
-    return (
-      <Login
-        onLogin={setUser}
-        theme={theme}
-        setTheme={setTheme}
-      />
-    );
+    return <Login onLogin={setUser} theme={theme} setTheme={setTheme} />;
   }
 
-  return (
-    <Dashboard
-      user={user}
-      onLogout={() => setUser(null)}
-      theme={theme}
-      setTheme={setTheme}
-    />
-  );
+  return <Dashboard user={user} onLogout={() => setUser(null)} theme={theme} setTheme={setTheme} />;
 }
 
 function Login({ onLogin, theme, setTheme }) {
@@ -113,17 +102,11 @@ function Login({ onLogin, theme, setTheme }) {
         <button
           type="button"
           className="theme-toggle login-theme-toggle"
-          onClick={() =>
-            setTheme(theme === "dark" ? "light" : "dark")
-          }
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           aria-label="Toggle theme"
         >
-          <span className="theme-toggle-icon">
-            {theme === "dark" ? "☀" : "☾"}
-          </span>
-          <span>
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </span>
+          <span className="theme-toggle-icon">{theme === "dark" ? "☀" : "☾"}</span>
+          <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
         </button>
 
         <form onSubmit={handleLogin}>
@@ -173,13 +156,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [renameValue, setRenameValue] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("name-asc");
+  const [viewMode, setViewMode] = useState("list");
 
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const [previewFileData, setPreviewFileData] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [previewText, setPreviewText] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
+
+  const [detailsTarget, setDetailsTarget] = useState(null);
 
   const [storageStats, setStorageStats] = useState({
     fileCount: 0,
@@ -188,6 +176,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   });
 
   const [activeView, setActiveView] = useState("dashboard");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const [sharedResources, setSharedResources] = useState([]);
   const [sharedLoading, setSharedLoading] = useState(false);
@@ -212,6 +201,17 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [publicLinkExpiry, setPublicLinkExpiry] = useState("");
   const [publicLinkMessage, setPublicLinkMessage] = useState("");
 
+  /* File Versioning */
+  const [versionTarget, setVersionTarget] = useState(null);
+  const [fileVersions, setFileVersions] = useState([]);
+  const [versionLoading, setVersionLoading] = useState(false);
+  const [versionUploading, setVersionUploading] = useState(false);
+  const [versionMessage, setVersionMessage] = useState("");
+
+  /* Recent Files */
+  const [recentFiles, setRecentFiles] = useState([]);
+  const [recentLoading, setRecentLoading] = useState(false);
+
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
@@ -222,6 +222,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     loadSharedWithMe();
     loadStarredResources();
     loadActivities();
+    loadRecentFiles();
   }, []);
 
   const loadActivities = async () => {
@@ -285,6 +286,53 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     } finally {
       setSharedLoading(false);
     }
+  };
+
+  const loadRecentFiles = async () => {
+    setRecentLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/recent`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setRecentFiles(data.files || []);
+      }
+    } catch (error) {
+      console.error("Failed to load recent files:", error);
+    } finally {
+      setRecentLoading(false);
+    }
+  };
+
+  const openDashboard = () => {
+    setActiveView("dashboard");
+    setSearchQuery("");
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    setFolderStack([]);
+    setCurrentFolder(null);
+    loadContents(null);
+    loadStorageStats();
+  };
+
+  const openRecent = () => {
+    setActiveView("recent");
+    setSearchQuery("");
+    setCurrentFolder(null);
+    setFolderStack([]);
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    loadRecentFiles();
   };
 
   const loadStarredResources = async () => {
@@ -362,17 +410,6 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         [key]: false,
       }));
     }
-  };
-
-  const openDashboard = () => {
-    setActiveView("dashboard");
-    setSearchQuery("");
-    setSharedFolder(null);
-    setSharedFolderFolders([]);
-    setSharedFolderFiles([]);
-    setSharedFolderStack([]);
-    loadContents(null);
-    loadStorageStats();
   };
 
   const openStarred = () => {
@@ -796,20 +833,28 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     }
   };
 
+  const openDetails = (file) => {
+    setDetailsTarget(file);
+  };
+
+  const closeDetails = () => {
+    setDetailsTarget(null);
+  };
+
   const previewFile = async (file, isShared = false) => {
     setPreviewLoading(true);
-
     setPreviewFileData({
       ...file,
       shared: isShared,
     });
+    setPreviewText("");
+
+    if (previewUrl) {
+      window.URL.revokeObjectURL(previewUrl);
+      setPreviewUrl("");
+    }
 
     try {
-      if (previewUrl) {
-        window.URL.revokeObjectURL(previewUrl);
-        setPreviewUrl("");
-      }
-
       const url = isShared
         ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
         : `${API_URL}/api/files/${file.id}/download`;
@@ -826,14 +871,24 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
       const blob = await response.blob();
 
-      const objectUrl = window.URL.createObjectURL(blob);
-
-      setPreviewUrl(objectUrl);
+      /*
+       * TEXT FILES:
+       * Read the file directly and render the text in a <pre>.
+       * This intentionally avoids an iframe so the file's own
+       * HTML/background styling cannot affect our preview UI.
+       */
+      if (getPreviewType(file.name) === "text") {
+        const text = await blob.text();
+        setPreviewText(text);
+      } else {
+        const objectUrl = window.URL.createObjectURL(blob);
+        setPreviewUrl(objectUrl);
+      }
     } catch (error) {
       console.error("Preview failed:", error);
-
       alert("Unable to preview file");
       setPreviewFileData(null);
+      setPreviewText("");
     } finally {
       setPreviewLoading(false);
     }
@@ -845,6 +900,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     }
 
     setPreviewUrl("");
+    setPreviewText("");
     setPreviewFileData(null);
     setPreviewLoading(false);
   };
@@ -1272,6 +1328,242 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     }
   };
 
+  const openVersionHistory = async (file) => {
+    setVersionTarget(file);
+    setFileVersions([]);
+    setVersionMessage("");
+    setVersionLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/${file.id}/versions`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setVersionMessage(
+          data.error?.message ||
+            "Unable to load version history"
+        );
+        return;
+      }
+
+      setFileVersions(data.versions || []);
+    } catch (error) {
+      console.error(
+        "Load version history failed:",
+        error
+      );
+      setVersionMessage("Unable to connect to server");
+    } finally {
+      setVersionLoading(false);
+    }
+  };
+
+  const closeVersionHistory = () => {
+    if (versionLoading || versionUploading) return;
+
+    setVersionTarget(null);
+    setFileVersions([]);
+    setVersionMessage("");
+  };
+
+  const uploadNewFileVersion = () => {
+    if (!versionTarget || versionUploading) return;
+
+    const input = document.createElement("input");
+    input.type = "file";
+
+    input.onchange = async (event) => {
+      const selectedFile = event.target.files?.[0];
+
+      if (!selectedFile) return;
+
+      setVersionUploading(true);
+      setVersionMessage("");
+
+      try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const response = await fetch(
+          `${API_URL}/api/files/${versionTarget.id}/versions`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setVersionMessage(
+            data.error?.message ||
+              "Unable to upload new version"
+          );
+          return;
+        }
+
+        setVersionMessage(
+          data.message ||
+            "New version uploaded successfully"
+        );
+
+        await loadContents(
+          currentFolder ? currentFolder.id : null
+        );
+        await loadStorageStats();
+
+        const versionsResponse = await fetch(
+          `${API_URL}/api/files/${versionTarget.id}/versions`,
+          {
+            credentials: "include",
+          }
+        );
+
+        if (versionsResponse.ok) {
+          const versionsData =
+            await versionsResponse.json();
+
+          setFileVersions(
+            versionsData.versions || []
+          );
+        }
+
+        loadActivities();
+      } catch (error) {
+        console.error(
+          "Upload new version failed:",
+          error
+        );
+        setVersionMessage("Unable to connect to server");
+      } finally {
+        setVersionUploading(false);
+      }
+    };
+
+    input.click();
+  };
+
+  const downloadFileVersion = async (
+    version
+  ) => {
+    if (!versionTarget) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/download`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json().catch(
+          () => ({})
+        );
+
+        setVersionMessage(
+          data.error?.message ||
+            "Unable to download version"
+        );
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = versionTarget.name;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(
+        "Download version failed:",
+        error
+      );
+      setVersionMessage("Unable to download version");
+    }
+  };
+
+  const restoreVersion = async (version) => {
+    if (!versionTarget) return;
+
+    const confirmed = window.confirm(
+      `Restore Version ${version.version_number}?`
+    );
+
+    if (!confirmed) return;
+
+    setVersionLoading(true);
+    setVersionMessage("");
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/restore`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setVersionMessage(
+          data.error?.message ||
+            "Unable to restore version"
+        );
+        return;
+      }
+
+      setVersionMessage(
+        data.message ||
+          `Version ${version.version_number} restored successfully`
+      );
+
+      await loadContents(
+        currentFolder ? currentFolder.id : null
+      );
+      await loadStorageStats();
+
+      const versionsResponse = await fetch(
+        `${API_URL}/api/files/${versionTarget.id}/versions`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (versionsResponse.ok) {
+        const versionsData =
+          await versionsResponse.json();
+
+        setFileVersions(
+          versionsData.versions || []
+        );
+      }
+
+      loadActivities();
+    } catch (error) {
+      console.error(
+        "Restore version failed:",
+        error
+      );
+      setVersionMessage("Unable to connect to server");
+    } finally {
+      setVersionLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       await fetch(
@@ -1291,18 +1583,24 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const normalizedSearch =
     searchQuery.trim().toLowerCase();
 
-  const filteredFolders = folders.filter(
-    (folder) =>
-      folder.name
-        .toLowerCase()
-        .includes(normalizedSearch)
+  const filteredFolders = sortItems(
+    folders.filter(
+      (folder) =>
+        folder.name
+          .toLowerCase()
+          .includes(normalizedSearch)
+    ),
+    sortOption
   );
 
-  const filteredFiles = files.filter(
-    (file) =>
-      file.name
-        .toLowerCase()
-        .includes(normalizedSearch)
+  const filteredFiles = sortItems(
+    files.filter(
+      (file) =>
+        file.name
+          .toLowerCase()
+          .includes(normalizedSearch)
+    ),
+    sortOption
   );
 
   const filteredSharedResources =
@@ -1372,6 +1670,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       : []),
   ];
 
+  const filteredRecentFiles = sortItems(
+    recentFiles.filter((file) =>
+      file.name
+        ?.toLowerCase()
+        .includes(searchQuery.trim().toLowerCase())
+    ),
+    sortOption
+  );
+
   return (
     <main className="dashboard">
       <aside className="sidebar">
@@ -1432,6 +1739,28 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className={`sidebar-item ${
+            activeView === "recent"
+              ? "active"
+              : ""
+          }`}
+          onClick={openRecent}
+        >
+          <ClockIcon size={18} />
+          <span>Recent</span>
+        </button>
+
+        <button
+          className={`sidebar-item ${
+            activeView === "recent" ? "active" : ""
+          }`}
+          onClick={openRecent}
+        >
+          <ClockIcon size={18} />
+          <span>Recent</span>
+        </button>
+
+        <button
+          className={`sidebar-item ${
             activeView === "starred"
               ? "active"
               : ""
@@ -1456,22 +1785,16 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className="theme-toggle"
-          onClick={() =>
-            setTheme(theme === "dark" ? "light" : "dark")
-          }
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
           aria-label="Toggle theme"
         >
-          <span className="theme-toggle-icon">
-            {theme === "dark" ? "☀" : "☾"}
-          </span>
-          <span>
-            {theme === "dark" ? "Light mode" : "Dark mode"}
-          </span>
+          <span className="theme-toggle-icon">{theme === "dark" ? "☀" : "☾"}</span>
+          <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
         </button>
 
         <button
           className="sidebar-item"
-          onClick={logout}
+          onClick={() => setShowLogoutConfirm(true)}
         >
           <LogoutIcon size={18} />
           <span>Logout</span>
@@ -1503,6 +1826,13 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   <UploadIcon size={14} />
                   Upload File
                 </button>
+                <input
+                  id="cloud-drive-upload"
+                  type="file"
+                  onChange={uploadFile}
+                  disabled={uploading}
+                  style={{ display: "none" }}
+                />
               </div>
             </header>
 
@@ -1601,7 +1931,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               </div>
 
               <div className="dashboard-file-list">
-                {files.slice(0, 5).map((file) => (
+                {recentFiles.slice(0, 5).map((file) => (
                   <div className="dashboard-file-row" key={file.id}>
                     <div className="dashboard-file-type"><FileIcon fileName={file.name} /></div>
                     <div className="dashboard-file-name">
@@ -1613,7 +1943,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     <button className="dashboard-row-action" onClick={() => downloadFile(file)}><DownloadIcon size={14} /> Download</button>
                   </div>
                 ))}
-                {files.length === 0 && (
+                {recentFiles.length === 0 && (
                   <div className="dashboard-empty-row">No files uploaded yet.</div>
                 )}
               </div>
@@ -1669,6 +1999,186 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </>
+        ) : activeView === "recent" ? (
+          <>
+            <header className="topbar">
+              <div>
+                <h2>Recent</h2>
+                <p>Your recently updated files</p>
+              </div>
+            </header>
+
+            <div className="search-bar">
+              <SearchIcon size={18} />
+
+              <input
+                type="text"
+                placeholder="Search recent files..."
+                value={searchQuery}
+                onChange={(e) =>
+                  setSearchQuery(e.target.value)
+                }
+              />
+
+              <select
+                className="sort-select"
+                value={sortOption}
+                onChange={(e) =>
+                  setSortOption(e.target.value)
+                }
+                aria-label="Sort recent files"
+              >
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="size-desc">Largest first</option>
+                <option value="size-asc">Smallest first</option>
+              </select>
+
+              <div className="view-toggle" role="group" aria-label="View mode">
+                <button
+                  type="button"
+                  className={`view-toggle-button ${viewMode === "list" ? "active" : ""}`}
+                  onClick={() => setViewMode("list")}
+                  aria-label="List view"
+                  title="List view"
+                >
+                  ☷
+                </button>
+                <button
+                  type="button"
+                  className={`view-toggle-button ${viewMode === "grid" ? "active" : ""}`}
+                  onClick={() => setViewMode("grid")}
+                  aria-label="Grid view"
+                  title="Grid view"
+                >
+                  ▦
+                </button>
+              </div>
+
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="clear-search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            {recentLoading ? (
+              <div className="empty-state">
+                Loading recent files...
+              </div>
+            ) : (
+              <div className="file-area">
+                {filteredRecentFiles.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">
+                      <ClockIcon size={48} />
+                    </div>
+
+                    <h3>
+                      {searchQuery
+                        ? "No results found"
+                        : "No recent files"}
+                    </h3>
+
+                    <p>
+                      {searchQuery
+                        ? `Nothing matches "${searchQuery}"`
+                        : "Files you recently update will appear here."}
+                    </p>
+                  </div>
+                ) : (
+                  <section>
+                    <h3 className="section-title">
+                      Recent files
+                    </h3>
+
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
+                      {filteredRecentFiles.map((file) => (
+                          <div
+                            className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
+                            key={file.id}
+                          >
+                            <div className="file-icon">
+                              <FileIcon
+                                fileName={file.name}
+                              />
+                            </div>
+
+                            <div className="file-info">
+                              <strong>{file.name}</strong>
+
+                              <span>
+                                {formatFileSize(file.size_bytes)}
+                                {" • "}
+                                Updated{" "}
+                                {new Date(
+                                  file.updated_at
+                                ).toLocaleString()}
+                              </span>
+                            </div>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                openDetails(file)
+                              }
+                            >
+                              ℹ️
+                              Details
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                previewFile(file)
+                              }
+                            >
+                              <EyeIcon size={15} />
+                              Preview
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                downloadFile(file)
+                              }
+                            >
+                              <DownloadIcon size={15} />
+                              Download
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                openVersionHistory(file)
+                              }
+                            >
+                              🕘
+                              Versions
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                openPublicLinkModal(file)
+                              }
+                            >
+                              🔗
+                              Public Link
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  </section>
+                )}
               </div>
             )}
           </>
@@ -1797,14 +2307,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       Files
                     </h3>
 
-                    <div className="items-list">
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredStarredFiles.map(
                         (file) => {
                           const key = `file-${file.resource_id}`;
 
                           return (
                             <div
-                              className="file-row"
+                              className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.resource_id}
                             >
                               <div className="file-icon">
@@ -1860,6 +2370,20 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   🔗
   Public Link
 </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openVersionHistory({
+                                    id: file.resource_id,
+                                    name: file.name,
+                                    size_bytes: file.size_bytes,
+                                  })
+                                }
+                              >
+                                🕘
+                                Versions
+                              </button>
 
                               <button
                                 className="file-action"
@@ -1956,11 +2480,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       Shared items
                     </h3>
 
-                    <div className="items-list">
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredSharedResources.map(
                         (resource) => (
                           <div
-                            className="file-row"
+                            className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                             key={resource.share_id}
                           >
                             <div className="file-icon">
@@ -2257,11 +2781,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                           Files
                         </h3>
 
-                        <div className="items-list">
+                        <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                           {filteredSharedFiles.map(
                             (file) => (
                               <div
-                                className="file-row"
+                                className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                                 key={file.id}
                               >
                                 <div className="file-icon">
@@ -2359,7 +2883,6 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     : "Upload File"}
 
                   <input
-                    id="cloud-drive-upload"
                     type="file"
                     onChange={uploadFile}
                     disabled={uploading}
@@ -2429,6 +2952,43 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   setSearchQuery(e.target.value)
                 }
               />
+
+              <select
+                className="sort-select"
+                value={sortOption}
+                onChange={(e) =>
+                  setSortOption(e.target.value)
+                }
+                aria-label="Sort files"
+              >
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="size-desc">Largest first</option>
+                <option value="size-asc">Smallest first</option>
+              </select>
+
+              <div className="view-toggle" role="group" aria-label="View mode">
+                <button
+                  type="button"
+                  className={`view-toggle-button ${viewMode === "list" ? "active" : ""}`}
+                  onClick={() => setViewMode("list")}
+                  aria-label="List view"
+                  title="List view"
+                >
+                  ☷
+                </button>
+                <button
+                  type="button"
+                  className={`view-toggle-button ${viewMode === "grid" ? "active" : ""}`}
+                  onClick={() => setViewMode("grid")}
+                  aria-label="Grid view"
+                  title="Grid view"
+                >
+                  ▦
+                </button>
+              </div>
 
               {searchQuery && (
                 <button
@@ -2642,7 +3202,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       Files
                     </h3>
 
-                    <div className="items-list">
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredFiles.map(
                         (file) => {
                           const starKey =
@@ -2650,7 +3210,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
                           return (
                             <div
-                              className="file-row"
+                              className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.id}
                             >
                               <div className="file-icon">
@@ -2668,14 +3228,40 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                   {formatFileSize(
                                     file.size_bytes
                                   )}
-                                </span>
+                                </span>\
+
                               </div>
 
+
                               <button
+
                                 className="file-action"
+
                                 onClick={() =>
-                                  previewFile(file)
+
+                                  openDetails(file)
+
                                 }
+
+                              >
+
+                                ℹ️
+
+                                Details
+
+                              </button>
+
+
+                              <button
+
+                                className="file-action"
+
+                                onClick={() =>
+
+                                  previewFile(file)
+
+                                }
+
                               >
                                 <EyeIcon size={15} />
                                 Preview
@@ -2713,6 +3299,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                 Public Link
                               </button>
 
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openVersionHistory(file)
+                                }
+                              >
+                                🕘
+                                Versions
+                              </button>
 
                               <button
                                 className="file-action"
@@ -2886,6 +3481,192 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {versionTarget && (
+        <div
+          className="version-history-overlay"
+          onClick={closeVersionHistory}
+        >
+          <div
+            className="version-history-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="share-modal-header">
+              <div>
+                <strong>Version History</strong>
+                <span>{versionTarget.name}</span>
+              </div>
+
+              <button
+                className="preview-close"
+                onClick={closeVersionHistory}
+                disabled={
+                  versionLoading ||
+                  versionUploading
+                }
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="share-form">
+              <button
+                type="button"
+                className="new-folder-button"
+                onClick={uploadNewFileVersion}
+                disabled={
+                  versionLoading ||
+                  versionUploading
+                }
+              >
+                {versionUploading
+                  ? "Uploading..."
+                  : "Upload New Version"}
+              </button>
+
+              {versionMessage && (
+                <p
+                  className={`message ${
+                    versionMessage
+                      .toLowerCase()
+                      .includes("success")
+                      ? "success"
+                      : "error"
+                  }`}
+                >
+                  {versionMessage}
+                </p>
+              )}
+
+              <label>
+                Versions
+              </label>
+
+              {versionLoading ? (
+                <div className="empty-state">
+                  Loading version history...
+                </div>
+              ) : fileVersions.length === 0 ? (
+                <div
+                  style={{
+                    padding: "18px",
+                    border: "1px solid #ddd",
+                    borderRadius: "10px",
+                    textAlign: "center",
+                  }}
+                >
+                  No archived versions yet.
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                    maxHeight: "360px",
+                    overflowY: "auto",
+                  }}
+                >
+                  {fileVersions.map((version) => (
+                    <div
+                      key={version.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        padding: "12px",
+                        border: "1px solid #ddd",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "42px",
+                          height: "42px",
+                          borderRadius: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "#f3f4f6",
+                          fontWeight: "700",
+                          flexShrink: 0,
+                        }}
+                      >
+                        v{version.version_number}
+                      </div>
+
+                      <div
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <strong>
+                          Version{" "}
+                          {version.version_number}
+                        </strong>
+
+                        <span
+                          style={{
+                            display: "block",
+                            marginTop: "4px",
+                            fontSize: "12px",
+                            color: "#666",
+                          }}
+                        >
+                          {formatFileSize(
+                            Number(
+                              version.size_bytes
+                            )
+                          )}{" "}
+                          ·{" "}
+                          {new Date(
+                            version.created_at
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "6px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() =>
+                            downloadFileVersion(
+                              version
+                            )
+                          }
+                          disabled={versionLoading}
+                        >
+                          Download
+                        </button>
+
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() =>
+                            restoreVersion(
+                              version
+                            )
+                          }
+                          disabled={versionLoading}
+                        >
+                          Restore
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
@@ -3068,7 +3849,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
       {previewFileData && (
         <div
-          className="preview-overlay"
+          className="preview-modal-overlay"
           onClick={closePreview}
         >
           <div
@@ -3077,14 +3858,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           >
             <div className="preview-header">
               <div>
-                <strong>
-                  {previewFileData.name}
-                </strong>
-
+                <strong>{previewFileData.name}</strong>
                 <span>
-                  {formatFileSize(
-                    previewFileData.size_bytes
-                  )}
+                  {formatFileSize(previewFileData.size_bytes)}
                 </span>
               </div>
 
@@ -3098,99 +3874,114 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
             <div className="preview-content">
               {previewLoading ? (
-                <div className="preview-loading">
-                  Loading preview...
-                </div>
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "image" ? (
-                <img
-                  src={previewUrl}
-                  alt={previewFileData.name}
-                  className="image-preview"
-                />
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "pdf" ? (
-                <iframe
-                  src={previewUrl}
-                  title={previewFileData.name}
-                  className="pdf-preview"
-                />
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "video" ? (
-                <video
-                  src={previewUrl}
-                  className="video-preview"
-                  controls
-                  autoPlay
-                >
-                  Your browser does not support video playback.
-                </video>
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "audio" ? (
-                <div className="audio-preview">
-                  <div className="audio-preview-icon">
-                    🎵
-                  </div>
-
-                  <h3>
-                    {previewFileData.name}
-                  </h3>
-
-                  <audio
-                    src={previewUrl}
-                    controls
-                    autoPlay
-                  >
-                    Your browser does not support audio playback.
-                  </audio>
-                </div>
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "text" ? (
-                <iframe
-                  src={previewUrl}
-                  title={previewFileData.name}
-                  className="text-preview"
-                />
-              ) : (
-                <div className="unsupported-preview">
-                  <div className="empty-icon">
+                <div className="constant-preview-placeholder">
+                  <div className="constant-preview-icon">
                     <FileIcon
-                      fileName={
-                        previewFileData.name
-                      }
-                      size={55}
+                      fileName={previewFileData.name}
+                      size={64}
                     />
                   </div>
+                  <h3>Loading Preview</h3>
+                  <p>Preparing your file preview...</p>
+                </div>
+              ) : (
+                previewUrl || getPreviewType(previewFileData.name) === "text"
+              ) ? (
+                <div className="constant-preview-viewer">
+                  {previewFileData.mime_type?.startsWith("image/") ? (
+                    <img
+                      src={previewUrl}
+                      alt={previewFileData.name}
+                      className="constant-preview-media"
+                    />
+                  ) : previewFileData.mime_type === "application/pdf" ? (
+                    <iframe
+                      src={previewUrl}
+                      title={previewFileData.name}
+                      className="constant-preview-frame"
+                    />
+                  ) : getPreviewType(previewFileData.name) === "text" ? (
+                    <pre className="constant-preview-text">
+                      {previewText}
+                    </pre>
+                  ) : previewFileData.mime_type?.startsWith("video/") ? (
+                    <video
+                      src={previewUrl}
+                      controls
+                      className="constant-preview-media"
+                    />
+                  ) : previewFileData.mime_type?.startsWith("audio/") ? (
+                    <div className="constant-preview-audio">
+                      <div className="constant-preview-icon">
+                        <FileIcon
+                          fileName={previewFileData.name}
+                          size={64}
+                        />
+                      </div>
+                      <audio src={previewUrl} controls />
+                    </div>
+                  ) : (
+                    <div className="constant-preview-placeholder">
+                      <div className="constant-preview-icon">
+                        <FileIcon
+                          fileName={previewFileData.name}
+                          size={64}
+                        />
+                      </div>
+                      <h3>Preview Unavailable</h3>
+                      <p>
+                        This file type cannot be displayed in the browser.
+                      </p>
+                    </div>
+                  )}
 
-                  <h3>Preview not available</h3>
+                  <div className="constant-preview-footer">
+                    <div className="constant-preview-meta">
+                      <span>{previewFileData.name}</span>
+                      <span>
+                        {formatFileSize(previewFileData.size_bytes)}
+                      </span>
+                    </div>
 
-                  <p>
-                    This file type cannot be previewed in
-                    the browser.
-                  </p>
-
-                  <button
-                    className="file-action"
-                    onClick={() =>
-                      previewFileData.shared
-                        ? downloadSharedFile(
-                            previewFileData
-                          )
-                        : downloadFile(
-                            previewFileData
-                          )
-                    }
-                  >
-                    <DownloadIcon size={15} />
-                    Download File
-                  </button>
+                    <button
+                      className="file-action"
+                      onClick={() =>
+                        previewFileData.shared
+                          ? downloadSharedFile(previewFileData)
+                          : downloadFile(previewFileData)
+                      }
+                    >
+                      <DownloadIcon size={15} />
+                      Download File
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="constant-preview-placeholder">
+                  <div className="constant-preview-icon">
+                    <FileIcon
+                      fileName={previewFileData.name}
+                      size={64}
+                    />
+                  </div>
+                  <h3>Preview Unavailable</h3>
+                  <p>Unable to load this file preview.</p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showLogoutConfirm && (
+        <div className="logout-confirm-overlay" onClick={() => setShowLogoutConfirm(false)}>
+          <div className="logout-confirm-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="logout-confirm-title">
+            <div className="logout-confirm-icon"><LogoutIcon size={22} /></div>
+            <h3 id="logout-confirm-title">Log out?</h3>
+            <p>Are you sure you want to log out of your Cloud Drive account?</p>
+            <div className="logout-confirm-actions">
+              <button type="button" className="logout-cancel-button" onClick={() => setShowLogoutConfirm(false)}>Cancel</button>
+              <button type="button" className="logout-confirm-button" onClick={async () => { setShowLogoutConfirm(false); await logout(); }}>Log out</button>
             </div>
           </div>
         </div>
@@ -3290,15 +4081,10 @@ function Icon({
 function DashboardIcon({ size = 20 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
-    </svg>
-  );
-}
-
-function UploadIcon({ size = 20 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 16V4" /><path d="m7 9 5-5 5 5" /><path d="M5 20h14" />
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <rect x="14" y="14" width="7" height="7" rx="1" />
     </svg>
   );
 }
@@ -3343,6 +4129,24 @@ function StarIcon({ size = 20, filled = false }) {
   );
 }
 
+function ClockIcon({ size = 20 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
+  );
+}
+
 function ActivityIcon({ size = 20 }) {
   return (
     <Icon size={size}>
@@ -3360,15 +4164,15 @@ function SearchIcon({ size = 20 }) {
   );
 }
 
-// function UploadIcon({ size = 20 }) {
-//   return (
-//     <Icon size={size}>
-//       <path d="M12 16V4" />
-//       <path d="m7 9 5-5 5 5" />
-//       <path d="M5 20h14" />
-//     </Icon>
-//   );
-// }
+function UploadIcon({ size = 20 }) {
+  return (
+    <Icon size={size}>
+      <path d="M12 16V4" />
+      <path d="m7 9 5-5 5 5" />
+      <path d="M5 20h14" />
+    </Icon>
+  );
+}
 
 function DownloadIcon({ size = 20 }) {
   return (
@@ -3654,6 +4458,45 @@ function formatActivityAction(activity) {
     .toLowerCase();
 
   return `${action || "updated"} — ${resourceName}`;
+}
+
+function sortItems(items, option) {
+  const sorted = [...items];
+
+  sorted.sort((a, b) => {
+    switch (option) {
+      case "name-desc":
+        return (b.name || "").localeCompare(a.name || "", undefined, {
+          sensitivity: "base",
+        });
+
+      case "date-desc":
+        return (
+          new Date(b.updated_at || b.created_at || 0).getTime() -
+          new Date(a.updated_at || a.created_at || 0).getTime()
+        );
+
+      case "date-asc":
+        return (
+          new Date(a.updated_at || a.created_at || 0).getTime() -
+          new Date(b.updated_at || b.created_at || 0).getTime()
+        );
+
+      case "size-desc":
+        return Number(b.size_bytes || 0) - Number(a.size_bytes || 0);
+
+      case "size-asc":
+        return Number(a.size_bytes || 0) - Number(b.size_bytes || 0);
+
+      case "name-asc":
+      default:
+        return (a.name || "").localeCompare(b.name || "", undefined, {
+          sensitivity: "base",
+        });
+    }
+  });
+
+  return sorted;
 }
 
 function formatFileSize(bytes) {
