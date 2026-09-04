@@ -166,6 +166,14 @@ function Dashboard({ user, onLogout }) {
   const [shareLoading, setShareLoading] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
 
+  /* Public Link */
+  const [publicLinkTarget, setPublicLinkTarget] = useState(null);
+  const [publicLinks, setPublicLinks] = useState([]);
+  const [publicLinkLoading, setPublicLinkLoading] = useState(false);
+  const [publicLinkPassword, setPublicLinkPassword] = useState("");
+  const [publicLinkExpiry, setPublicLinkExpiry] = useState("");
+  const [publicLinkMessage, setPublicLinkMessage] = useState("");
+
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
@@ -1020,6 +1028,201 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
+  const openPublicLinkModal = async (file) => {
+    setPublicLinkTarget(file);
+    setPublicLinkPassword("");
+    setPublicLinkExpiry("");
+    setPublicLinkMessage("");
+    setPublicLinkLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/shares/public?resourceType=file&resourceId=${file.id}`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPublicLinks(
+          (data.links || []).map((link) => ({
+            ...link,
+            url: link.url.startsWith("http")
+              ? link.url
+              : `${API_URL}${link.url}`,
+          }))
+        );
+      } else {
+        setPublicLinks([]);
+        setPublicLinkMessage(
+          data.error?.message ||
+            "Unable to load public links"
+        );
+      }
+    } catch (error) {
+      console.error("Load public links failed:", error);
+      setPublicLinks([]);
+      setPublicLinkMessage(
+        "Unable to connect to server"
+      );
+    } finally {
+      setPublicLinkLoading(false);
+    }
+  };
+
+  const closePublicLinkModal = () => {
+    if (publicLinkLoading) return;
+
+    setPublicLinkTarget(null);
+    setPublicLinks([]);
+    setPublicLinkPassword("");
+    setPublicLinkExpiry("");
+    setPublicLinkMessage("");
+  };
+
+  const createPublicLink = async () => {
+    if (!publicLinkTarget) return;
+
+    setPublicLinkLoading(true);
+    setPublicLinkMessage("");
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/shares/public`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            resourceType: "file",
+            resourceId: publicLinkTarget.id,
+            role: "viewer",
+            password:
+              publicLinkPassword.trim() || undefined,
+            expiresAt:
+              publicLinkExpiry
+                ? new Date(
+                    publicLinkExpiry
+                  ).toISOString()
+                : undefined,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setPublicLinkMessage(
+          data.error?.message ||
+            "Unable to create public link"
+        );
+        return;
+      }
+
+      const link = data.link;
+
+      const fullUrl = link.url.startsWith("http")
+        ? link.url
+        : `${API_URL}${link.url}`;
+
+      setPublicLinks((previous) => [
+        {
+          ...link,
+          url: fullUrl,
+        },
+        ...previous,
+      ]);
+
+      setPublicLinkPassword("");
+      setPublicLinkExpiry("");
+      setPublicLinkMessage(
+        "Public link created successfully"
+      );
+    } catch (error) {
+      console.error(
+        "Create public link failed:",
+        error
+      );
+      setPublicLinkMessage(
+        "Unable to connect to server"
+      );
+    } finally {
+      setPublicLinkLoading(false);
+    }
+  };
+
+  const revokePublicLink = async (linkId) => {
+    const confirmed = window.confirm(
+      "Revoke this public link?"
+    );
+
+    if (!confirmed) return;
+
+    setPublicLinkLoading(true);
+    setPublicLinkMessage("");
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/shares/public/${linkId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setPublicLinkMessage(
+          data.error?.message ||
+            "Unable to revoke public link"
+        );
+        return;
+      }
+
+      setPublicLinks((previous) =>
+        previous.filter(
+          (link) => link.id !== linkId
+        )
+      );
+
+      setPublicLinkMessage(
+        "Public link revoked"
+      );
+    } catch (error) {
+      console.error(
+        "Revoke public link failed:",
+        error
+      );
+      setPublicLinkMessage(
+        "Unable to connect to server"
+      );
+    } finally {
+      setPublicLinkLoading(false);
+    }
+  };
+
+  const copyPublicLink = async (url) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      setPublicLinkMessage(
+        "Link copied to clipboard"
+      );
+    } catch (error) {
+      console.error(
+        "Copy link failed:",
+        error
+      );
+      setPublicLinkMessage(
+        "Unable to copy link"
+      );
+    }
+  };
+
   const logout = async () => {
     try {
       await fetch(
@@ -1435,6 +1638,14 @@ function Dashboard({ user, onLogout }) {
                                 <DownloadIcon size={15} />
                                 Download
                               </button>
+
+                              <button
+  className="file-action"
+  onClick={() => openPublicLinkModal(file)}
+>
+  🔗
+  Public Link
+</button>
 
                               <button
                                 className="file-action"
@@ -2277,6 +2488,16 @@ function Dashboard({ user, onLogout }) {
                                 <UsersIcon size={15} />
                                 Share
                               </button>
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openPublicLinkModal(file)
+                                }
+                              >
+                                🔗
+                                Public Link
+                              </button>
+
 
                               <button
                                 className="file-action"
@@ -2450,6 +2671,182 @@ function Dashboard({ user, onLogout }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {publicLinkTarget && (
+        <div
+          className="preview-overlay"
+          onClick={closePublicLinkModal}
+        >
+          <div
+            className="share-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="share-modal-header">
+              <div>
+                <strong>Public Link</strong>
+                <span>{publicLinkTarget.name}</span>
+              </div>
+
+              <button
+                className="preview-close"
+                onClick={closePublicLinkModal}
+                disabled={publicLinkLoading}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="share-form">
+              <label>Password (optional)</label>
+
+              <input
+                type="password"
+                placeholder="Leave empty for no password"
+                value={publicLinkPassword}
+                onChange={(e) =>
+                  setPublicLinkPassword(e.target.value)
+                }
+                disabled={publicLinkLoading}
+              />
+
+              <label>Expires at (optional)</label>
+
+              <input
+                type="datetime-local"
+                value={publicLinkExpiry}
+                onChange={(e) =>
+                  setPublicLinkExpiry(e.target.value)
+                }
+                disabled={publicLinkLoading}
+              />
+
+              <button
+                type="button"
+                className="new-folder-button"
+                onClick={createPublicLink}
+                disabled={publicLinkLoading}
+              >
+                {publicLinkLoading
+                  ? "Working..."
+                  : "Create Public Link"}
+              </button>
+
+              {publicLinkMessage && (
+                <p
+                  className={`message ${
+                    publicLinkMessage
+                      .toLowerCase()
+                      .includes("success") ||
+                    publicLinkMessage
+                      .toLowerCase()
+                      .includes("copied") ||
+                    publicLinkMessage
+                      .toLowerCase()
+                      .includes("revoked")
+                      ? "success"
+                      : "error"
+                  }`}
+                >
+                  {publicLinkMessage}
+                </p>
+              )}
+
+              {publicLinks.length > 0 && (
+                <div
+                  style={{
+                    marginTop: "20px",
+                  }}
+                >
+                  <label>Existing links</label>
+
+                  {publicLinks.map((link) => {
+                    const fullUrl =
+                      link.url.startsWith("http")
+                        ? link.url
+                        : `${API_URL}${link.url}`;
+
+                    return (
+                      <div
+                        key={link.id}
+                        style={{
+                          marginTop: "10px",
+                          padding: "12px",
+                          border: "1px solid #ddd",
+                          borderRadius: "8px",
+                        }}
+                      >
+                        <input
+                          value={fullUrl}
+                          readOnly
+                        />
+
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "8px",
+                            marginTop: "8px",
+                          }}
+                        >
+                          <button
+                            type="button"
+                            className="file-action"
+                            onClick={() =>
+                              copyPublicLink(
+                                fullUrl
+                              )
+                            }
+                          >
+                            Copy
+                          </button>
+
+                          <button
+                            type="button"
+                            className="file-action delete"
+                            onClick={() =>
+                              revokePublicLink(
+                                link.id
+                              )
+                            }
+                          >
+                            Revoke
+                          </button>
+                        </div>
+
+                        {link.password_protected && (
+                          <small>
+                            🔒 Password protected
+                          </small>
+                        )}
+
+                        {link.expires_at && (
+                          <small>
+                            <br />
+                            Expires:{" "}
+                            {new Date(
+                              link.expires_at
+                            ).toLocaleString()}
+                          </small>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="share-modal-actions">
+                <button
+                  type="button"
+                  className="file-action"
+                  onClick={closePublicLinkModal}
+                  disabled={publicLinkLoading}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
