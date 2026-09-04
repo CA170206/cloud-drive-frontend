@@ -1,3 +1,5 @@
+// app/page.jsx
+
 "use client";
 
 import { useEffect, useState } from "react";
@@ -117,6 +119,9 @@ function Login({ onLogin }) {
 }
 
 function Dashboard({ user, onLogout }) {
+  const [activities, setActivities] = useState([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(false);
+
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
 
@@ -149,21 +154,18 @@ function Dashboard({ user, onLogout }) {
   const [sharedResources, setSharedResources] = useState([]);
   const [sharedLoading, setSharedLoading] = useState(false);
 
-  /* Shared folder state */
   const [sharedFolder, setSharedFolder] = useState(null);
   const [sharedFolderFolders, setSharedFolderFolders] = useState([]);
   const [sharedFolderFiles, setSharedFolderFiles] = useState([]);
   const [sharedFolderStack, setSharedFolderStack] = useState([]);
   const [sharedFolderLoading, setSharedFolderLoading] = useState(false);
 
-  /* Share modal state */
   const [shareTarget, setShareTarget] = useState(null);
   const [shareEmail, setShareEmail] = useState("");
   const [shareRole, setShareRole] = useState("viewer");
   const [shareLoading, setShareLoading] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
 
-  /* Stars */
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
@@ -173,7 +175,27 @@ function Dashboard({ user, onLogout }) {
     loadStorageStats();
     loadSharedWithMe();
     loadStarredResources();
+    loadActivities();
   }, []);
+
+  const loadActivities = async () => {
+    setActivitiesLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/activities`, {
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setActivities(data.activities || []);
+      }
+    } catch (error) {
+      console.error("Failed to load activities:", error);
+    } finally {
+      setActivitiesLoading(false);
+    }
+  };
 
   const loadStorageStats = async () => {
     try {
@@ -219,10 +241,6 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
-  /* =========================
-     Stars
-  ========================= */
-
   const loadStarredResources = async () => {
     setStarredLoading(true);
 
@@ -266,20 +284,17 @@ function Dashboard({ user, onLogout }) {
     );
 
     try {
-      const response = await fetch(
-        `${API_URL}/api/stars`,
-        {
-          method: currentlyStarred ? "DELETE" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            resourceType,
-            resourceId,
-          }),
-        }
-      );
+      const response = await fetch(`${API_URL}/api/stars`, {
+        method: currentlyStarred ? "DELETE" : "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          resourceType,
+          resourceId,
+        }),
+      });
 
       const data = await response.json();
 
@@ -311,6 +326,16 @@ function Dashboard({ user, onLogout }) {
     setSharedFolderFiles([]);
     setSharedFolderStack([]);
     loadStarredResources();
+  };
+
+  const openActivity = () => {
+    setActiveView("activity");
+    setSearchQuery("");
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    loadActivities();
   };
 
   const openStarredFolder = (folder) => {
@@ -445,10 +470,6 @@ function Dashboard({ user, onLogout }) {
     loadContents(newCurrentFolder?.id || null);
   };
 
-  /* =========================
-     Shared folder functions
-  ========================= */
-
   const loadSharedFolder = async (folderId, stack = []) => {
     setSharedFolderLoading(true);
     setSearchQuery("");
@@ -548,10 +569,6 @@ function Dashboard({ user, onLogout }) {
     await loadSharedFolder(target.id, newStack);
   };
 
-  /* =========================
-     My Files
-  ========================= */
-
   const createFolder = async (e) => {
     e.preventDefault();
 
@@ -576,6 +593,7 @@ function Dashboard({ user, onLogout }) {
 
         loadContents(currentFolder?.id || null);
         loadStorageStats();
+        loadActivities();
       } else {
         const data = await response.json();
 
@@ -622,11 +640,9 @@ function Dashboard({ user, onLogout }) {
       if (response.ok) {
         cancelRename();
 
-        loadContents(
-          currentFolder?.id || null
-        );
-
+        loadContents(currentFolder?.id || null);
         loadStarredResources();
+        loadActivities();
       } else {
         const data = await response.json();
 
@@ -657,12 +673,10 @@ function Dashboard({ user, onLogout }) {
       );
 
       if (response.ok) {
-        loadContents(
-          currentFolder?.id || null
-        );
-
+        loadContents(currentFolder?.id || null);
         loadStorageStats();
         loadStarredResources();
+        loadActivities();
       } else {
         const data = await response.json();
 
@@ -705,11 +719,9 @@ function Dashboard({ user, onLogout }) {
       );
 
       if (response.ok) {
-        loadContents(
-          currentFolder?.id || null
-        );
-
+        loadContents(currentFolder?.id || null);
         loadStorageStats();
+        loadActivities();
       } else {
         const data = await response.json();
 
@@ -727,68 +739,58 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
-  /* =========================
-     Preview
-  ========================= */
+  const previewFile = async (file, isShared = false) => {
+    setPreviewLoading(true);
 
-  // REPLACE your existing previewFile function with this:
-
-const previewFile = async (file, isShared = false) => {
-  setPreviewLoading(true);
-
-  setPreviewFileData({
-    ...file,
-    shared: isShared,
-  });
-
-  try {
-    if (previewUrl) {
-      window.URL.revokeObjectURL(previewUrl);
-      setPreviewUrl("");
-    }
-
-    const url = isShared
-      ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
-      : `${API_URL}/api/files/${file.id}/download`;
-
-    const response = await fetch(url, {
-      credentials: "include",
+    setPreviewFileData({
+      ...file,
+      shared: isShared,
     });
 
-    if (!response.ok) {
+    try {
+      if (previewUrl) {
+        window.URL.revokeObjectURL(previewUrl);
+        setPreviewUrl("");
+      }
+
+      const url = isShared
+        ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
+        : `${API_URL}/api/files/${file.id}/download`;
+
+      const response = await fetch(url, {
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        alert("Unable to preview file");
+        setPreviewFileData(null);
+        return;
+      }
+
+      const blob = await response.blob();
+
+      const objectUrl = window.URL.createObjectURL(blob);
+
+      setPreviewUrl(objectUrl);
+    } catch (error) {
+      console.error("Preview failed:", error);
+
       alert("Unable to preview file");
       setPreviewFileData(null);
-      return;
+    } finally {
+      setPreviewLoading(false);
+    }
+  };
+
+  const closePreview = () => {
+    if (previewUrl) {
+      window.URL.revokeObjectURL(previewUrl);
     }
 
-    const blob = await response.blob();
-
-    const objectUrl = window.URL.createObjectURL(blob);
-
-    setPreviewUrl(objectUrl);
-  } catch (error) {
-    console.error("Preview failed:", error);
-
-    alert("Unable to preview file");
+    setPreviewUrl("");
     setPreviewFileData(null);
-  } finally {
     setPreviewLoading(false);
-  }
-};
-
-const closePreview = () => {
-  if (previewUrl) {
-    window.URL.revokeObjectURL(previewUrl);
-  }
-
-  setPreviewUrl("");
-  setPreviewFileData(null);
-  setPreviewLoading(false);
-};
-
-  /* =========================
-     Downloads
-  ========================= */
+  };
 
   const downloadFile = async (file) => {
     try {
@@ -806,11 +808,9 @@ const closePreview = () => {
 
       const blob = await response.blob();
 
-      const url =
-        window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(blob);
 
-      const link =
-        document.createElement("a");
+      const link = document.createElement("a");
 
       link.href = url;
       link.download = file.name;
@@ -823,7 +823,6 @@ const closePreview = () => {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error("Download failed:", error);
-
       alert("Unable to download file");
     }
   };
@@ -844,11 +843,9 @@ const closePreview = () => {
 
       const blob = await response.blob();
 
-      const url =
-        window.URL.createObjectURL(blob);
+      const url = window.URL.createObjectURL(blob);
 
-      const link =
-        document.createElement("a");
+      const link = document.createElement("a");
 
       link.href = url;
       link.download = file.name;
@@ -860,18 +857,10 @@ const closePreview = () => {
 
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error(
-        "Shared download failed:",
-        error
-      );
-
+      console.error("Shared download failed:", error);
       alert("Unable to download shared file");
     }
   };
-
-  /* =========================
-     Delete
-  ========================= */
 
   const deleteFile = async (file) => {
     const confirmed = window.confirm(
@@ -890,12 +879,10 @@ const closePreview = () => {
       );
 
       if (response.ok) {
-        loadContents(
-          currentFolder?.id || null
-        );
-
+        loadContents(currentFolder?.id || null);
         loadStorageStats();
         loadStarredResources();
+        loadActivities();
       } else {
         const data = await response.json();
 
@@ -909,13 +896,7 @@ const closePreview = () => {
     }
   };
 
-  /* =========================
-     Shared resources
-  ========================= */
-
-  const removeSharedResource = async (
-    resource
-  ) => {
+  const removeSharedResource = async (resource) => {
     const confirmed = window.confirm(
       `Remove "${resource.resource_name}" from Shared with me?`
     );
@@ -940,6 +921,8 @@ const closePreview = () => {
         } else {
           loadSharedWithMe();
         }
+
+        loadActivities();
       } else {
         const data = await response.json();
 
@@ -954,15 +937,9 @@ const closePreview = () => {
         error
       );
 
-      alert(
-        "Unable to remove shared resource"
-      );
+      alert("Unable to remove shared resource");
     }
   };
-
-  /* =========================
-     Sharing
-  ========================= */
 
   const openShareModal = (resourceType, resource) => {
     setShareTarget({
@@ -1030,6 +1007,7 @@ const closePreview = () => {
       );
 
       setShareEmail("");
+      loadActivities();
 
       setTimeout(() => {
         closeShareModal();
@@ -1057,10 +1035,6 @@ const closePreview = () => {
 
     onLogout();
   };
-
-  /* =========================
-     Search
-  ========================= */
 
   const normalizedSearch =
     searchQuery.trim().toLowerCase();
@@ -1099,10 +1073,6 @@ const closePreview = () => {
         .toLowerCase()
         .includes(normalizedSearch)
     );
-
-  /* =========================
-     Breadcrumbs
-  ========================= */
 
   const breadcrumbs = [
     {
@@ -1211,6 +1181,18 @@ const closePreview = () => {
         </button>
 
         <button
+          className={`sidebar-item ${
+            activeView === "activity"
+              ? "active"
+              : ""
+          }`}
+          onClick={openActivity}
+        >
+          <ActivityIcon size={18} />
+          <span>Activity</span>
+        </button>
+
+        <button
           className="sidebar-item"
           onClick={logout}
         >
@@ -1220,19 +1202,65 @@ const closePreview = () => {
       </aside>
 
       <section className="content">
-        {/* ==================================
-            STARRED
-        ================================== */}
+        {activeView === "activity" ? (
+          <>
+            <header className="topbar">
+              <div>
+                <h2>Activity</h2>
+                <p>Recent activity on your Cloud Drive</p>
+              </div>
+            </header>
 
-        {activeView === "starred" ? (
+            {activitiesLoading ? (
+              <div className="empty-state">
+                Loading activity...
+              </div>
+            ) : activities.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <ActivityIcon size={48} />
+                </div>
+
+                <h3>No activity yet</h3>
+
+                <p>
+                  Your recent Cloud Drive activity will
+                  appear here.
+                </p>
+              </div>
+            ) : (
+              <div className="activity-list">
+                {activities.map((activity) => (
+                  <div
+                    className="activity-row"
+                    key={activity.id}
+                  >
+                    <div className="activity-icon">
+                      <ActivityIcon size={20} />
+                    </div>
+
+                    <div className="activity-info">
+                      <strong>
+                        {formatActivityAction(activity)}
+                      </strong>
+
+                      <span>
+                        {new Date(
+                          activity.created_at
+                        ).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </>
+        ) : activeView === "starred" ? (
           <>
             <header className="topbar">
               <div>
                 <h2>Starred</h2>
-
-                <p>
-                  Your favorite files and folders
-                </p>
+                <p>Your favorite files and folders</p>
               </div>
             </header>
 
@@ -1250,9 +1278,7 @@ const closePreview = () => {
 
               {searchQuery && (
                 <button
-                  onClick={() =>
-                    setSearchQuery("")
-                  }
+                  onClick={() => setSearchQuery("")}
                   className="clear-search"
                 >
                   ×
@@ -1294,9 +1320,7 @@ const closePreview = () => {
                                 }}
                               >
                                 <div className="item-icon">
-                                  <FolderIcon
-                                    size={32}
-                                  />
+                                  <FolderIcon size={32} />
                                 </div>
 
                                 <div className="item-info">
@@ -1319,9 +1343,7 @@ const closePreview = () => {
                                     )
                                   }
                                 >
-                                  <FolderIcon
-                                    size={14}
-                                  />
+                                  <FolderIcon size={14} />
                                   Open
                                 </button>
 
@@ -1333,9 +1355,7 @@ const closePreview = () => {
                                       folder.resource_id
                                     )
                                   }
-                                  disabled={
-                                    starLoading[key]
-                                  }
+                                  disabled={starLoading[key]}
                                 >
                                   <StarIcon
                                     size={14}
@@ -1412,9 +1432,7 @@ const closePreview = () => {
                                   })
                                 }
                               >
-                                <DownloadIcon
-                                  size={15}
-                                />
+                                <DownloadIcon size={15} />
                                 Download
                               </button>
 
@@ -1426,9 +1444,7 @@ const closePreview = () => {
                                     file.resource_id
                                   )
                                 }
-                                disabled={
-                                  starLoading[key]
-                                }
+                                disabled={starLoading[key]}
                               >
                                 <StarIcon
                                   size={15}
@@ -1473,21 +1489,13 @@ const closePreview = () => {
             )}
           </>
         ) : activeView === "shared" ? (
-          /* ==================================
-             SHARED WITH ME
-          ================================== */
-
           <>
             {!sharedFolder ? (
               <>
                 <header className="topbar">
                   <div>
                     <h2>Shared with me</h2>
-
-                    <p>
-                      Files and folders shared
-                      with you
-                    </p>
+                    <p>Files and folders shared with you</p>
                   </div>
                 </header>
 
@@ -1499,17 +1507,13 @@ const closePreview = () => {
                     placeholder="Search shared files and folders..."
                     value={searchQuery}
                     onChange={(e) =>
-                      setSearchQuery(
-                        e.target.value
-                      )
+                      setSearchQuery(e.target.value)
                     }
                   />
 
                   {searchQuery && (
                     <button
-                      onClick={() =>
-                        setSearchQuery("")
-                      }
+                      onClick={() => setSearchQuery("")}
                       className="clear-search"
                     >
                       ×
@@ -1521,8 +1525,7 @@ const closePreview = () => {
                   <div className="empty-state">
                     Loading shared files...
                   </div>
-                ) : filteredSharedResources.length >
-                  0 ? (
+                ) : filteredSharedResources.length > 0 ? (
                   <section>
                     <h3 className="section-title">
                       Shared items
@@ -1538,9 +1541,7 @@ const closePreview = () => {
                             <div className="file-icon">
                               {resource.resource_type ===
                               "folder" ? (
-                                <FolderIcon
-                                  size={30}
-                                />
+                                <FolderIcon size={30} />
                               ) : (
                                 <FileIcon
                                   fileName={
@@ -1558,9 +1559,7 @@ const closePreview = () => {
                                   resource.resource_type ===
                                   "folder"
                                 ) {
-                                  openSharedFolder(
-                                    resource
-                                  );
+                                  openSharedFolder(resource);
                                 }
                               }}
                               style={{
@@ -1572,9 +1571,7 @@ const closePreview = () => {
                               }}
                             >
                               <strong>
-                                {
-                                  resource.resource_name
-                                }
+                                {resource.resource_name}
                               </strong>
 
                               <span>
@@ -1607,14 +1604,10 @@ const closePreview = () => {
                               <button
                                 className="file-action"
                                 onClick={() =>
-                                  openSharedFolder(
-                                    resource
-                                  )
+                                  openSharedFolder(resource)
                                 }
                               >
-                                <FolderIcon
-                                  size={15}
-                                />
+                                <FolderIcon size={15} />
                                 Open
                               </button>
                             ) : (
@@ -1633,26 +1626,20 @@ const closePreview = () => {
                                     )
                                   }
                                 >
-                                  <EyeIcon
-                                    size={15}
-                                  />
+                                  <EyeIcon size={15} />
                                   Preview
                                 </button>
 
                                 <button
                                   className="file-action"
                                   onClick={() =>
-                                    downloadSharedFile(
-                                      {
-                                        id: resource.resource_id,
-                                        name: resource.resource_name,
-                                      }
-                                    )
+                                    downloadSharedFile({
+                                      id: resource.resource_id,
+                                      name: resource.resource_name,
+                                    })
                                   }
                                 >
-                                  <DownloadIcon
-                                    size={15}
-                                  />
+                                  <DownloadIcon size={15} />
                                   Download
                                 </button>
                               </>
@@ -1661,9 +1648,7 @@ const closePreview = () => {
                             <button
                               className="file-action delete"
                               onClick={() =>
-                                removeSharedResource(
-                                  resource
-                                )
+                                removeSharedResource(resource)
                               }
                             >
                               <TrashIcon size={15} />
@@ -1695,16 +1680,10 @@ const closePreview = () => {
                 )}
               </>
             ) : (
-              /* ==================================
-                 INSIDE SHARED FOLDER
-              ================================== */
-
               <>
                 <header className="topbar">
                   <div>
-                    <h2>
-                      {sharedFolder.name}
-                    </h2>
+                    <h2>{sharedFolder.name}</h2>
 
                     <p>
                       Shared folder ·{" "}
@@ -1718,8 +1697,7 @@ const closePreview = () => {
                     (breadcrumb, index) => {
                       const isLast =
                         index ===
-                        sharedBreadcrumbs.length -
-                          1;
+                        sharedBreadcrumbs.length - 1;
 
                       return (
                         <div
@@ -1740,9 +1718,7 @@ const closePreview = () => {
                             disabled={isLast}
                           >
                             {index === 0 && (
-                              <UsersIcon
-                                size={15}
-                              />
+                              <UsersIcon size={15} />
                             )}
 
                             {breadcrumb.name}
@@ -1767,17 +1743,13 @@ const closePreview = () => {
                     placeholder="Search this shared folder..."
                     value={searchQuery}
                     onChange={(e) =>
-                      setSearchQuery(
-                        e.target.value
-                      )
+                      setSearchQuery(e.target.value)
                     }
                   />
 
                   {searchQuery && (
                     <button
-                      onClick={() =>
-                        setSearchQuery("")
-                      }
+                      onClick={() => setSearchQuery("")}
                       className="clear-search"
                     >
                       ×
@@ -1799,8 +1771,7 @@ const closePreview = () => {
                   </div>
                 ) : (
                   <>
-                    {filteredSharedFolders.length >
-                      0 && (
+                    {filteredSharedFolders.length > 0 && (
                       <section>
                         <h3 className="section-title">
                           Folders
@@ -1816,20 +1787,14 @@ const closePreview = () => {
                                 <div
                                   className="item-main"
                                   onDoubleClick={() =>
-                                    openSharedFolder(
-                                      folder
-                                    )
+                                    openSharedFolder(folder)
                                   }
                                   onClick={() =>
-                                    openSharedFolder(
-                                      folder
-                                    )
+                                    openSharedFolder(folder)
                                   }
                                 >
                                   <div className="item-icon">
-                                    <FolderIcon
-                                      size={32}
-                                    />
+                                    <FolderIcon size={32} />
                                   </div>
 
                                   <div className="item-info">
@@ -1847,14 +1812,10 @@ const closePreview = () => {
                                   <button
                                     className="folder-action"
                                     onClick={() =>
-                                      openSharedFolder(
-                                        folder
-                                      )
+                                      openSharedFolder(folder)
                                     }
                                   >
-                                    <FolderIcon
-                                      size={14}
-                                    />
+                                    <FolderIcon size={14} />
                                     Open
                                   </button>
                                 </div>
@@ -1865,8 +1826,7 @@ const closePreview = () => {
                       </section>
                     )}
 
-                    {filteredSharedFiles.length >
-                      0 && (
+                    {filteredSharedFiles.length > 0 && (
                       <section>
                         <h3 className="section-title">
                           Files
@@ -1881,9 +1841,7 @@ const closePreview = () => {
                               >
                                 <div className="file-icon">
                                   <FileIcon
-                                    fileName={
-                                      file.name
-                                    }
+                                    fileName={file.name}
                                   />
                                 </div>
 
@@ -1902,29 +1860,20 @@ const closePreview = () => {
                                 <button
                                   className="file-action"
                                   onClick={() =>
-                                    previewFile(
-                                      file,
-                                      true
-                                    )
+                                    previewFile(file, true)
                                   }
                                 >
-                                  <EyeIcon
-                                    size={15}
-                                  />
+                                  <EyeIcon size={15} />
                                   Preview
                                 </button>
 
                                 <button
                                   className="file-action"
                                   onClick={() =>
-                                    downloadSharedFile(
-                                      file
-                                    )
+                                    downloadSharedFile(file)
                                   }
                                 >
-                                  <DownloadIcon
-                                    size={15}
-                                  />
+                                  <DownloadIcon size={15} />
                                   Download
                                 </button>
                               </div>
@@ -1934,10 +1883,8 @@ const closePreview = () => {
                       </section>
                     )}
 
-                    {filteredSharedFolders.length ===
-                      0 &&
-                      filteredSharedFiles.length ===
-                        0 && (
+                    {filteredSharedFolders.length === 0 &&
+                      filteredSharedFiles.length === 0 && (
                         <div className="empty-state">
                           <div className="empty-icon">
                             <FolderIcon size={48} />
@@ -1962,10 +1909,6 @@ const closePreview = () => {
             )}
           </>
         ) : (
-          /* ==================================
-             MY FILES
-          ================================== */
-
           <>
             <header className="topbar">
               <div>
@@ -2013,8 +1956,7 @@ const closePreview = () => {
               {breadcrumbs.map(
                 (breadcrumb, index) => {
                   const isLast =
-                    index ===
-                    breadcrumbs.length - 1;
+                    index === breadcrumbs.length - 1;
 
                   return (
                     <div
@@ -2058,17 +2000,13 @@ const closePreview = () => {
                 placeholder="Search files and folders..."
                 value={searchQuery}
                 onChange={(e) =>
-                  setSearchQuery(
-                    e.target.value
-                  )
+                  setSearchQuery(e.target.value)
                 }
               />
 
               {searchQuery && (
                 <button
-                  onClick={() =>
-                    setSearchQuery("")
-                  }
+                  onClick={() => setSearchQuery("")}
                   className="clear-search"
                 >
                   ×
@@ -2076,9 +2014,7 @@ const closePreview = () => {
               )}
             </div>
 
-            <StorageCard
-              stats={storageStats}
-            />
+            <StorageCard stats={storageStats} />
 
             {currentFolder && (
               <button
@@ -2101,9 +2037,7 @@ const closePreview = () => {
                   placeholder="Folder name"
                   value={newFolderName}
                   onChange={(e) =>
-                    setNewFolderName(
-                      e.target.value
-                    )
+                    setNewFolderName(e.target.value)
                   }
                 />
 
@@ -2129,8 +2063,7 @@ const closePreview = () => {
               </div>
             ) : (
               <div className="file-area">
-                {filteredFolders.length >
-                  0 && (
+                {filteredFolders.length > 0 && (
                   <section>
                     <h3 className="section-title">
                       Folders
@@ -2139,7 +2072,8 @@ const closePreview = () => {
                     <div className="items-grid">
                       {filteredFolders.map(
                         (folder) => {
-                          const starKey = `folder-${folder.id}`;
+                          const starKey =
+                            `folder-${folder.id}`;
 
                           return (
                             <div
@@ -2150,19 +2084,14 @@ const closePreview = () => {
                               folder.id ? (
                                 <form
                                   className="rename-form"
-                                  onSubmit={
-                                    renameFolder
-                                  }
+                                  onSubmit={renameFolder}
                                 >
                                   <input
                                     autoFocus
-                                    value={
-                                      renameValue
-                                    }
+                                    value={renameValue}
                                     onChange={(e) =>
                                       setRenameValue(
-                                        e.target
-                                          .value
+                                        e.target.value
                                       )
                                     }
                                   />
@@ -2187,15 +2116,11 @@ const closePreview = () => {
                                   <div
                                     className="item-main"
                                     onDoubleClick={() =>
-                                      openFolder(
-                                        folder
-                                      )
+                                      openFolder(folder)
                                     }
                                   >
                                     <div className="item-icon">
-                                      <FolderIcon
-                                        size={32}
-                                      />
+                                      <FolderIcon size={32} />
                                     </div>
 
                                     <div className="item-info">
@@ -2218,9 +2143,7 @@ const closePreview = () => {
                                         )
                                       }
                                     >
-                                      <EditIcon
-                                        size={14}
-                                      />
+                                      <EditIcon size={14} />
                                       Rename
                                     </button>
 
@@ -2233,9 +2156,7 @@ const closePreview = () => {
                                         )
                                       }
                                     >
-                                      <UsersIcon
-                                        size={14}
-                                      />
+                                      <UsersIcon size={14} />
                                       Share
                                     </button>
 
@@ -2248,9 +2169,7 @@ const closePreview = () => {
                                         )
                                       }
                                       disabled={
-                                        starLoading[
-                                          starKey
-                                        ]
+                                        starLoading[starKey]
                                       }
                                     >
                                       <StarIcon
@@ -2260,9 +2179,8 @@ const closePreview = () => {
                                           folder.id
                                         )}
                                       />
-                                      {starLoading[
-                                        starKey
-                                      ]
+
+                                      {starLoading[starKey]
                                         ? "..."
                                         : isStarred(
                                             "folder",
@@ -2275,14 +2193,10 @@ const closePreview = () => {
                                     <button
                                       className="folder-action delete"
                                       onClick={() =>
-                                        deleteFolder(
-                                          folder
-                                        )
+                                        deleteFolder(folder)
                                       }
                                     >
-                                      <TrashIcon
-                                        size={14}
-                                      />
+                                      <TrashIcon size={14} />
                                       Delete
                                     </button>
                                   </div>
@@ -2296,8 +2210,7 @@ const closePreview = () => {
                   </section>
                 )}
 
-                {filteredFiles.length >
-                  0 && (
+                {filteredFiles.length > 0 && (
                   <section>
                     <h3 className="section-title">
                       Files
@@ -2306,7 +2219,8 @@ const closePreview = () => {
                     <div className="items-list">
                       {filteredFiles.map(
                         (file) => {
-                          const starKey = `file-${file.id}`;
+                          const starKey =
+                            `file-${file.id}`;
 
                           return (
                             <div
@@ -2347,9 +2261,7 @@ const closePreview = () => {
                                   downloadFile(file)
                                 }
                               >
-                                <DownloadIcon
-                                  size={15}
-                                />
+                                <DownloadIcon size={15} />
                                 Download
                               </button>
 
@@ -2375,9 +2287,7 @@ const closePreview = () => {
                                   )
                                 }
                                 disabled={
-                                  starLoading[
-                                    starKey
-                                  ]
+                                  starLoading[starKey]
                                 }
                               >
                                 <StarIcon
@@ -2387,6 +2297,7 @@ const closePreview = () => {
                                     file.id
                                   )}
                                 />
+
                                 {starLoading[starKey]
                                   ? "..."
                                   : isStarred(
@@ -2414,10 +2325,8 @@ const closePreview = () => {
                   </section>
                 )}
 
-                {filteredFolders.length ===
-                  0 &&
-                  filteredFiles.length ===
-                    0 && (
+                {filteredFolders.length === 0 &&
+                  filteredFiles.length === 0 && (
                     <div className="empty-state">
                       <div className="empty-icon">
                         {normalizedSearch ? (
@@ -2445,10 +2354,6 @@ const closePreview = () => {
           </>
         )}
       </section>
-
-      {/* ==================================
-          SHARE MODAL
-      ================================== */}
 
       {shareTarget && (
         <div
@@ -2549,10 +2454,6 @@ const closePreview = () => {
         </div>
       )}
 
-      {/* ==================================
-          PREVIEW MODAL
-      ================================== */}
-
       {previewFileData && (
         <div
           className="preview-overlay"
@@ -2560,9 +2461,7 @@ const closePreview = () => {
         >
           <div
             className="preview-modal"
-            onClick={(e) =>
-              e.stopPropagation()
-            }
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="preview-header">
               <div>
@@ -2585,94 +2484,108 @@ const closePreview = () => {
               </button>
             </div>
 
+            <div className="preview-content">
+              {previewLoading ? (
+                <div className="preview-loading">
+                  Loading preview...
+                </div>
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "image" ? (
+                <img
+                  src={previewUrl}
+                  alt={previewFileData.name}
+                  className="image-preview"
+                />
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "pdf" ? (
+                <iframe
+                  src={previewUrl}
+                  title={previewFileData.name}
+                  className="pdf-preview"
+                />
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "video" ? (
+                <video
+                  src={previewUrl}
+                  className="video-preview"
+                  controls
+                  autoPlay
+                >
+                  Your browser does not support video playback.
+                </video>
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "audio" ? (
+                <div className="audio-preview">
+                  <div className="audio-preview-icon">
+                    🎵
+                  </div>
 
-<div className="preview-content">
-  {previewLoading ? (
-    <div className="preview-loading">
-      Loading preview...
-    </div>
-  ) : getPreviewType(previewFileData.name) === "image" ? (
-    <img
-      src={previewUrl}
-      alt={previewFileData.name}
-      className="image-preview"
-    />
-  ) : getPreviewType(previewFileData.name) === "pdf" ? (
-    <iframe
-      src={previewUrl}
-      title={previewFileData.name}
-      className="pdf-preview"
-    />
-  ) : getPreviewType(previewFileData.name) === "video" ? (
-    <video
-      src={previewUrl}
-      className="video-preview"
-      controls
-      autoPlay
-    >
-      Your browser does not support video playback.
-    </video>
-  ) : getPreviewType(previewFileData.name) === "audio" ? (
-    <div className="audio-preview">
-      <div className="audio-preview-icon">
-        🎵
-      </div>
+                  <h3>
+                    {previewFileData.name}
+                  </h3>
 
-      <h3>{previewFileData.name}</h3>
+                  <audio
+                    src={previewUrl}
+                    controls
+                    autoPlay
+                  >
+                    Your browser does not support audio playback.
+                  </audio>
+                </div>
+              ) : getPreviewType(
+                  previewFileData.name
+                ) === "text" ? (
+                <iframe
+                  src={previewUrl}
+                  title={previewFileData.name}
+                  className="text-preview"
+                />
+              ) : (
+                <div className="unsupported-preview">
+                  <div className="empty-icon">
+                    <FileIcon
+                      fileName={
+                        previewFileData.name
+                      }
+                      size={55}
+                    />
+                  </div>
 
-      <audio
-        src={previewUrl}
-        controls
-        autoPlay
-      >
-        Your browser does not support audio playback.
-      </audio>
-    </div>
-  ) : getPreviewType(previewFileData.name) === "text" ? (
-    <iframe
-      src={previewUrl}
-      title={previewFileData.name}
-      className="text-preview"
-    />
-  ) : (
-    <div className="unsupported-preview">
-      <div className="empty-icon">
-        <FileIcon
-          fileName={previewFileData.name}
-          size={55}
-        />
-      </div>
+                  <h3>Preview not available</h3>
 
-      <h3>Preview not available</h3>
+                  <p>
+                    This file type cannot be previewed in
+                    the browser.
+                  </p>
 
-      <p>
-        This file type cannot be previewed in the browser.
-      </p>
-
-      <button
-        className="file-action"
-        onClick={() =>
-          previewFileData.shared
-            ? downloadSharedFile(previewFileData)
-            : downloadFile(previewFileData)
-        }
-      >
-        <DownloadIcon size={15} />
-        Download File
-      </button>
-    </div>
-  )}
-</div>
+                  <button
+                    className="file-action"
+                    onClick={() =>
+                      previewFileData.shared
+                        ? downloadSharedFile(
+                            previewFileData
+                          )
+                        : downloadFile(
+                            previewFileData
+                          )
+                    }
+                  >
+                    <DownloadIcon size={15} />
+                    Download File
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
     </main>
   );
 }
-
-/* =========================
-   Storage Card
-========================= */
 
 function StorageCard({ stats }) {
   const STORAGE_LIMIT =
@@ -2739,10 +2652,6 @@ function StorageCard({ stats }) {
   );
 }
 
-/* =========================
-   Icons
-========================= */
-
 function Icon({
   children,
   size = 20,
@@ -2802,6 +2711,14 @@ function StarIcon({ size = 20, filled = false }) {
         d="m12 3 2.78 5.63 6.22.9-4.5 4.38 1.06 6.19L12 17.18l-5.56 2.92 1.06-6.19L3 9.53l6.22-.9L12 3Z"
         fill={filled ? "currentColor" : "none"}
       />
+    </Icon>
+  );
+}
+
+function ActivityIcon({ size = 20 }) {
+  return (
+    <Icon size={size}>
+      <path d="M3 12h4l2-7 4 14 2-7h6" />
     </Icon>
   );
 }
@@ -2893,10 +2810,6 @@ function LogoutIcon({ size = 20 }) {
   );
 }
 
-/* =========================
-   File Icon
-========================= */
-
 function FileIcon({
   fileName,
   size = 32,
@@ -2925,15 +2838,11 @@ function FileIcon({
   ) {
     type = "word";
   } else if (
-    ["xls", "xlsx", "csv"].includes(
-      extension
-    )
+    ["xls", "xlsx", "csv"].includes(extension)
   ) {
     type = "excel";
   } else if (
-    ["ppt", "pptx"].includes(
-      extension
-    )
+    ["ppt", "pptx"].includes(extension)
   ) {
     type = "powerpoint";
   } else if (
@@ -2943,9 +2852,7 @@ function FileIcon({
   ) {
     type = "archive";
   } else if (
-    ["mp3", "wav", "ogg", "m4a"].includes(
-      extension
-    )
+    ["mp3", "wav", "ogg", "m4a"].includes(extension)
   ) {
     type = "audio";
   } else if (
@@ -3033,18 +2940,12 @@ function FileShape() {
   );
 }
 
-/* =========================
-   Helpers
-========================= */
-
 function getFileExtension(fileName) {
   return fileName
     .split(".")
     .pop()
     .toLowerCase();
 }
-
-// REPLACE your existing getPreviewType function with this:
 
 function getPreviewType(fileName) {
   const extension = getFileExtension(fileName);
@@ -3112,6 +3013,19 @@ function getPreviewType(fileName) {
   }
 
   return "unsupported";
+}
+
+function formatActivityAction(activity) {
+  const resourceName =
+    activity.context?.name ||
+    activity.context?.resource_name ||
+    "resource";
+
+  const action = activity.action
+    ?.replace(/_/g, " ")
+    .toLowerCase();
+
+  return `${action || "updated"} — ${resourceName}`;
 }
 
 function formatFileSize(bytes) {
