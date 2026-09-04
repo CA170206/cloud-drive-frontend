@@ -248,6 +248,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
+  const [selectedFileIds, setSelectedFileIds] = useState([]);
 
   const [trashFiles, setTrashFiles] = useState([]);
   const [trashFolders, setTrashFolders] = useState([]);
@@ -630,6 +631,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   };
 
   const openMyFiles = () => {
+    setSelectedFileIds([]);
     setActiveView("my-files");
     setSearchQuery("");
     setFolderStack([]);
@@ -652,6 +654,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   };
 
   const openFolder = (folder) => {
+    setSelectedFileIds([]);
     setSearchQuery("");
 
     setFolderStack((previous) => [
@@ -664,6 +667,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   };
 
   const goBack = () => {
+    setSelectedFileIds([]);
     setSearchQuery("");
 
     const previousFolder =
@@ -1231,6 +1235,102 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       console.error("Shared download failed:", error);
       alert("Unable to download shared file");
     }
+  };
+
+
+  const toggleFileSelection = (fileId) => {
+    setSelectedFileIds((previous) =>
+      previous.includes(fileId)
+        ? previous.filter((id) => id !== fileId)
+        : [...previous, fileId]
+    );
+  };
+
+  const toggleSelectAllFiles = () => {
+    const visibleIds = filteredFiles.map((file) => file.id);
+
+    if (
+      visibleIds.length > 0 &&
+      visibleIds.every((id) => selectedFileIds.includes(id))
+    ) {
+      setSelectedFileIds((previous) =>
+        previous.filter((id) => !visibleIds.includes(id))
+      );
+    } else {
+      setSelectedFileIds((previous) => [
+        ...new Set([...previous, ...visibleIds]),
+      ]);
+    }
+  };
+
+  const clearFileSelection = () => setSelectedFileIds([]);
+
+  const bulkDeleteFiles = async () => {
+    if (!selectedFileIds.length) return;
+
+    if (
+      !window.confirm(
+        `Delete ${selectedFileIds.length} selected file${selectedFileIds.length === 1 ? "" : "s"}?`
+      )
+    ) {
+      return;
+    }
+
+    for (const id of selectedFileIds) {
+      try {
+        await fetch(`${API_URL}/api/files/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+      } catch (error) {
+        console.error("Bulk delete failed:", error);
+      }
+    }
+
+    clearFileSelection();
+    await loadContents(currentFolder?.id || null);
+    await loadStorageStats();
+    await loadStarredResources();
+    loadActivities();
+  };
+
+  const bulkDownloadFiles = async () => {
+    const selected = files.filter((file) =>
+      selectedFileIds.includes(file.id)
+    );
+
+    for (const file of selected) {
+      await downloadFile(file);
+    }
+
+    clearFileSelection();
+  };
+
+  const bulkStarFiles = async () => {
+    const selected = files.filter((file) =>
+      selectedFileIds.includes(file.id)
+    );
+
+    for (const file of selected) {
+      if (isStarred("file", file.id)) continue;
+
+      try {
+        await fetch(`${API_URL}/api/stars`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            resourceType: "file",
+            resourceId: file.id,
+          }),
+        });
+      } catch (error) {
+        console.error("Bulk star failed:", error);
+      }
+    }
+
+    await loadStarredResources();
+    clearFileSelection();
   };
 
   const deleteFile = async (file) => {
@@ -3722,6 +3822,53 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               </div>
             )}
 
+            {filteredFiles.length > 0 && (
+              <div className="bulk-actions-toolbar">
+                <label className="bulk-select-toggle">
+                  <input
+                    type="checkbox"
+                    checked={
+                      filteredFiles.length > 0 &&
+                      filteredFiles.every((file) =>
+                        selectedFileIds.includes(file.id)
+                      )
+                    }
+                    onChange={toggleSelectAllFiles}
+                  />
+                  <span>
+                    {selectedFileIds.length > 0
+                      ? `${selectedFileIds.length} selected`
+                      : "Select files"}
+                  </span>
+                </label>
+
+                {selectedFileIds.length > 0 && (
+                  <div className="bulk-action-buttons">
+                    <button type="button" onClick={bulkDownloadFiles}>
+                      Download
+                    </button>
+                    <button type="button" onClick={bulkStarFiles}>
+                      Star
+                    </button>
+                    <button
+                      type="button"
+                      className="danger"
+                      onClick={bulkDeleteFiles}
+                    >
+                      Delete
+                    </button>
+                    <button
+                      type="button"
+                      className="clear"
+                      onClick={clearFileSelection}
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
             <StorageCard stats={storageStats} />
 
             {currentFolder && (
@@ -3954,6 +4101,17 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                 </form>
                               ) : (
                               <>
+                              <label className="file-select-checkbox">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedFileIds.includes(file.id)}
+                                  onChange={() =>
+                                    toggleFileSelection(file.id)
+                                  }
+                                  aria-label={`Select ${file.name}`}
+                                />
+                              </label>
+
                               <div className="file-icon">
                                 <FileIcon
                                   fileName={file.name}
