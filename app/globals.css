@@ -1537,3 +1537,50 @@ section {
   font-size: 12px;
   color: #6b7280;
 }
+/* =========================================================
+   SORT DROPDOWN
+========================================================= */
+
+.sort-select {
+  min-width: 130px;
+  height: 38px;
+  padding: 0 34px 0 12px;
+
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+
+  background-color: #ffffff;
+  color: #1f2937;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  outline: none;
+
+  appearance: auto;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.sort-select:hover {
+  border-color: #b8c0cc;
+}
+
+.sort-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* Sort control wrapper */
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
