@@ -1749,15 +1749,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           <span>Recent</span>
         </button>
 
-        <button
-          className={`sidebar-item ${
-            activeView === "recent" ? "active" : ""
-          }`}
-          onClick={openRecent}
-        >
-          <ClockIcon size={18} />
-          <span>Recent</span>
-        </button>
+        
 
         <button
           className={`sidebar-item ${

@@ -3796,3 +3796,37 @@ html[data-theme="dark"] .preview-modal .preview-close:hover {
   border-color: #dfe5eb !important;
   color-scheme: light !important;
 }
+
+/* FIX SIDEBAR USER CARD */
+.sidebar-user {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+}
+
+.sidebar-user > div:last-child {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.sidebar-user > div:last-child strong {
+  display: block !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.2 !important;
+  margin: 0 0 3px 0 !important;
+}
+
+.sidebar-user > div:last-child small {
+  display: block !important;
+  width: 100% !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+}
