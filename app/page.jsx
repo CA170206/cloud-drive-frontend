@@ -6,6 +6,28 @@ import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:5000";
 
+const recentGridMenuButtonStyle = {
+  width: "100%",
+  height: "30px",
+  minHeight: "30px",
+  margin: 0,
+  padding: "0 9px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "flex-start",
+  gap: "8px",
+  boxSizing: "border-box",
+  border: 0,
+  borderRadius: "6px",
+  background: "transparent",
+  color: "#cbd5e1",
+  fontSize: "10px",
+  fontWeight: 500,
+  textAlign: "left",
+  whiteSpace: "nowrap",
+  cursor: "pointer",
+};
+
 export default function Home() {
   const [user, setUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -102,7 +124,7 @@ function Login({ onLogin, theme, setTheme }) {
         <button
           type="button"
           className="theme-toggle login-theme-toggle"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); closeMobileMenu(); }}
           aria-label="Toggle theme"
         >
           <span className="theme-toggle-icon">{theme === "dark" ? "☀" : "☾"}</span>
@@ -143,6 +165,12 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [activities, setActivities] = useState([]);
   const [activitiesLoading, setActivitiesLoading] = useState(false);
 
+  /* Activity Filters */
+  const [activityMonth, setActivityMonth] = useState("");
+  const [activityYear, setActivityYear] = useState("");
+  const [activityFromDate, setActivityFromDate] = useState("");
+  const [activityToDate, setActivityToDate] = useState("");
+
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
 
@@ -177,6 +205,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const [activeView, setActiveView] = useState("dashboard");
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [sharedResources, setSharedResources] = useState([]);
   const [sharedLoading, setSharedLoading] = useState(false);
@@ -211,6 +240,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   /* Recent Files */
   const [recentFiles, setRecentFiles] = useState([]);
   const [recentLoading, setRecentLoading] = useState(false);
+  const [recentGridMenuOpen, setRecentGridMenuOpen] = useState(null);
 
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
@@ -242,6 +272,60 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     } finally {
       setActivitiesLoading(false);
     }
+  };
+
+  const activityYears = Array.from(
+    new Set(
+      activities
+        .map((activity) => {
+          const date = new Date(activity.created_at);
+          return Number.isNaN(date.getTime())
+            ? null
+            : date.getFullYear();
+        })
+        .filter(Boolean)
+    )
+  ).sort((a, b) => b - a);
+
+  const filteredActivities = activities.filter((activity) => {
+    const activityDate = new Date(activity.created_at);
+
+    if (Number.isNaN(activityDate.getTime())) {
+      return false;
+    }
+
+    if (activityMonth && activityDate.getMonth() + 1 !== Number(activityMonth)) {
+      return false;
+    }
+
+    if (activityYear && activityDate.getFullYear() !== Number(activityYear)) {
+      return false;
+    }
+
+    if (activityFromDate) {
+      const from = new Date(`${activityFromDate}T00:00:00`);
+
+      if (activityDate < from) {
+        return false;
+      }
+    }
+
+    if (activityToDate) {
+      const to = new Date(`${activityToDate}T23:59:59.999`);
+
+      if (activityDate > to) {
+        return false;
+      }
+    }
+
+    return true;
+  });
+
+  const clearActivityFilters = () => {
+    setActivityMonth("");
+    setActivityYear("");
+    setActivityFromDate("");
+    setActivityToDate("");
   };
 
   const loadStorageStats = async () => {
@@ -1564,6 +1648,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     }
   };
 
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+  };
+
   const logout = async () => {
     try {
       await fetch(
@@ -1681,7 +1769,34 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   return (
     <main className="dashboard">
-      <aside className="sidebar">
+      <header className="mobile-header">
+        <button
+          type="button"
+          className={`mobile-menu-button ${mobileMenuOpen ? "open" : ""}`}
+          onClick={() => setMobileMenuOpen((previous) => !previous)}
+          aria-label="Open navigation menu"
+          aria-expanded={mobileMenuOpen}
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div className="mobile-brand">
+          <div className="brand-icon">
+            <CloudIcon />
+          </div>
+          <strong>Cloud Drive</strong>
+        </div>
+
+        <div className="mobile-profile">
+          <div className="avatar">
+            {user.name?.charAt(0).toUpperCase()}
+          </div>
+        </div>
+      </header>
+
+      <aside className={`sidebar ${mobileMenuOpen ? "mobile-open" : ""}`}>
         <div className="brand">
           <div className="brand-icon">
             <CloudIcon />
@@ -1707,7 +1822,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           className={`sidebar-item ${
             activeView === "dashboard" ? "active" : ""
           }`}
-          onClick={openDashboard}
+          onClick={() => { openDashboard(); closeMobileMenu(); }}
         >
           <DashboardIcon size={17} />
           <span>Dashboard</span>
@@ -1719,7 +1834,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               ? "active"
               : ""
           }`}
-          onClick={openMyFiles}
+          onClick={() => { openMyFiles(); closeMobileMenu(); }}
         >
           <FolderIcon size={18} />
           <span>My Files</span>
@@ -1731,7 +1846,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               ? "active"
               : ""
           }`}
-          onClick={openSharedWithMe}
+          onClick={() => { openSharedWithMe(); closeMobileMenu(); }}
         >
           <UsersIcon size={18} />
           <span>Shared with me</span>
@@ -1743,7 +1858,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               ? "active"
               : ""
           }`}
-          onClick={openRecent}
+          onClick={() => { openRecent(); closeMobileMenu(); }}
         >
           <ClockIcon size={18} />
           <span>Recent</span>
@@ -1757,7 +1872,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               ? "active"
               : ""
           }`}
-          onClick={openStarred}
+          onClick={() => { openStarred(); closeMobileMenu(); }}
         >
           <StarIcon size={18} filled />
           <span>Starred</span>
@@ -1769,7 +1884,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               ? "active"
               : ""
           }`}
-          onClick={openActivity}
+          onClick={() => { openActivity(); closeMobileMenu(); }}
         >
           <ActivityIcon size={18} />
           <span>Activity</span>
@@ -1777,7 +1892,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className="theme-toggle"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); closeMobileMenu(); }}
           aria-label="Toggle theme"
         >
           <span className="theme-toggle-icon">{theme === "dark" ? "☀" : "☾"}</span>
@@ -1786,7 +1901,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className="sidebar-item"
-          onClick={() => setShowLogoutConfirm(true)}
+          onClick={() => { setShowLogoutConfirm(true); closeMobileMenu(); }}
         >
           <LogoutIcon size={18} />
           <span>Logout</span>
@@ -1870,25 +1985,25 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             <section>
               <h3 className="dashboard-section-title">QUICK ACCESS</h3>
               <div className="quick-access-grid">
-                <button className="quick-card" onClick={openMyFiles}>
+                <button className="quick-card" onClick={() => { openMyFiles(); closeMobileMenu(); }}>
                   <span className="quick-icon blue"><FolderIcon size={19} /></span>
                   <strong>Files</strong>
                   <small>Browse and manage files</small>
                 </button>
 
-                <button className="quick-card" onClick={openSharedWithMe}>
+                <button className="quick-card" onClick={() => { openSharedWithMe(); closeMobileMenu(); }}>
                   <span className="quick-icon cyan"><UsersIcon size={19} /></span>
                   <strong>Shared</strong>
                   <small>{sharedResources.length} shared items</small>
                 </button>
 
-                <button className="quick-card" onClick={openStarred}>
+                <button className="quick-card" onClick={() => { openStarred(); closeMobileMenu(); }}>
                   <span className="quick-icon purple"><StarIcon size={19} filled /></span>
                   <strong>Starred</strong>
                   <small>{starredResources.length} favorites</small>
                 </button>
 
-                <button className="quick-card" onClick={openActivity}>
+                <button className="quick-card" onClick={() => { openActivity(); closeMobileMenu(); }}>
                   <span className="quick-icon green"><ActivityIcon size={19} /></span>
                   <strong>Activity</strong>
                   <small>{activities.length} recent events</small>
@@ -1899,7 +2014,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             <section>
               <div className="dashboard-section-heading">
                 <h3 className="dashboard-section-title">RECENTLY VIEWED FOLDERS</h3>
-                <button onClick={openMyFiles}>View all</button>
+                <button onClick={() => { openMyFiles(); closeMobileMenu(); }}>View all</button>
               </div>
 
               <div className="recent-folder-grid">
@@ -1919,7 +2034,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             <section>
               <div className="dashboard-section-heading">
                 <h3 className="dashboard-section-title">RECENT FILES</h3>
-                <button onClick={openMyFiles}>View all</button>
+                <button onClick={() => { openMyFiles(); closeMobileMenu(); }}>View all</button>
               </div>
 
               <div className="dashboard-file-list">
@@ -1968,30 +2083,141 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 </p>
               </div>
             ) : (
-              <div className="activity-list">
-                {activities.map((activity) => (
-                  <div
-                    className="activity-row"
-                    key={activity.id}
-                  >
-                    <div className="activity-icon">
-                      <ActivityIcon size={20} />
+              <>
+                <div className="activity-filter-card">
+                  <div className="activity-filter-heading">
+                    <div>
+                      <strong>Filter activity</strong>
+                      <span>Show activity from the selected period</span>
                     </div>
 
-                    <div className="activity-info">
-                      <strong>
-                        {formatActivityAction(activity)}
-                      </strong>
-
-                      <span>
-                        {new Date(
-                          activity.created_at
-                        ).toLocaleString()}
-                      </span>
-                    </div>
+                    <button
+                      type="button"
+                      className="activity-clear-filter"
+                      onClick={clearActivityFilters}
+                      disabled={!activityMonth && !activityYear && !activityFromDate && !activityToDate}
+                    >
+                      Clear
+                    </button>
                   </div>
-                ))}
-              </div>
+
+                  <div className="activity-filter-grid">
+                    <label>
+                      <span>Month</span>
+                      <select
+                        value={activityMonth}
+                        onChange={(e) => setActivityMonth(e.target.value)}
+                      >
+                        <option value="">All months</option>
+                        {
+                          [
+                            "January",
+                            "February",
+                            "March",
+                            "April",
+                            "May",
+                            "June",
+                            "July",
+                            "August",
+                            "September",
+                            "October",
+                            "November",
+                            "December",
+                          ].map((month, index) => (
+                            <option key={month} value={index + 1}>
+                              {month}
+                            </option>
+                          ))
+                        }
+                      </select>
+                    </label>
+
+                    <label>
+                      <span>Year</span>
+                      <select
+                        value={activityYear}
+                        onChange={(e) => setActivityYear(e.target.value)}
+                      >
+                        <option value="">All years</option>
+                        {activityYears.map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+
+                    <label>
+                      <span>From date</span>
+                      <input
+                        type="date"
+                        value={activityFromDate}
+                        onChange={(e) => setActivityFromDate(e.target.value)}
+                      />
+                    </label>
+
+                    <label>
+                      <span>To date</span>
+                      <input
+                        type="date"
+                        value={activityToDate}
+                        min={activityFromDate || undefined}
+                        onChange={(e) => setActivityToDate(e.target.value)}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="activity-filter-footer">
+                    <span>
+                      Showing <strong>{filteredActivities.length}</strong> of <strong>{activities.length}</strong> activities
+                    </span>
+                    {(activityFromDate || activityToDate) && activityFromDate && activityToDate && activityFromDate > activityToDate && (
+                      <span className="activity-filter-error">
+                        From date cannot be after To date.
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {filteredActivities.length === 0 ? (
+                  <div className="empty-state activity-filter-empty">
+                    <div className="empty-icon">
+                      <ActivityIcon size={42} />
+                    </div>
+
+                    <h3>No activity in this period</h3>
+
+                    <p>
+                      Try another month, year, or date range.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="activity-list">
+                    {filteredActivities.map((activity) => (
+                      <div
+                        className="activity-row"
+                        key={activity.id}
+                      >
+                        <div className="activity-icon">
+                          <ActivityIcon size={19} />
+                        </div>
+
+                        <div className="activity-info">
+                          <strong>
+                            {formatActivityAction(activity)}
+                          </strong>
+
+                          <span>
+                            {new Date(
+                              activity.created_at
+                            ).toLocaleString()}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </>
         ) : activeView === "recent" ? (
@@ -2092,82 +2318,235 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       Recent files
                     </h3>
 
-                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
+                    <div
+                      className={`items-list mobile-actions-list ${viewMode === "grid" ? "grid-view" : ""}`}
+                      style={
+                        viewMode === "grid"
+                          ? { overflow: "visible" }
+                          : undefined
+                      }
+                    >
                       {filteredRecentFiles.map((file) => (
-                          <div
-                            className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
-                            key={file.id}
-                          >
-                            <div className="file-icon">
-                              <FileIcon
-                                fileName={file.name}
-                              />
-                            </div>
-
-                            <div className="file-info">
-                              <strong>{file.name}</strong>
-
-                              <span>
-                                {formatFileSize(file.size_bytes)}
-                                {" • "}
-                                Updated{" "}
-                                {new Date(
-                                  file.updated_at
-                                ).toLocaleString()}
-                              </span>
-                            </div>
-
-                            <button
-                              className="file-action"
-                              onClick={() =>
-                                openDetails(file)
-                              }
-                            >
-                              ℹ️
-                              Details
-                            </button>
-
-                            <button
-                              className="file-action"
-                              onClick={() =>
-                                previewFile(file)
-                              }
-                            >
-                              <EyeIcon size={15} />
-                              Preview
-                            </button>
-
-                            <button
-                              className="file-action"
-                              onClick={() =>
-                                downloadFile(file)
-                              }
-                            >
-                              <DownloadIcon size={15} />
-                              Download
-                            </button>
-
-                            <button
-                              className="file-action"
-                              onClick={() =>
-                                openVersionHistory(file)
-                              }
-                            >
-                              🕘
-                              Versions
-                            </button>
-
-                            <button
-                              className="file-action"
-                              onClick={() =>
-                                openPublicLinkModal(file)
-                              }
-                            >
-                              🔗
-                              Public Link
-                            </button>
+                        <div
+                          className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
+                          key={file.id}
+                          style={
+                            viewMode === "grid"
+                              ? {
+                                  position: "relative",
+                                  overflow: "visible",
+                                  zIndex:
+                                    recentGridMenuOpen === file.id
+                                      ? 1000
+                                      : 1,
+                                }
+                              : undefined
+                          }
+                        >
+                          <div className="file-icon">
+                            <FileIcon fileName={file.name} />
                           </div>
-                        ))}
+
+                          <div className="file-info">
+                            <strong>{file.name}</strong>
+
+                            <span>
+                              {formatFileSize(file.size_bytes)}
+                              {" • "}
+                              Updated{" "}
+                              {new Date(
+                                file.updated_at
+                              ).toLocaleString()}
+                            </span>
+                          </div>
+
+                          <details className="mobile-file-options">
+                            <summary aria-label="File options">⋮</summary>
+                            <div className="mobile-file-options-menu">
+                              <button type="button" onClick={() => openDetails(file)}>ℹ️ Details</button>
+                              <button type="button" onClick={() => previewFile(file)}><EyeIcon size={14} /> Preview</button>
+                              <button type="button" onClick={() => downloadFile(file)}><DownloadIcon size={14} /> Download</button>
+                              <button type="button" onClick={() => openVersionHistory(file)}>🕘 Versions</button>
+                              <button type="button" onClick={() => openPublicLinkModal(file)}>🔗 Public Link</button>
+                            </div>
+                          </details>
+
+                          {viewMode === "grid" ? (
+                            <div
+                              style={{
+                                position: "absolute",
+                                top: "9px",
+                                right: "9px",
+                                zIndex: 1001,
+                              }}
+                            >
+                              <button
+                                type="button"
+                                aria-label="File options"
+                                aria-expanded={
+                                  recentGridMenuOpen === file.id
+                                }
+                                onClick={() =>
+                                  setRecentGridMenuOpen(
+                                    recentGridMenuOpen === file.id
+                                      ? null
+                                      : file.id
+                                  )
+                                }
+                                style={{
+                                  width: "28px",
+                                  height: "28px",
+                                  padding: 0,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "center",
+                                  border: "1px solid #34404d",
+                                  borderRadius: "7px",
+                                  background: "#202832",
+                                  color: "#cbd5e1",
+                                  fontSize: "18px",
+                                  fontWeight: 700,
+                                  lineHeight: 1,
+                                  cursor: "pointer",
+                                }}
+                              >
+                                ⋮
+                              </button>
+
+                              {recentGridMenuOpen === file.id && (
+                                <div
+                                  style={{
+                                    position: "absolute",
+                                    top: "33px",
+                                    right: 0,
+                                    width: "155px",
+                                    padding: "5px",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "2px",
+                                    boxSizing: "border-box",
+                                    background: "#1b222b",
+                                    border: "1px solid #35404d",
+                                    borderRadius: "9px",
+                                    boxShadow:
+                                      "0 12px 30px rgba(0,0,0,.35)",
+                                    zIndex: 10000,
+                                  }}
+                                >
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRecentGridMenuOpen(null);
+                                      openDetails(file);
+                                    }}
+                                    style={recentGridMenuButtonStyle}
+                                  >
+                                    ℹ️ Details
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRecentGridMenuOpen(null);
+                                      previewFile(file);
+                                    }}
+                                    style={recentGridMenuButtonStyle}
+                                  >
+                                    <EyeIcon size={14} />
+                                    Preview
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRecentGridMenuOpen(null);
+                                      downloadFile(file);
+                                    }}
+                                    style={recentGridMenuButtonStyle}
+                                  >
+                                    <DownloadIcon size={14} />
+                                    Download
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRecentGridMenuOpen(null);
+                                      openVersionHistory(file);
+                                    }}
+                                    style={recentGridMenuButtonStyle}
+                                  >
+                                    🕘 Versions
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setRecentGridMenuOpen(null);
+                                      openPublicLinkModal(file);
+                                    }}
+                                    style={recentGridMenuButtonStyle}
+                                  >
+                                    🔗 Public Link
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <>
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openDetails(file)
+                                }
+                              >
+                                ℹ️
+                                Details
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  previewFile(file)
+                                }
+                              >
+                                <EyeIcon size={15} />
+                                Preview
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  downloadFile(file)
+                                }
+                              >
+                                <DownloadIcon size={15} />
+                                Download
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openVersionHistory(file)
+                                }
+                              >
+                                🕘
+                                Versions
+                              </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openPublicLinkModal(file)
+                                }
+                              >
+                                🔗
+                                Public Link
+                              </button>
+                            </>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </section>
                 )}
@@ -2299,7 +2678,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       Files
                     </h3>
 
-                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
+                    <div className={`items-list mobile-actions-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredStarredFiles.map(
                         (file) => {
                           const key = `file-${file.resource_id}`;
@@ -2326,6 +2705,20 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                   )}
                                 </span>
                               </div>
+
+                              <details className="mobile-file-options">
+                                <summary aria-label="File options">⋮</summary>
+                                <div className="mobile-file-options-menu">
+                                  <button type="button" onClick={() => previewFile({ id: file.resource_id, name: file.name, size_bytes: file.size_bytes })}><EyeIcon size={14} /> Preview</button>
+                                  <button type="button" onClick={() => downloadFile({ id: file.resource_id, name: file.name })}><DownloadIcon size={14} /> Download</button>
+                                  <button type="button" onClick={() => openPublicLinkModal(file)}>🔗 Public Link</button>
+                                  <button type="button" onClick={() => openVersionHistory({ id: file.resource_id, name: file.name, size_bytes: file.size_bytes })}>🕘 Versions</button>
+                                  <button type="button" onClick={() => toggleStar("file", file.resource_id)} disabled={starLoading[key]}>
+                                    <StarIcon size={14} filled />
+                                    {starLoading[key] ? "..." : "Unstar"}
+                                  </button>
+                                </div>
+                              </details>
 
                               <button
                                 className="file-action"
@@ -3194,7 +3587,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       Files
                     </h3>
 
-                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
+                    <div className={`items-list mobile-actions-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredFiles.map(
                         (file) => {
                           const starKey =
@@ -3220,10 +3613,26 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                   {formatFileSize(
                                     file.size_bytes
                                   )}
-                                </span>\
+                                </span>
 
                               </div>
 
+                              <details className="mobile-file-options">
+                                <summary aria-label="File options">⋮</summary>
+                                <div className="mobile-file-options-menu">
+                                  <button type="button" onClick={() => openDetails(file)}>ℹ️ Details</button>
+                                  <button type="button" onClick={() => previewFile(file)}><EyeIcon size={14} /> Preview</button>
+                                  <button type="button" onClick={() => downloadFile(file)}><DownloadIcon size={14} /> Download</button>
+                                  <button type="button" onClick={() => openShareModal("file", file)}><UsersIcon size={14} /> Share</button>
+                                  <button type="button" onClick={() => openPublicLinkModal(file)}>🔗 Public Link</button>
+                                  <button type="button" onClick={() => openVersionHistory(file)}>🕘 Versions</button>
+                                  <button type="button" onClick={() => toggleStar("file", file.id)} disabled={starLoading[starKey]}>
+                                    <StarIcon size={14} filled={isStarred("file", file.id)} />
+                                    {starLoading[starKey] ? "..." : isStarred("file", file.id) ? "Unstar" : "Star"}
+                                  </button>
+                                  <button type="button" className="mobile-file-delete" onClick={() => deleteFile(file)}><TrashIcon size={14} /> Delete</button>
+                                </div>
+                              </details>
 
                               <button
 
@@ -3477,6 +3886,87 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </div>
       )}
 
+      {detailsTarget && (
+        <div
+          className="details-modal-overlay"
+          onClick={closeDetails}
+        >
+          <div
+            className="details-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="details-header">
+              <div>
+                <h2>File Details</h2>
+                <p>{detailsTarget.name}</p>
+              </div>
+
+              <button
+                type="button"
+                className="preview-close"
+                onClick={closeDetails}
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="details-content">
+              <div className="details-file-icon">
+                <FileIcon
+                  fileName={detailsTarget.name}
+                  size={42}
+                />
+              </div>
+
+              <div className="details-grid">
+                <div className="details-item details-item-wide">
+                  <span>Name</span>
+                  <strong>{detailsTarget.name}</strong>
+                </div>
+
+                <div className="details-item">
+                  <span>Size</span>
+                  <strong>{formatFileSize(detailsTarget.size_bytes)}</strong>
+                </div>
+
+                <div className="details-item">
+                  <span>Type</span>
+                  <strong>{detailsTarget.mime_type || getPreviewType(detailsTarget.name)}</strong>
+                </div>
+
+                <div className="details-item">
+                  <span>Created</span>
+                  <strong>
+                    {detailsTarget.created_at
+                      ? new Date(detailsTarget.created_at).toLocaleString()
+                      : "—"}
+                  </strong>
+                </div>
+
+                <div className="details-item">
+                  <span>Updated</span>
+                  <strong>
+                    {detailsTarget.updated_at
+                      ? new Date(detailsTarget.updated_at).toLocaleString()
+                      : "—"}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="share-modal-actions">
+                <button
+                  type="button"
+                  className="file-action"
+                  onClick={closeDetails}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {versionTarget && (
         <div
           className="version-history-overlay"
@@ -3665,11 +4155,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
       {publicLinkTarget && (
         <div
-          className="preview-overlay"
+          className="public-link-modal-overlay"
           onClick={closePublicLinkModal}
         >
           <div
-            className="share-modal"
+            className="public-link-modal"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="share-modal-header">
