@@ -731,62 +731,60 @@ function Dashboard({ user, onLogout }) {
      Preview
   ========================= */
 
-  const previewFile = async (
-    file,
-    isShared = false
-  ) => {
-    setPreviewLoading(true);
+  // REPLACE your existing previewFile function with this:
 
-    setPreviewFileData({
-      ...file,
-      shared: isShared,
-    });
+const previewFile = async (file, isShared = false) => {
+  setPreviewLoading(true);
 
-    try {
-      if (previewUrl) {
-        window.URL.revokeObjectURL(previewUrl);
-        setPreviewUrl("");
-      }
+  setPreviewFileData({
+    ...file,
+    shared: isShared,
+  });
 
-      const url = isShared
-        ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
-        : `${API_URL}/api/files/${file.id}/download`;
-
-      const response = await fetch(url, {
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        alert("Unable to preview file");
-        setPreviewFileData(null);
-        return;
-      }
-
-      const blob = await response.blob();
-
-      const objectUrl =
-        window.URL.createObjectURL(blob);
-
-      setPreviewUrl(objectUrl);
-    } catch (error) {
-      console.error("Preview failed:", error);
-
-      alert("Unable to preview file");
-      setPreviewFileData(null);
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
-  const closePreview = () => {
+  try {
     if (previewUrl) {
       window.URL.revokeObjectURL(previewUrl);
+      setPreviewUrl("");
     }
 
-    setPreviewUrl("");
+    const url = isShared
+      ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
+      : `${API_URL}/api/files/${file.id}/download`;
+
+    const response = await fetch(url, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      alert("Unable to preview file");
+      setPreviewFileData(null);
+      return;
+    }
+
+    const blob = await response.blob();
+
+    const objectUrl = window.URL.createObjectURL(blob);
+
+    setPreviewUrl(objectUrl);
+  } catch (error) {
+    console.error("Preview failed:", error);
+
+    alert("Unable to preview file");
     setPreviewFileData(null);
+  } finally {
     setPreviewLoading(false);
-  };
+  }
+};
+
+const closePreview = () => {
+  if (previewUrl) {
+    window.URL.revokeObjectURL(previewUrl);
+  }
+
+  setPreviewUrl("");
+  setPreviewFileData(null);
+  setPreviewLoading(false);
+};
 
   /* =========================
      Downloads
@@ -2587,73 +2585,84 @@ function Dashboard({ user, onLogout }) {
               </button>
             </div>
 
-            <div className="preview-content">
-              {previewLoading ? (
-                <div className="preview-loading">
-                  Loading preview...
-                </div>
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "image" ? (
-                <img
-                  src={previewUrl}
-                  alt={previewFileData.name}
-                  className="image-preview"
-                />
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "pdf" ? (
-                <iframe
-                  src={previewUrl}
-                  title={previewFileData.name}
-                  className="pdf-preview"
-                />
-              ) : getPreviewType(
-                  previewFileData.name
-                ) === "text" ? (
-                <iframe
-                  src={previewUrl}
-                  title={previewFileData.name}
-                  className="text-preview"
-                />
-              ) : (
-                <div className="unsupported-preview">
-                  <div className="empty-icon">
-                    <FileIcon
-                      fileName={
-                        previewFileData.name
-                      }
-                      size={55}
-                    />
-                  </div>
 
-                  <h3>
-                    Preview not available
-                  </h3>
+<div className="preview-content">
+  {previewLoading ? (
+    <div className="preview-loading">
+      Loading preview...
+    </div>
+  ) : getPreviewType(previewFileData.name) === "image" ? (
+    <img
+      src={previewUrl}
+      alt={previewFileData.name}
+      className="image-preview"
+    />
+  ) : getPreviewType(previewFileData.name) === "pdf" ? (
+    <iframe
+      src={previewUrl}
+      title={previewFileData.name}
+      className="pdf-preview"
+    />
+  ) : getPreviewType(previewFileData.name) === "video" ? (
+    <video
+      src={previewUrl}
+      className="video-preview"
+      controls
+      autoPlay
+    >
+      Your browser does not support video playback.
+    </video>
+  ) : getPreviewType(previewFileData.name) === "audio" ? (
+    <div className="audio-preview">
+      <div className="audio-preview-icon">
+        🎵
+      </div>
 
-                  <p>
-                    This file type cannot be
-                    previewed in the browser.
-                  </p>
+      <h3>{previewFileData.name}</h3>
 
-                  <button
-                    className="file-action"
-                    onClick={() =>
-                      previewFileData.shared
-                        ? downloadSharedFile(
-                            previewFileData
-                          )
-                        : downloadFile(
-                            previewFileData
-                          )
-                    }
-                  >
-                    <DownloadIcon size={15} />
-                    Download File
-                  </button>
-                </div>
-              )}
-            </div>
+      <audio
+        src={previewUrl}
+        controls
+        autoPlay
+      >
+        Your browser does not support audio playback.
+      </audio>
+    </div>
+  ) : getPreviewType(previewFileData.name) === "text" ? (
+    <iframe
+      src={previewUrl}
+      title={previewFileData.name}
+      className="text-preview"
+    />
+  ) : (
+    <div className="unsupported-preview">
+      <div className="empty-icon">
+        <FileIcon
+          fileName={previewFileData.name}
+          size={55}
+        />
+      </div>
+
+      <h3>Preview not available</h3>
+
+      <p>
+        This file type cannot be previewed in the browser.
+      </p>
+
+      <button
+        className="file-action"
+        onClick={() =>
+          previewFileData.shared
+            ? downloadSharedFile(previewFileData)
+            : downloadFile(previewFileData)
+        }
+      >
+        <DownloadIcon size={15} />
+        Download File
+      </button>
+    </div>
+  )}
+</div>
           </div>
         </div>
       )}
@@ -3035,9 +3044,10 @@ function getFileExtension(fileName) {
     .toLowerCase();
 }
 
+// REPLACE your existing getPreviewType function with this:
+
 function getPreviewType(fileName) {
-  const extension =
-    getFileExtension(fileName);
+  const extension = getFileExtension(fileName);
 
   if (
     [
@@ -3059,6 +3069,32 @@ function getPreviewType(fileName) {
 
   if (
     [
+      "mp4",
+      "webm",
+      "ogg",
+      "mov",
+      "avi",
+      "mkv",
+    ].includes(extension)
+  ) {
+    return "video";
+  }
+
+  if (
+    [
+      "mp3",
+      "wav",
+      "ogg",
+      "m4a",
+      "aac",
+      "flac",
+    ].includes(extension)
+  ) {
+    return "audio";
+  }
+
+  if (
+    [
       "txt",
       "md",
       "json",
@@ -3069,6 +3105,7 @@ function getPreviewType(fileName) {
       "jsx",
       "ts",
       "tsx",
+      "csv",
     ].includes(extension)
   ) {
     return "text";
