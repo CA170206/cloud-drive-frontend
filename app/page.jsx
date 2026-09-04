@@ -181,6 +181,10 @@ function Dashboard({ user, onLogout }) {
   const [versionUploading, setVersionUploading] = useState(false);
   const [versionMessage, setVersionMessage] = useState("");
 
+  /* Recent Files */
+  const [recentFiles, setRecentFiles] = useState([]);
+  const [recentLoading, setRecentLoading] = useState(false);
+
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
@@ -191,6 +195,7 @@ function Dashboard({ user, onLogout }) {
     loadSharedWithMe();
     loadStarredResources();
     loadActivities();
+    loadRecentFiles();
   }, []);
 
   const loadActivities = async () => {
@@ -254,6 +259,40 @@ function Dashboard({ user, onLogout }) {
     } finally {
       setSharedLoading(false);
     }
+  };
+
+  const loadRecentFiles = async () => {
+    setRecentLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/recent`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        setRecentFiles(data.files || []);
+      }
+    } catch (error) {
+      console.error("Failed to load recent files:", error);
+    } finally {
+      setRecentLoading(false);
+    }
+  };
+
+  const openRecent = () => {
+    setActiveView("recent");
+    setSearchQuery("");
+    setCurrentFolder(null);
+    setFolderStack([]);
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    loadRecentFiles();
   };
 
   const loadStarredResources = async () => {
@@ -1616,6 +1655,18 @@ function Dashboard({ user, onLogout }) {
 
         <button
           className={`sidebar-item ${
+            activeView === "recent"
+              ? "active"
+              : ""
+          }`}
+          onClick={openRecent}
+        >
+          <ClockIcon size={18} />
+          <span>Recent</span>
+        </button>
+
+        <button
+          className={`sidebar-item ${
             activeView === "starred"
               ? "active"
               : ""
@@ -1698,6 +1749,151 @@ function Dashboard({ user, onLogout }) {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </>
+        ) : activeView === "recent" ? (
+          <>
+            <header className="topbar">
+              <div>
+                <h2>Recent</h2>
+                <p>Your recently updated files</p>
+              </div>
+            </header>
+
+            <div className="search-bar">
+              <SearchIcon size={18} />
+
+              <input
+                type="text"
+                placeholder="Search recent files..."
+                value={searchQuery}
+                onChange={(e) =>
+                  setSearchQuery(e.target.value)
+                }
+              />
+
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="clear-search"
+                >
+                  ×
+                </button>
+              )}
+            </div>
+
+            {recentLoading ? (
+              <div className="empty-state">
+                Loading recent files...
+              </div>
+            ) : (
+              <div className="file-area">
+                {recentFiles.filter((file) =>
+                  file.name
+                    ?.toLowerCase()
+                    .includes(searchQuery.trim().toLowerCase())
+                ).length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">
+                      <ClockIcon size={48} />
+                    </div>
+
+                    <h3>
+                      {searchQuery
+                        ? "No results found"
+                        : "No recent files"}
+                    </h3>
+
+                    <p>
+                      {searchQuery
+                        ? `Nothing matches "${searchQuery}"`
+                        : "Files you recently update will appear here."}
+                    </p>
+                  </div>
+                ) : (
+                  <section>
+                    <h3 className="section-title">
+                      Recent files
+                    </h3>
+
+                    <div className="items-list">
+                      {recentFiles
+                        .filter((file) =>
+                          file.name
+                            ?.toLowerCase()
+                            .includes(
+                              searchQuery.trim().toLowerCase()
+                            )
+                        )
+                        .map((file) => (
+                          <div
+                            className="file-row"
+                            key={file.id}
+                          >
+                            <div className="file-icon">
+                              <FileIcon
+                                fileName={file.name}
+                              />
+                            </div>
+
+                            <div className="file-info">
+                              <strong>{file.name}</strong>
+
+                              <span>
+                                {formatFileSize(file.size_bytes)}
+                                {" • "}
+                                Updated{" "}
+                                {new Date(
+                                  file.updated_at
+                                ).toLocaleString()}
+                              </span>
+                            </div>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                previewFile(file)
+                              }
+                            >
+                              <EyeIcon size={15} />
+                              Preview
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                downloadFile(file)
+                              }
+                            >
+                              <DownloadIcon size={15} />
+                              Download
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                openVersionHistory(file)
+                              }
+                            >
+                              🕘
+                              Versions
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
+                                openPublicLinkModal(file)
+                              }
+                            >
+                              🔗
+                              Public Link
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  </section>
+                )}
               </div>
             )}
           </>
@@ -3564,6 +3760,24 @@ function StarIcon({ size = 20, filled = false }) {
         fill={filled ? "currentColor" : "none"}
       />
     </Icon>
+  );
+}
+
+function ClockIcon({ size = 20 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v5l3 2" />
+    </svg>
   );
 }
 
