@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const API_URL = "http://localhost:5000";
 
@@ -165,12 +165,6 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [activities, setActivities] = useState([]);
   const [activitiesLoading, setActivitiesLoading] = useState(false);
 
-  /* Activity Filters */
-  const [activityMonth, setActivityMonth] = useState("");
-  const [activityYear, setActivityYear] = useState("");
-  const [activityFromDate, setActivityFromDate] = useState("");
-  const [activityToDate, setActivityToDate] = useState("");
-
   const [folders, setFolders] = useState([]);
   const [files, setFiles] = useState([]);
 
@@ -188,6 +182,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [viewMode, setViewMode] = useState("list");
 
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [dragActive, setDragActive] = useState(false);
+  const dragDepth = useRef(0);
   const [loading, setLoading] = useState(true);
 
   const [previewFileData, setPreviewFileData] = useState(null);
@@ -272,60 +269,6 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     } finally {
       setActivitiesLoading(false);
     }
-  };
-
-  const activityYears = Array.from(
-    new Set(
-      activities
-        .map((activity) => {
-          const date = new Date(activity.created_at);
-          return Number.isNaN(date.getTime())
-            ? null
-            : date.getFullYear();
-        })
-        .filter(Boolean)
-    )
-  ).sort((a, b) => b - a);
-
-  const filteredActivities = activities.filter((activity) => {
-    const activityDate = new Date(activity.created_at);
-
-    if (Number.isNaN(activityDate.getTime())) {
-      return false;
-    }
-
-    if (activityMonth && activityDate.getMonth() + 1 !== Number(activityMonth)) {
-      return false;
-    }
-
-    if (activityYear && activityDate.getFullYear() !== Number(activityYear)) {
-      return false;
-    }
-
-    if (activityFromDate) {
-      const from = new Date(`${activityFromDate}T00:00:00`);
-
-      if (activityDate < from) {
-        return false;
-      }
-    }
-
-    if (activityToDate) {
-      const to = new Date(`${activityToDate}T23:59:59.999`);
-
-      if (activityDate > to) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-
-  const clearActivityFilters = () => {
-    setActivityMonth("");
-    setActivityYear("");
-    setActivityFromDate("");
-    setActivityToDate("");
   };
 
   const loadStorageStats = async () => {
@@ -868,52 +811,126 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     }
   };
 
-  const uploadFile = async (e) => {
-    const file = e.target.files?.[0];
+  const uploadSelectedFile = (file) => {
+    return new Promise((resolve, reject) => {
+      if (!file) {
+        resolve(false);
+        return;
+      }
 
-    if (!file) return;
+      setUploading(true);
+      setUploadProgress(0);
 
-    setUploading(true);
-
-    try {
       const formData = new FormData();
-
       formData.append("file", file);
 
       if (currentFolder?.id) {
-        formData.append(
-          "folderId",
-          currentFolder.id
-        );
+        formData.append("folderId", currentFolder.id);
       }
 
-      const response = await fetch(
-        `${API_URL}/api/files/upload`,
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
+      const xhr = new XMLHttpRequest();
+
+      xhr.open("POST", `${API_URL}/api/files/upload`, true);
+      xhr.withCredentials = true;
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          setUploadProgress(Math.round((event.loaded / event.total) * 100));
         }
-      );
+      };
 
-      if (response.ok) {
-        loadContents(currentFolder?.id || null);
-        loadStorageStats();
-        loadActivities();
-      } else {
-        const data = await response.json();
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          setUploadProgress(100);
+          loadContents(currentFolder?.id || null);
+          loadStorageStats();
+          loadActivities();
+          resolve(true);
+        } else {
+          let message = "Upload failed";
+          try {
+            const data = JSON.parse(xhr.responseText);
+            message = data.error?.message || message;
+          } catch {}
+          alert(message);
+          resolve(false);
+        }
+      };
 
-        alert(
-          data.error?.message ||
-            "Upload failed"
-        );
-      }
+      xhr.onerror = () => {
+        console.error("Upload failed: network error");
+        alert("Unable to upload file");
+        reject(new Error("Upload failed"));
+      };
+
+      xhr.onloadend = () => {
+        setUploading(false);
+      };
+
+      xhr.send(formData);
+    });
+  };
+
+  const uploadFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      await uploadSelectedFile(file);
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("Unable to upload file");
     } finally {
-      setUploading(false);
       e.target.value = "";
+    }
+  };
+
+  const isFileDrag = (e) => {
+    const types = Array.from(e.dataTransfer?.types || []);
+    return types.includes("Files") || types.includes("application/x-moz-file");
+  };
+
+  const handleDragEnter = (e) => {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    dragDepth.current += 1;
+    if (!uploading) setDragActive(true);
+  };
+
+  const handleDragOver = (e) => {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.dataTransfer) e.dataTransfer.dropEffect = uploading ? "none" : "copy";
+    if (!uploading) setDragActive(true);
+  };
+
+  const handleDragLeave = (e) => {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    dragDepth.current = Math.max(0, dragDepth.current - 1);
+    if (dragDepth.current === 0) setDragActive(false);
+  };
+
+  const handleDrop = async (e) => {
+    if (!isFileDrag(e)) return;
+    e.preventDefault();
+    e.stopPropagation();
+    dragDepth.current = 0;
+    setDragActive(false);
+
+    if (uploading) return;
+
+    const files = Array.from(e.dataTransfer.files || []).filter(Boolean);
+    if (!files.length) return;
+
+    try {
+      for (const file of files) {
+        await uploadSelectedFile(file);
+      }
+    } catch (error) {
+      console.error("Drop upload failed:", error);
     }
   };
 
@@ -1908,7 +1925,22 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </button>
       </aside>
 
-      <section className="content">
+      <section
+        className="content"
+        onDragEnter={activeView === "my-files" ? handleDragEnter : undefined}
+        onDragOver={activeView === "my-files" ? handleDragOver : undefined}
+        onDragLeave={activeView === "my-files" ? handleDragLeave : undefined}
+        onDrop={activeView === "my-files" ? handleDrop : undefined}
+      >
+        {activeView === "my-files" && dragActive && !uploading && (
+          <div className="file-drop-overlay" aria-hidden="true">
+            <div className="file-drop-overlay-card">
+              <UploadIcon size={30} />
+              <strong>Drop files to upload</strong>
+              <span>Release anywhere in My Files</span>
+            </div>
+          </div>
+        )}
         {activeView === "dashboard" ? (
           <div className="home-dashboard">
             <header className="topbar dashboard-heading">
@@ -1977,7 +2009,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
               <div className="dashboard-transfer-card">
                 <span className="dashboard-eyebrow">ACTIVE TRANSFERS</span>
-                <strong>{uploading ? "Upload in progress" : "No active transfers"}</strong>
+                <strong>{uploading ? `Upload in progress — ${uploadProgress}%` : "No active transfers"}</strong>
                 <span>{uploading ? "Uploading your file..." : "All transfers are complete"}</span>
               </div>
             </section>
@@ -2083,141 +2115,30 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 </p>
               </div>
             ) : (
-              <>
-                <div className="activity-filter-card">
-                  <div className="activity-filter-heading">
-                    <div>
-                      <strong>Filter activity</strong>
-                      <span>Show activity from the selected period</span>
+              <div className="activity-list">
+                {activities.map((activity) => (
+                  <div
+                    className="activity-row"
+                    key={activity.id}
+                  >
+                    <div className="activity-icon">
+                      <ActivityIcon size={20} />
                     </div>
 
-                    <button
-                      type="button"
-                      className="activity-clear-filter"
-                      onClick={clearActivityFilters}
-                      disabled={!activityMonth && !activityYear && !activityFromDate && !activityToDate}
-                    >
-                      Clear
-                    </button>
-                  </div>
+                    <div className="activity-info">
+                      <strong>
+                        {formatActivityAction(activity)}
+                      </strong>
 
-                  <div className="activity-filter-grid">
-                    <label>
-                      <span>Month</span>
-                      <select
-                        value={activityMonth}
-                        onChange={(e) => setActivityMonth(e.target.value)}
-                      >
-                        <option value="">All months</option>
-                        {
-                          [
-                            "January",
-                            "February",
-                            "March",
-                            "April",
-                            "May",
-                            "June",
-                            "July",
-                            "August",
-                            "September",
-                            "October",
-                            "November",
-                            "December",
-                          ].map((month, index) => (
-                            <option key={month} value={index + 1}>
-                              {month}
-                            </option>
-                          ))
-                        }
-                      </select>
-                    </label>
-
-                    <label>
-                      <span>Year</span>
-                      <select
-                        value={activityYear}
-                        onChange={(e) => setActivityYear(e.target.value)}
-                      >
-                        <option value="">All years</option>
-                        {activityYears.map((year) => (
-                          <option key={year} value={year}>
-                            {year}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-
-                    <label>
-                      <span>From date</span>
-                      <input
-                        type="date"
-                        value={activityFromDate}
-                        onChange={(e) => setActivityFromDate(e.target.value)}
-                      />
-                    </label>
-
-                    <label>
-                      <span>To date</span>
-                      <input
-                        type="date"
-                        value={activityToDate}
-                        min={activityFromDate || undefined}
-                        onChange={(e) => setActivityToDate(e.target.value)}
-                      />
-                    </label>
-                  </div>
-
-                  <div className="activity-filter-footer">
-                    <span>
-                      Showing <strong>{filteredActivities.length}</strong> of <strong>{activities.length}</strong> activities
-                    </span>
-                    {(activityFromDate || activityToDate) && activityFromDate && activityToDate && activityFromDate > activityToDate && (
-                      <span className="activity-filter-error">
-                        From date cannot be after To date.
+                      <span>
+                        {new Date(
+                          activity.created_at
+                        ).toLocaleString()}
                       </span>
-                    )}
-                  </div>
-                </div>
-
-                {filteredActivities.length === 0 ? (
-                  <div className="empty-state activity-filter-empty">
-                    <div className="empty-icon">
-                      <ActivityIcon size={42} />
                     </div>
-
-                    <h3>No activity in this period</h3>
-
-                    <p>
-                      Try another month, year, or date range.
-                    </p>
                   </div>
-                ) : (
-                  <div className="activity-list">
-                    {filteredActivities.map((activity) => (
-                      <div
-                        className="activity-row"
-                        key={activity.id}
-                      >
-                        <div className="activity-icon">
-                          <ActivityIcon size={19} />
-                        </div>
-
-                        <div className="activity-info">
-                          <strong>
-                            {formatActivityAction(activity)}
-                          </strong>
-
-                          <span>
-                            {new Date(
-                              activity.created_at
-                            ).toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
+                ))}
+              </div>
             )}
           </>
         ) : activeView === "recent" ? (
@@ -3026,7 +2947,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   </div>
                 </header>
 
-                <div className="breadcrumbs">
+            <div className="breadcrumbs">
                   {sharedBreadcrumbs.map(
                     (breadcrumb, index) => {
                       const isLast =
@@ -3285,6 +3206,65 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 </button>
               </div>
             </header>
+
+            <div
+              className={`upload-dropzone ${dragActive ? "active" : ""} ${uploading ? "uploading" : ""}`}
+              onDragEnter={handleDragOver}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              role="button"
+              tabIndex={0}
+              onClick={() => {
+                if (!uploading) {
+                  document.getElementById("cloud-drive-upload-inline")?.click();
+                }
+              }}
+              onKeyDown={(e) => {
+                if (!uploading && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  document.getElementById("cloud-drive-upload-inline")?.click();
+                }
+              }}
+            >
+              <UploadIcon size={20} />
+              <div className="upload-dropzone-copy">
+                <strong>{uploading ? `Uploading... ${uploadProgress}%` : "Drag & drop files here"}</strong>
+                <span>{uploading ? "Please wait while the file uploads" : "Drop one or more files here, or click to choose"}</span>
+              </div>
+              {uploading && (
+                <div className="upload-progress-track">
+                  <div
+                    className="upload-progress-fill"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              )}
+              <input
+                id="cloud-drive-upload-inline"
+                type="file"
+                multiple
+                onChange={async (e) => {
+                  const files = Array.from(e.target.files || []).filter(Boolean);
+                  if (!files.length || uploading) {
+                    e.target.value = "";
+                    return;
+                  }
+
+                  try {
+                    for (const file of files) {
+                      await uploadSelectedFile(file);
+                    }
+                  } catch (error) {
+                    console.error("Inline upload failed:", error);
+                  } finally {
+                    e.target.value = "";
+                  }
+                }}
+                disabled={uploading}
+                style={{ display: "none" }}
+              />
+            </div>
 
             <div className="breadcrumbs">
               {breadcrumbs.map(

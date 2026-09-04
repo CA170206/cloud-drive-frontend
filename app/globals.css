@@ -3600,3 +3600,242 @@ html[data-theme="dark"] .activity-filter-footer strong {
     flex-basis: 32px;
   }
 }
+
+/* =========================================================
+   UPLOAD — DRAG & DROP + PROGRESS
+========================================================= */
+.upload-dropzone {
+  width: 100%;
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border: 1px dashed #3b82f6;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.06);
+  color: #60a5fa;
+  transition: .15s ease;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.active {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.upload-dropzone.uploading {
+  border-style: solid;
+}
+
+.upload-dropzone > div:not(.upload-progress-track) {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.upload-dropzone strong {
+  color: #dce8f5;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.upload-dropzone span {
+  color: #77899e;
+  font-size: 9px;
+}
+
+.upload-progress-track {
+  width: 150px;
+  height: 6px;
+  margin-left: auto;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #293544;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #3b82f6;
+  transition: width .12s ease;
+}
+
+html[data-theme="light"] .upload-dropzone {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+html[data-theme="light"] .upload-dropzone:hover,
+html[data-theme="light"] .upload-dropzone.active {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+html[data-theme="light"] .upload-dropzone strong {
+  color: #1e3a5f;
+}
+
+html[data-theme="light"] .upload-dropzone span {
+  color: #64748b;
+}
+
+html[data-theme="light"] .upload-progress-track {
+  background: #dbe5ef;
+}
+
+@media (max-width: 700px) {
+  .upload-dropzone {
+    min-height: 64px;
+    padding: 10px 12px;
+    gap: 9px;
+  }
+
+  .upload-progress-track {
+    width: 90px;
+  }
+}
+/* =========================================================
+   UPLOAD — DRAG & DROP + PROGRESS
+========================================================= */
+.upload-dropzone {
+  width: 100%;
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  border: 1px dashed #3b82f6;
+  border-radius: 10px;
+  background: rgba(37, 99, 235, 0.06);
+  color: #60a5fa;
+  transition: .15s ease;
+}
+
+.upload-dropzone:hover,
+.upload-dropzone.active {
+  border-color: #60a5fa;
+  background: rgba(37, 99, 235, 0.12);
+}
+
+.upload-dropzone.uploading {
+  border-style: solid;
+}
+
+.upload-dropzone > div:not(.upload-progress-track) {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.upload-dropzone strong {
+  color: #dce8f5;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.upload-dropzone span {
+  color: #77899e;
+  font-size: 9px;
+}
+
+.upload-progress-track {
+  width: 150px;
+  height: 6px;
+  margin-left: auto;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #293544;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: #3b82f6;
+  transition: width .12s ease;
+}
+
+html[data-theme="light"] .upload-dropzone {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+html[data-theme="light"] .upload-dropzone:hover,
+html[data-theme="light"] .upload-dropzone.active {
+  background: #dbeafe;
+  border-color: #60a5fa;
+}
+
+html[data-theme="light"] .upload-dropzone strong {
+  color: #1e3a5f;
+}
+
+html[data-theme="light"] .upload-dropzone span {
+  color: #64748b;
+}
+
+html[data-theme="light"] .upload-progress-track {
+  background: #dbe5ef;
+}
+
+@media (max-width: 700px) {
+  .upload-dropzone {
+    min-height: 64px;
+    padding: 10px 12px;
+    gap: 9px;
+  }
+
+  .upload-progress-track {
+    width: 90px;
+  }
+}
+
+
+/* Drop anywhere in My Files */
+.content { position: relative; }
+.file-drop-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  background: rgba(37, 99, 235, 0.10);
+  border: 2px dashed #3b82f6;
+  border-radius: 12px;
+  box-sizing: border-box;
+  margin: 10px;
+}
+.file-drop-overlay-card {
+  min-width: 240px;
+  padding: 24px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid rgba(59,130,246,.35);
+  border-radius: 14px;
+  background: rgba(17,24,39,.96);
+  box-shadow: 0 18px 50px rgba(0,0,0,.25);
+  text-align: center;
+}
+.file-drop-overlay-card strong { color: #fff; font-size: 14px; }
+.file-drop-overlay-card span { color: #a8b6c7; font-size: 11px; }
+html[data-theme="light"] .file-drop-overlay { background: rgba(37,99,235,.08); }
+html[data-theme="light"] .file-drop-overlay-card { background: #fff; }
+html[data-theme="light"] .file-drop-overlay-card strong { color: #172033; }
+html[data-theme="light"] .file-drop-overlay-card span { color: #64748b; }
+@media (max-width: 700px) {
+  .file-drop-overlay { margin: 6px; }
+  .file-drop-overlay-card { min-width: 190px; padding: 20px 22px; }
+}
