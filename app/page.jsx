@@ -174,6 +174,13 @@ function Dashboard({ user, onLogout }) {
   const [publicLinkExpiry, setPublicLinkExpiry] = useState("");
   const [publicLinkMessage, setPublicLinkMessage] = useState("");
 
+  /* File Versioning */
+  const [versionTarget, setVersionTarget] = useState(null);
+  const [fileVersions, setFileVersions] = useState([]);
+  const [versionLoading, setVersionLoading] = useState(false);
+  const [versionUploading, setVersionUploading] = useState(false);
+  const [versionMessage, setVersionMessage] = useState("");
+
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
@@ -1223,6 +1230,242 @@ function Dashboard({ user, onLogout }) {
     }
   };
 
+  const openVersionHistory = async (file) => {
+    setVersionTarget(file);
+    setFileVersions([]);
+    setVersionMessage("");
+    setVersionLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/${file.id}/versions`,
+        {
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setVersionMessage(
+          data.error?.message ||
+            "Unable to load version history"
+        );
+        return;
+      }
+
+      setFileVersions(data.versions || []);
+    } catch (error) {
+      console.error(
+        "Load version history failed:",
+        error
+      );
+      setVersionMessage("Unable to connect to server");
+    } finally {
+      setVersionLoading(false);
+    }
+  };
+
+  const closeVersionHistory = () => {
+    if (versionLoading || versionUploading) return;
+
+    setVersionTarget(null);
+    setFileVersions([]);
+    setVersionMessage("");
+  };
+
+  const uploadNewFileVersion = () => {
+    if (!versionTarget || versionUploading) return;
+
+    const input = document.createElement("input");
+    input.type = "file";
+
+    input.onchange = async (event) => {
+      const selectedFile = event.target.files?.[0];
+
+      if (!selectedFile) return;
+
+      setVersionUploading(true);
+      setVersionMessage("");
+
+      try {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const response = await fetch(
+          `${API_URL}/api/files/${versionTarget.id}/versions`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setVersionMessage(
+            data.error?.message ||
+              "Unable to upload new version"
+          );
+          return;
+        }
+
+        setVersionMessage(
+          data.message ||
+            "New version uploaded successfully"
+        );
+
+        await loadContents(
+          currentFolder ? currentFolder.id : null
+        );
+        await loadStorageStats();
+
+        const versionsResponse = await fetch(
+          `${API_URL}/api/files/${versionTarget.id}/versions`,
+          {
+            credentials: "include",
+          }
+        );
+
+        if (versionsResponse.ok) {
+          const versionsData =
+            await versionsResponse.json();
+
+          setFileVersions(
+            versionsData.versions || []
+          );
+        }
+
+        loadActivities();
+      } catch (error) {
+        console.error(
+          "Upload new version failed:",
+          error
+        );
+        setVersionMessage("Unable to connect to server");
+      } finally {
+        setVersionUploading(false);
+      }
+    };
+
+    input.click();
+  };
+
+  const downloadFileVersion = async (
+    version
+  ) => {
+    if (!versionTarget) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/download`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (!response.ok) {
+        const data = await response.json().catch(
+          () => ({})
+        );
+
+        setVersionMessage(
+          data.error?.message ||
+            "Unable to download version"
+        );
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = versionTarget.name;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(
+        "Download version failed:",
+        error
+      );
+      setVersionMessage("Unable to download version");
+    }
+  };
+
+  const restoreVersion = async (version) => {
+    if (!versionTarget) return;
+
+    const confirmed = window.confirm(
+      `Restore Version ${version.version_number}?`
+    );
+
+    if (!confirmed) return;
+
+    setVersionLoading(true);
+    setVersionMessage("");
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/restore`,
+        {
+          method: "POST",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setVersionMessage(
+          data.error?.message ||
+            "Unable to restore version"
+        );
+        return;
+      }
+
+      setVersionMessage(
+        data.message ||
+          `Version ${version.version_number} restored successfully`
+      );
+
+      await loadContents(
+        currentFolder ? currentFolder.id : null
+      );
+      await loadStorageStats();
+
+      const versionsResponse = await fetch(
+        `${API_URL}/api/files/${versionTarget.id}/versions`,
+        {
+          credentials: "include",
+        }
+      );
+
+      if (versionsResponse.ok) {
+        const versionsData =
+          await versionsResponse.json();
+
+        setFileVersions(
+          versionsData.versions || []
+        );
+      }
+
+      loadActivities();
+    } catch (error) {
+      console.error(
+        "Restore version failed:",
+        error
+      );
+      setVersionMessage("Unable to connect to server");
+    } finally {
+      setVersionLoading(false);
+    }
+  };
+
   const logout = async () => {
     try {
       await fetch(
@@ -1646,6 +1889,20 @@ function Dashboard({ user, onLogout }) {
   🔗
   Public Link
 </button>
+
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openVersionHistory({
+                                    id: file.resource_id,
+                                    name: file.name,
+                                    size_bytes: file.size_bytes,
+                                  })
+                                }
+                              >
+                                🕘
+                                Versions
+                              </button>
 
                               <button
                                 className="file-action"
@@ -2498,6 +2755,15 @@ function Dashboard({ user, onLogout }) {
                                 Public Link
                               </button>
 
+                              <button
+                                className="file-action"
+                                onClick={() =>
+                                  openVersionHistory(file)
+                                }
+                              >
+                                🕘
+                                Versions
+                              </button>
 
                               <button
                                 className="file-action"
@@ -2671,6 +2937,195 @@ function Dashboard({ user, onLogout }) {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {versionTarget && (
+        <div
+          className="preview-overlay"
+          onClick={closeVersionHistory}
+        >
+          <div
+            className="share-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: "650px",
+            }}
+          >
+            <div className="share-modal-header">
+              <div>
+                <strong>Version History</strong>
+                <span>{versionTarget.name}</span>
+              </div>
+
+              <button
+                className="preview-close"
+                onClick={closeVersionHistory}
+                disabled={
+                  versionLoading ||
+                  versionUploading
+                }
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="share-form">
+              <button
+                type="button"
+                className="new-folder-button"
+                onClick={uploadNewFileVersion}
+                disabled={
+                  versionLoading ||
+                  versionUploading
+                }
+              >
+                {versionUploading
+                  ? "Uploading..."
+                  : "Upload New Version"}
+              </button>
+
+              {versionMessage && (
+                <p
+                  className={`message ${
+                    versionMessage
+                      .toLowerCase()
+                      .includes("success")
+                      ? "success"
+                      : "error"
+                  }`}
+                >
+                  {versionMessage}
+                </p>
+              )}
+
+              <label>
+                Versions
+              </label>
+
+              {versionLoading ? (
+                <div className="empty-state">
+                  Loading version history...
+                </div>
+              ) : fileVersions.length === 0 ? (
+                <div
+                  style={{
+                    padding: "18px",
+                    border: "1px solid #ddd",
+                    borderRadius: "10px",
+                    textAlign: "center",
+                  }}
+                >
+                  No archived versions yet.
+                </div>
+              ) : (
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                    maxHeight: "360px",
+                    overflowY: "auto",
+                  }}
+                >
+                  {fileVersions.map((version) => (
+                    <div
+                      key={version.id}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "12px",
+                        padding: "12px",
+                        border: "1px solid #ddd",
+                        borderRadius: "10px",
+                      }}
+                    >
+                      <div
+                        style={{
+                          width: "42px",
+                          height: "42px",
+                          borderRadius: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          background: "#f3f4f6",
+                          fontWeight: "700",
+                          flexShrink: 0,
+                        }}
+                      >
+                        v{version.version_number}
+                      </div>
+
+                      <div
+                        style={{
+                          flex: 1,
+                          minWidth: 0,
+                        }}
+                      >
+                        <strong>
+                          Version{" "}
+                          {version.version_number}
+                        </strong>
+
+                        <span
+                          style={{
+                            display: "block",
+                            marginTop: "4px",
+                            fontSize: "12px",
+                            color: "#666",
+                          }}
+                        >
+                          {formatFileSize(
+                            Number(
+                              version.size_bytes
+                            )
+                          )}{" "}
+                          ·{" "}
+                          {new Date(
+                            version.created_at
+                          ).toLocaleString()}
+                        </span>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: "6px",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() =>
+                            downloadFileVersion(
+                              version
+                            )
+                          }
+                          disabled={versionLoading}
+                        >
+                          Download
+                        </button>
+
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() =>
+                            restoreVersion(
+                              version
+                            )
+                          }
+                          disabled={versionLoading}
+                        >
+                          Restore
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
