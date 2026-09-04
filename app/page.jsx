@@ -249,6 +249,12 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
   const [selectedFileIds, setSelectedFileIds] = useState([]);
+  const [contextMenu, setContextMenu] = useState(null);
+  const [shortcutHelpOpen, setShortcutHelpOpen] = useState(false);
+  const [tagEditor, setTagEditor] = useState(null);
+  const [tagInput, setTagInput] = useState("");
+  const [fileTags, setFileTags] = useState({});
+  const [visibleFileCount, setVisibleFileCount] = useState(20);
 
   const [trashFiles, setTrashFiles] = useState([]);
   const [trashFolders, setTrashFolders] = useState([]);
@@ -262,6 +268,33 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     loadActivities();
     loadRecentFiles();
   }, []);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("cloud-drive-file-tags");
+      if (saved) setFileTags(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem("cloud-drive-file-tags", JSON.stringify(fileTags)); } catch {}
+  }, [fileTags]);
+
+  useEffect(() => {
+    const handler = (event) => {
+      if (event.key === "Escape") { setContextMenu(null); setTagEditor(null); setShortcutHelpOpen(false); return; }
+      const t = event.target;
+      const typing = t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement || t?.isContentEditable;
+      if (typing) return;
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "a") { event.preventDefault(); if (activeView === "my-files") toggleSelectAllFiles(); }
+      if (event.key === "Delete" && selectedFileIds.length && activeView === "my-files") { event.preventDefault(); bulkDeleteFiles(); }
+      if (event.key === "?") { event.preventDefault(); setShortcutHelpOpen(true); }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [activeView, selectedFileIds]);
+
+  useEffect(() => { setVisibleFileCount(20); }, [searchQuery, fileTypeFilter, ownerFilter, sortOption, currentFolder]);
 
   const loadActivities = async () => {
     setActivitiesLoading(true);
@@ -1998,6 +2031,26 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     sortOption
   );
 
+  const visibleFiles = filteredFiles.slice(0, visibleFileCount);
+
+  const openContextMenu = (event, item, type) => {
+    event.preventDefault(); event.stopPropagation();
+    setContextMenu({ x: Math.min(event.clientX, window.innerWidth - 220), y: Math.min(event.clientY, window.innerHeight - 250), item, type });
+  };
+
+  const addFileTag = (fileId) => {
+    const tag = tagInput.trim();
+    if (!tag) return;
+    setFileTags((current) => ({ ...current, [fileId]: Array.from(new Set([...(current[fileId] || []), tag])).slice(0, 8) }));
+    setTagInput(""); setTagEditor(null);
+  };
+
+  const removeFileTag = (fileId, tag) => {
+    setFileTags((current) => ({ ...current, [fileId]: (current[fileId] || []).filter((item) => item !== tag) }));
+  };
+
+  const loadMoreFiles = () => setVisibleFileCount((count) => Math.min(count + 20, filteredFiles.length));
+
   const filteredSharedResources =
     sharedResources.filter((resource) =>
       resource.resource_name
@@ -2400,9 +2453,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             </header>
 
             {activitiesLoading ? (
-              <div className="empty-state">
-                Loading activity...
-              </div>
+              <div className="frontend-skeleton-list" aria-label="Loading activity">
+    {Array.from({ length: 6 }).map((_, index) => (
+      <div className="frontend-skeleton-row" key={index}>
+        <span className="skeleton-box skeleton-icon" />
+        <span className="skeleton-box skeleton-line wide" />
+        <span className="skeleton-box skeleton-line short" />
+      </div>
+    ))}
+  </div>
             ) : activities.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">
@@ -2453,7 +2512,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             </header>
 
             {trashLoading ? (
-              <div className="empty-state">Loading Trash...</div>
+              <div className="frontend-skeleton-list" aria-label="Loading activity">
+    {Array.from({ length: 6 }).map((_, index) => (
+      <div className="frontend-skeleton-row" key={index}>
+        <span className="skeleton-box skeleton-icon" />
+        <span className="skeleton-box skeleton-line wide" />
+        <span className="skeleton-box skeleton-line short" />
+      </div>
+    ))}
+  </div>
             ) : trashFiles.length === 0 && trashFolders.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">
@@ -2584,10 +2651,16 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             </div>
 
             {recentLoading ? (
-              <div className="empty-state">
-                Loading recent files...
-              </div>
-            ) : (
+  <div className="frontend-skeleton-list recent-skeleton" aria-label="Loading recent files">
+    {Array.from({ length: 5 }).map((_, index) => (
+      <div className="frontend-skeleton-row" key={index}>
+        <span className="skeleton-box skeleton-icon" />
+        <span className="skeleton-box skeleton-line wide" />
+        <span className="skeleton-box skeleton-line short" />
+      </div>
+    ))}
+  </div>
+) : (
               <div className="file-area">
                 {filteredRecentFiles.length === 0 ? (
                   <div className="empty-state">
@@ -2875,11 +2948,17 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               )}
             </div>
 
-            {starredLoading ? (
-              <div className="empty-state">
-                Loading starred items...
-              </div>
-            ) : (
+           {starredLoading ? (
+  <div className="frontend-skeleton-list" aria-label="Loading starred items">
+    {Array.from({ length: 5 }).map((_, index) => (
+      <div className="frontend-skeleton-row" key={index}>
+        <span className="skeleton-box skeleton-icon" />
+        <span className="skeleton-box skeleton-line wide" />
+        <span className="skeleton-box skeleton-line short" />
+      </div>
+    ))}
+  </div>
+) : (
               <div className="file-area">
                 {filteredStarredFolders.length > 0 && (
                   <section>
@@ -3159,9 +3238,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 </div>
 
                 {sharedLoading ? (
-                  <div className="empty-state">
-                    Loading shared files...
-                  </div>
+                   <div className="frontend-skeleton-list" aria-label="Loading shared items">
+    {Array.from({ length: 5 }).map((_, index) => (
+      <div className="frontend-skeleton-row" key={index}>
+        <span className="skeleton-box skeleton-icon" />
+        <span className="skeleton-box skeleton-line wide" />
+        <span className="skeleton-box skeleton-line short" />
+      </div>
+    ))}
+  </div>
                 ) : filteredSharedResources.length > 0 ? (
                   <section className="shared-items-section">
                     <h3 className="section-title">
@@ -3913,8 +3998,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             )}
 
             {loading ? (
-              <div className="empty-state">
-                Loading...
+              <div className="frontend-skeleton-list" aria-label="Loading files">
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div className="frontend-skeleton-row" key={index}>
+                    <span className="skeleton-box skeleton-icon" />
+                    <span className="skeleton-box skeleton-line wide" />
+                    <span className="skeleton-box skeleton-line short" />
+                  </div>
+                ))}
               </div>
             ) : (
               <div className="file-area">
@@ -3934,7 +4025,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                             <div
                               className="item-card"
                               key={folder.id}
-                            >
+                             onContextMenu={(e) => openContextMenu(e, folder, "folder")}>
                               {renamingFolder?.id ===
                               folder.id ? (
                                 <form
@@ -4072,7 +4163,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     </h3>
 
                     <div className={`items-list mobile-actions-list ${viewMode === "grid" ? "grid-view" : ""}`}>
-                      {filteredFiles.map(
+                      {visibleFiles.map(
                         (file) => {
                           const starKey =
                             `file-${file.id}`;
@@ -4081,7 +4172,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                             <div
                               className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.id}
-                            >
+                             onContextMenu={(e) => openContextMenu(e, file, "file")}>
                               {renamingFile?.id === file.id ? (
                                 <form className="rename-file-form" onSubmit={renameFile}>
                                   <div className="rename-file-label">Rename file</div>
@@ -4128,6 +4219,13 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                     file.size_bytes
                                   )}
                                 </span>
+                                {fileTags[file.id]?.length > 0 && (
+                                  <div className="file-tags-inline">
+                                    {fileTags[file.id].slice(0, 3).map((tag) => (
+                                      <span className="file-tag" key={tag}>#{tag}</span>
+                                    ))}
+                                  </div>
+                                )}
 
                               </div>
 
@@ -4189,6 +4287,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                         }
                       )}
                     </div>
+                    {visibleFileCount < filteredFiles.length && (
+                      <div className="infinite-scroll-more">
+                        <button type="button" onClick={loadMoreFiles}>Load more files</button>
+                      </div>
+                    )}
                   </section>
                 )}
 
@@ -4901,6 +5004,53 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   <p>Unable to load this file preview.</p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {contextMenu && (
+        <div className="frontend-context-menu" style={{ left: contextMenu.x, top: contextMenu.y }} onClick={(e) => e.stopPropagation()}>
+          {contextMenu.type === "file" ? (
+            <>
+              <button type="button" onClick={() => { setContextMenu(null); openDetails(contextMenu.item); }}>Details</button>
+              <button type="button" onClick={() => { setContextMenu(null); previewFile(contextMenu.item); }}>Preview</button>
+              <button type="button" onClick={() => { setContextMenu(null); startRenameFile(contextMenu.item); }}>Rename</button>
+              <button type="button" onClick={() => { setContextMenu(null); openShareModal("file", contextMenu.item); }}>Share</button>
+              <button type="button" onClick={() => { setTagEditor(contextMenu.item.id); setContextMenu(null); }}>Add label</button>
+              <button type="button" className="danger" onClick={() => { setContextMenu(null); deleteFile(contextMenu.item); }}>Delete</button>
+            </>
+          ) : (
+            <>
+              <button type="button" onClick={() => { setContextMenu(null); openFolder(contextMenu.item); }}>Open</button>
+              <button type="button" onClick={() => { setContextMenu(null); startRenameFolder(contextMenu.item); }}>Rename</button>
+              <button type="button" onClick={() => { setContextMenu(null); openShareModal("folder", contextMenu.item); }}>Share</button>
+              <button type="button" className="danger" onClick={() => { setContextMenu(null); deleteFolder(contextMenu.item); }}>Delete</button>
+            </>
+          )}
+        </div>
+      )}
+
+      {tagEditor && (
+        <div className="frontend-tag-popover" onClick={(e) => e.stopPropagation()}>
+          <strong>Labels</strong>
+          <input autoFocus value={tagInput} onChange={(e) => setTagInput(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") addFileTag(tagEditor); if (e.key === "Escape") setTagEditor(null); }} placeholder="Add a label" />
+          <div className="frontend-tag-list">
+            {(fileTags[tagEditor] || []).map((tag) => <button type="button" key={tag} onClick={() => removeFileTag(tagEditor, tag)}>#{tag} ×</button>)}
+          </div>
+          <div className="frontend-tag-actions"><button type="button" onClick={() => setTagEditor(null)}>Cancel</button><button type="button" onClick={() => addFileTag(tagEditor)}>Add</button></div>
+        </div>
+      )}
+
+      {shortcutHelpOpen && (
+        <div className="frontend-modal-overlay" onClick={() => setShortcutHelpOpen(false)}>
+          <div className="frontend-shortcuts-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="frontend-shortcuts-header"><strong>Keyboard shortcuts</strong><button type="button" onClick={() => setShortcutHelpOpen(false)}>×</button></div>
+            <div className="shortcut-grid">
+              <div><kbd>Ctrl/⌘ + A</kbd><span>Select all files</span></div>
+              <div><kbd>Delete</kbd><span>Delete selected files</span></div>
+              <div><kbd>Esc</kbd><span>Close menus/dialogs</span></div>
+              <div><kbd>?</kbd><span>Show shortcuts</span></div>
             </div>
           </div>
         </div>
