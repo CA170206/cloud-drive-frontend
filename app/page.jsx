@@ -145,6 +145,8 @@ function Dashboard({ user, onLogout }) {
   const [previewUrl, setPreviewUrl] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
 
+  const [detailsTarget, setDetailsTarget] = useState(null);
+
   const [storageStats, setStorageStats] = useState({
     fileCount: 0,
     folderCount: 0,
@@ -794,6 +796,15 @@ function Dashboard({ user, onLogout }) {
       e.target.value = "";
     }
   };
+
+  const openDetails = (file) => {
+    setDetailsTarget(file);
+  };
+
+  const closeDetails = () => {
+    setDetailsTarget(null);
+  };
+  
 
   const previewFile = async (file, isShared = false) => {
     setPreviewLoading(true);
@@ -1895,6 +1906,16 @@ function Dashboard({ user, onLogout }) {
                             <button
                               className="file-action"
                               onClick={() =>
+                                openDetails(file)
+                              }
+                            >
+                              ℹ️
+                              Details
+                            </button>
+
+                            <button
+                              className="file-action"
+                              onClick={() =>
                                 previewFile(file)
                               }
                             >
@@ -2965,13 +2986,39 @@ function Dashboard({ user, onLogout }) {
                                     file.size_bytes
                                   )}
                                 </span>
+
                               </div>
 
+
                               <button
+
                                 className="file-action"
+
                                 onClick={() =>
-                                  previewFile(file)
+
+                                  openDetails(file)
+
                                 }
+
+                              >
+
+                                ℹ️
+
+                                Details
+
+                              </button>
+
+
+                              <button
+
+                                className="file-action"
+
+                                onClick={() =>
+
+                                  previewFile(file)
+
+                                }
+
                               >
                                 <EyeIcon size={15} />
                                 Preview
@@ -3559,6 +3606,97 @@ function Dashboard({ user, onLogout }) {
           </div>
         </div>
       )}
+
+      {detailsTarget && (
+  <div
+    className="details-modal-overlay"
+    onClick={closeDetails}
+  >
+    <div
+      className="details-modal"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <div className="details-header">
+        <div>
+          <h2>File Details</h2>
+          <p>{detailsTarget.name}</p>
+        </div>
+
+        <button
+          className="preview-close"
+          onClick={closeDetails}
+        >
+          ×
+        </button>
+      </div>
+
+      <div className="details-content">
+        <div className="details-file-icon">
+          <FileIcon fileName={detailsTarget.name} />
+        </div>
+
+        <div className="details-grid">
+          <div className="details-item">
+            <span>Name</span>
+            <strong>{detailsTarget.name}</strong>
+          </div>
+
+          <div className="details-item">
+            <span>Type</span>
+            <strong>
+              {detailsTarget.mime_type || "Unknown"}
+            </strong>
+          </div>
+
+          <div className="details-item">
+            <span>Size</span>
+            <strong>
+              {formatFileSize(detailsTarget.size_bytes)}
+            </strong>
+          </div>
+
+          <div className="details-item">
+            <span>Created</span>
+            <strong>
+              {detailsTarget.created_at
+                ? new Date(
+                    detailsTarget.created_at
+                  ).toLocaleString()
+                : "—"}
+            </strong>
+          </div>
+
+          <div className="details-item">
+            <span>Last updated</span>
+            <strong>
+              {detailsTarget.updated_at
+                ? new Date(
+                    detailsTarget.updated_at
+                  ).toLocaleString()
+                : "—"}
+            </strong>
+          </div>
+
+          <div className="details-item">
+            <span>Folder</span>
+            <strong>
+              {detailsTarget.folder_id
+                ? "Folder"
+                : "My Drive"}
+            </strong>
+          </div>
+
+          <div className="details-item details-item-wide">
+            <span>File ID</span>
+            <strong className="details-id">
+              {detailsTarget.id}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
       {previewFileData && (
         <div
