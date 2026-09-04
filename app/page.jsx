@@ -135,6 +135,7 @@ function Dashboard({ user, onLogout }) {
   const [renameValue, setRenameValue] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortOption, setSortOption] = useState("name-asc");
 
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -1524,18 +1525,24 @@ function Dashboard({ user, onLogout }) {
   const normalizedSearch =
     searchQuery.trim().toLowerCase();
 
-  const filteredFolders = folders.filter(
-    (folder) =>
-      folder.name
-        .toLowerCase()
-        .includes(normalizedSearch)
+  const filteredFolders = sortItems(
+    folders.filter(
+      (folder) =>
+        folder.name
+          .toLowerCase()
+          .includes(normalizedSearch)
+    ),
+    sortOption
   );
 
-  const filteredFiles = files.filter(
-    (file) =>
-      file.name
-        .toLowerCase()
-        .includes(normalizedSearch)
+  const filteredFiles = sortItems(
+    files.filter(
+      (file) =>
+        file.name
+          .toLowerCase()
+          .includes(normalizedSearch)
+    ),
+    sortOption
   );
 
   const filteredSharedResources =
@@ -1604,6 +1611,15 @@ function Dashboard({ user, onLogout }) {
         ]
       : []),
   ];
+
+  const filteredRecentFiles = sortItems(
+    recentFiles.filter((file) =>
+      file.name
+        ?.toLowerCase()
+        .includes(searchQuery.trim().toLowerCase())
+    ),
+    sortOption
+  );
 
   return (
     <main className="dashboard">
@@ -1773,6 +1789,22 @@ function Dashboard({ user, onLogout }) {
                 }
               />
 
+              <select
+                className="sort-select"
+                value={sortOption}
+                onChange={(e) =>
+                  setSortOption(e.target.value)
+                }
+                aria-label="Sort recent files"
+              >
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="size-desc">Largest first</option>
+                <option value="size-asc">Smallest first</option>
+              </select>
+
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
@@ -1789,11 +1821,7 @@ function Dashboard({ user, onLogout }) {
               </div>
             ) : (
               <div className="file-area">
-                {recentFiles.filter((file) =>
-                  file.name
-                    ?.toLowerCase()
-                    .includes(searchQuery.trim().toLowerCase())
-                ).length === 0 ? (
+                {filteredRecentFiles.length === 0 ? (
                   <div className="empty-state">
                     <div className="empty-icon">
                       <ClockIcon size={48} />
@@ -1818,15 +1846,7 @@ function Dashboard({ user, onLogout }) {
                     </h3>
 
                     <div className="items-list">
-                      {recentFiles
-                        .filter((file) =>
-                          file.name
-                            ?.toLowerCase()
-                            .includes(
-                              searchQuery.trim().toLowerCase()
-                            )
-                        )
-                        .map((file) => (
+                      {filteredRecentFiles.map((file) => (
                           <div
                             className="file-row"
                             key={file.id}
@@ -2667,6 +2687,22 @@ function Dashboard({ user, onLogout }) {
                   setSearchQuery(e.target.value)
                 }
               />
+
+              <select
+                className="sort-select"
+                value={sortOption}
+                onChange={(e) =>
+                  setSortOption(e.target.value)
+                }
+                aria-label="Sort files"
+              >
+                <option value="name-asc">Name A–Z</option>
+                <option value="name-desc">Name Z–A</option>
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="size-desc">Largest first</option>
+                <option value="size-asc">Smallest first</option>
+              </select>
 
               {searchQuery && (
                 <button
@@ -4092,6 +4128,45 @@ function formatActivityAction(activity) {
     .toLowerCase();
 
   return `${action || "updated"} — ${resourceName}`;
+}
+
+function sortItems(items, option) {
+  const sorted = [...items];
+
+  sorted.sort((a, b) => {
+    switch (option) {
+      case "name-desc":
+        return (b.name || "").localeCompare(a.name || "", undefined, {
+          sensitivity: "base",
+        });
+
+      case "date-desc":
+        return (
+          new Date(b.updated_at || b.created_at || 0).getTime() -
+          new Date(a.updated_at || a.created_at || 0).getTime()
+        );
+
+      case "date-asc":
+        return (
+          new Date(a.updated_at || a.created_at || 0).getTime() -
+          new Date(b.updated_at || b.created_at || 0).getTime()
+        );
+
+      case "size-desc":
+        return Number(b.size_bytes || 0) - Number(a.size_bytes || 0);
+
+      case "size-asc":
+        return Number(a.size_bytes || 0) - Number(b.size_bytes || 0);
+
+      case "name-asc":
+      default:
+        return (a.name || "").localeCompare(b.name || "", undefined, {
+          sensitivity: "base",
+        });
+    }
+  });
+
+  return sorted;
 }
 
 function formatFileSize(bytes) {
