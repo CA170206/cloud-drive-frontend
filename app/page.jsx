@@ -176,6 +176,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const [renamingFolder, setRenamingFolder] = useState(null);
   const [renameValue, setRenameValue] = useState("");
+  const [renamingFile, setRenamingFile] = useState(null);
+  const [renameFileValue, setRenameFileValue] = useState("");
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name-asc");
@@ -246,6 +248,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [starredResources, setStarredResources] = useState([]);
   const [starredLoading, setStarredLoading] = useState(false);
   const [starLoading, setStarLoading] = useState({});
+
+  const [trashFiles, setTrashFiles] = useState([]);
+  const [trashFolders, setTrashFolders] = useState([]);
+  const [trashLoading, setTrashLoading] = useState(false);
 
   useEffect(() => {
     loadContents(null);
@@ -339,6 +345,101 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     } finally {
       setRecentLoading(false);
     }
+  };
+
+  const loadTrash = async () => {
+    setTrashLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/files/trash`, {
+        credentials: "include",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error?.message || "Unable to load Trash");
+        return;
+      }
+
+      setTrashFiles(data.trash?.files || []);
+      setTrashFolders(data.trash?.folders || []);
+    } catch (error) {
+      console.error("Failed to load trash:", error);
+      alert("Unable to load Trash");
+    } finally {
+      setTrashLoading(false);
+    }
+  };
+
+  const openTrash = () => {
+    setActiveView("trash");
+    setSearchQuery("");
+    setCurrentFolder(null);
+    setFolderStack([]);
+    setSharedFolder(null);
+    setSharedFolderFolders([]);
+    setSharedFolderFiles([]);
+    setSharedFolderStack([]);
+    loadTrash();
+  };
+
+  const restoreTrashFile = async (file) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/trash/${file.id}/restore`,
+        {
+          method: "PATCH",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error?.message || "Unable to restore file");
+        return;
+      }
+
+      setTrashFiles((previous) => previous.filter((item) => item.id !== file.id));
+      loadStorageStats();
+      loadActivities();
+    } catch (error) {
+      console.error("Restore file failed:", error);
+      alert("Unable to restore file");
+    }
+  };
+
+  const restoreTrashFolder = async (folder) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/trash/folder/${folder.id}/restore`,
+        {
+          method: "PATCH",
+          credentials: "include",
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(data.error?.message || "Unable to restore folder");
+        return;
+      }
+
+      setTrashFolders((previous) => previous.filter((item) => item.id !== folder.id));
+      loadActivities();
+    } catch (error) {
+      console.error("Restore folder failed:", error);
+      alert("Unable to restore folder");
+    }
+  };
+
+  const getTrashDaysLeft = (updatedAt) => {
+    if (!updatedAt) return 30;
+    const deletedAt = new Date(updatedAt).getTime();
+    const expiresAt = deletedAt + 30 * 24 * 60 * 60 * 1000;
+    return Math.max(0, Math.ceil((expiresAt - Date.now()) / (24 * 60 * 60 * 1000)));
   };
 
   const openDashboard = () => {
@@ -778,6 +879,51 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       }
     } catch (error) {
       console.error("Rename folder failed:", error);
+    }
+  };
+
+  const startRenameFile = (file) => {
+    setRenamingFile(file);
+    setRenameFileValue(file.name);
+  };
+
+  const cancelRenameFile = () => {
+    setRenamingFile(null);
+    setRenameFileValue("");
+  };
+
+  const renameFile = async (e) => {
+    e.preventDefault();
+
+    if (!renameFileValue.trim() || !renamingFile) return;
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/files/${renamingFile.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            name: renameFileValue.trim(),
+          }),
+        }
+      );
+
+      if (response.ok) {
+        cancelRenameFile();
+        loadContents(currentFolder?.id || null);
+        loadStarredResources();
+        loadActivities();
+      } else {
+        const data = await response.json();
+        alert(data.error?.message || "Unable to rename file");
+      }
+    } catch (error) {
+      console.error("Rename file failed:", error);
+      alert("Unable to rename file");
     }
   };
 
@@ -1952,6 +2098,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </button>
 
         <button
+          className={`sidebar-item ${
+            activeView === "trash"
+              ? "active"
+              : ""
+          }`}
+          onClick={() => { openTrash(); closeMobileMenu(); }}
+        >
+          <TrashIcon size={18} />
+          <span>Trash</span>
+        </button>
+
+        <button
           className="theme-toggle"
           onClick={() => { setTheme(theme === "dark" ? "light" : "dark"); closeMobileMenu(); }}
           aria-label="Toggle theme"
@@ -2182,6 +2340,78 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+          </>
+        ) : activeView === "trash" ? (
+          <>
+            <header className="topbar">
+              <div>
+                <h2>Trash</h2>
+                <p>Deleted items are permanently removed after 30 days.</p>
+              </div>
+            </header>
+
+            {trashLoading ? (
+              <div className="empty-state">Loading Trash...</div>
+            ) : trashFiles.length === 0 && trashFolders.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-icon">
+                  <TrashIcon size={48} />
+                </div>
+                <h3>Trash is empty</h3>
+                <p>Deleted files and folders will appear here.</p>
+              </div>
+            ) : (
+              <div className="trash-page">
+                <div className="trash-retention-banner">
+                  <TrashIcon size={16} />
+                  <span>Items stay in Trash for 30 days before permanent deletion.</span>
+                </div>
+
+                {trashFolders.length > 0 && (
+                  <section className="trash-section">
+                    <div className="trash-section-title">Folders</div>
+                    <div className="trash-list">
+                      {trashFolders.map((folder) => {
+                        const daysLeft = getTrashDaysLeft(folder.updated_at);
+                        return (
+                          <div className="trash-row" key={`folder-${folder.id}`}>
+                            <div className="trash-item-icon"><FolderIcon size={24} /></div>
+                            <div className="trash-item-info">
+                              <strong>{folder.name}</strong>
+                              <span>Deleted {folder.updated_at ? new Date(folder.updated_at).toLocaleDateString() : "recently"}</span>
+                            </div>
+                            <div className="trash-expiry">{daysLeft} day{daysLeft === 1 ? "" : "s"} left</div>
+                            <button type="button" className="file-action trash-restore-button" onClick={() => restoreTrashFolder(folder)}>Restore</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
+
+                {trashFiles.length > 0 && (
+                  <section className="trash-section">
+                    <div className="trash-section-title">Files</div>
+                    <div className="trash-list">
+                      {trashFiles.map((file) => {
+                        const daysLeft = getTrashDaysLeft(file.updated_at);
+                        return (
+                          <div className="trash-row" key={`file-${file.id}`}>
+                            <div className="trash-item-icon"><FileIcon fileName={file.name} size={28} /></div>
+                            <div className="trash-item-info">
+                              <strong>{file.name}</strong>
+                              <span>{formatFileSize(file.size_bytes)} · Deleted {file.updated_at ? new Date(file.updated_at).toLocaleDateString() : "recently"}</span>
+                            </div>
+                            <div className="trash-expiry">{daysLeft} day{daysLeft === 1 ? "" : "s"} left</div>
+                            <button type="button" className="file-action trash-restore-button" onClick={() => restoreTrashFile(file)}>Restore</button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </section>
+                )}
               </div>
             )}
           </>
@@ -2458,57 +2688,53 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               )}
                             </div>
                           ) : (
-                            <>
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  openDetails(file)
-                                }
-                              >
-                                ℹ️
-                                Details
-                              </button>
+                            <details className="recent-desktop-file-options">
+                              <summary aria-label="File options">
+                                ⋮
+                              </summary>
 
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  previewFile(file)
-                                }
-                              >
-                                <EyeIcon size={15} />
-                                Preview
-                              </button>
+                              <div className="desktop-file-options-menu">
+                                <button
+                                  type="button"
+                                  onClick={() => openDetails(file)}
+                                >
+                                  ℹ️
+                                  <span>Details</span>
+                                </button>
 
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  downloadFile(file)
-                                }
-                              >
-                                <DownloadIcon size={15} />
-                                Download
-                              </button>
+                                <button
+                                  type="button"
+                                  onClick={() => previewFile(file)}
+                                >
+                                  <EyeIcon size={14} />
+                                  <span>Preview</span>
+                                </button>
 
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  openVersionHistory(file)
-                                }
-                              >
-                                🕘
-                                Versions
-                              </button>
+                                <button
+                                  type="button"
+                                  onClick={() => downloadFile(file)}
+                                >
+                                  <DownloadIcon size={14} />
+                                  <span>Download</span>
+                                </button>
 
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  openPublicLinkModal(file)
-                                }
-                              >
-                                🔗
-                                Public Link
-                              </button>
-                            </>
+                                <button
+                                  type="button"
+                                  onClick={() => openVersionHistory(file)}
+                                >
+                                  🕘
+                                  <span>Versions</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => openPublicLinkModal(file)}
+                                >
+                                  🔗
+                                  <span>Public Link</span>
+                                </button>
+                              </div>
+                            </details>
                           )}
                         </div>
                       ))}
@@ -2670,6 +2896,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                   )}
                                 </span>
                               </div>
+
+                              <details className="starred-desktop-file-options">
+                                <summary aria-label="File options">⋮</summary>
+                                <div className="desktop-file-options-menu">
+                                  <button type="button" onClick={() => openDetails({ id: file.resource_id, name: file.name, size_bytes: file.size_bytes })}>ℹ️ <span>Details</span></button>
+                                  <button type="button" onClick={() => previewFile({ id: file.resource_id, name: file.name, size_bytes: file.size_bytes })}><EyeIcon size={14} /> <span>Preview</span></button>
+                                  <button type="button" onClick={() => downloadFile({ id: file.resource_id, name: file.name })}><DownloadIcon size={14} /> <span>Download</span></button>
+                                  <button type="button" onClick={() => openVersionHistory({ id: file.resource_id, name: file.name, size_bytes: file.size_bytes })}>🕘 <span>Versions</span></button>
+                                  <button type="button" onClick={() => openPublicLinkModal(file)}>🔗 <span>Public Link</span></button>
+                                  <button type="button" onClick={() => toggleStar("file", file.resource_id)} disabled={starLoading[key]}><StarIcon size={14} filled /> <span>{starLoading[key] ? "..." : "Unstar"}</span></button>
+                                </div>
+                              </details>
 
                               <details className="mobile-file-options">
                                 <summary aria-label="File options">⋮</summary>
@@ -2898,6 +3136,21 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               <span className="shared-role-label">Role</span>
                               <span className="shared-role-value">{resource.role || "viewer"}</span>
                             </div>
+
+                            <details className="shared-desktop-file-options">
+                              <summary aria-label="Shared item options">⋮</summary>
+                              <div className="desktop-file-options-menu">
+                                {resource.resource_type === "folder" ? (
+                                  <button type="button" onClick={() => openSharedFolder(resource)}><FolderIcon size={14} /> <span>Open</span></button>
+                                ) : (
+                                  <>
+                                    <button type="button" onClick={() => previewFile({ id: resource.resource_id, name: resource.resource_name, size_bytes: resource.size_bytes }, true)}><EyeIcon size={14} /> <span>Preview</span></button>
+                                    <button type="button" onClick={() => downloadSharedFile({ id: resource.resource_id, name: resource.resource_name })}><DownloadIcon size={14} /> <span>Download</span></button>
+                                  </>
+                                )}
+                                <button type="button" className="shared-remove-option" onClick={() => removeSharedResource(resource)}><TrashIcon size={14} /> <span>Remove</span></button>
+                              </div>
+                            </details>
 
                             {resource.resource_type ===
                             "folder" ? (
@@ -3682,6 +3935,25 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.id}
                             >
+                              {renamingFile?.id === file.id ? (
+                                <form className="rename-file-form" onSubmit={renameFile}>
+                                  <div className="rename-file-label">Rename file</div>
+                                  <input
+                                    autoFocus
+                                    type="text"
+                                    value={renameFileValue}
+                                    onChange={(e) => setRenameFileValue(e.target.value)}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Escape") cancelRenameFile();
+                                    }}
+                                  />
+                                  <div className="rename-file-actions">
+                                    <button type="submit">Save</button>
+                                    <button type="button" onClick={cancelRenameFile}>Cancel</button>
+                                  </div>
+                                </form>
+                              ) : (
+                              <>
                               <div className="file-icon">
                                 <FileIcon
                                   fileName={file.name}
@@ -3704,6 +3976,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               <details className="mobile-file-options">
                                 <summary aria-label="File options">⋮</summary>
                                 <div className="mobile-file-options-menu">
+                                  <button type="button" onClick={() => startRenameFile(file)}><EditIcon size={14} /> Rename</button>
                                   <button type="button" onClick={() => openDetails(file)}>ℹ️ Details</button>
                                   <button type="button" onClick={() => previewFile(file)}><EyeIcon size={14} /> Preview</button>
                                   <button type="button" onClick={() => downloadFile(file)}><DownloadIcon size={14} /> Download</button>
@@ -3718,121 +3991,41 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                 </div>
                               </details>
 
-                              <button
-
-                                className="file-action"
-
-                                onClick={() =>
-
-                                  openDetails(file)
-
-                                }
-
-                              >
-
-                                ℹ️
-
-                                Details
-
-                              </button>
-
-
-                              <button
-
-                                className="file-action"
-
-                                onClick={() =>
-
-                                  previewFile(file)
-
-                                }
-
-                              >
-                                <EyeIcon size={15} />
-                                Preview
-                              </button>
-
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  downloadFile(file)
-                                }
-                              >
-                                <DownloadIcon size={15} />
-                                Download
-                              </button>
-
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  openShareModal(
-                                    "file",
-                                    file
-                                  )
-                                }
-                              >
-                                <UsersIcon size={15} />
-                                Share
-                              </button>
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  openPublicLinkModal(file)
-                                }
-                              >
-                                🔗
-                                Public Link
-                              </button>
-
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  openVersionHistory(file)
-                                }
-                              >
-                                🕘
-                                Versions
-                              </button>
-
-                              <button
-                                className="file-action"
-                                onClick={() =>
-                                  toggleStar(
-                                    "file",
-                                    file.id
-                                  )
-                                }
-                                disabled={
-                                  starLoading[starKey]
-                                }
-                              >
-                                <StarIcon
-                                  size={15}
-                                  filled={isStarred(
-                                    "file",
-                                    file.id
-                                  )}
-                                />
-
-                                {starLoading[starKey]
-                                  ? "..."
-                                  : isStarred(
-                                      "file",
-                                      file.id
-                                    )
-                                  ? "Unstar"
-                                  : "Star"}
-                              </button>
-
-                              <button
-                                className="file-action delete"
-                                onClick={() =>
-                                  deleteFile(file)
-                                }
-                              >
-                                <TrashIcon size={15} />
-                                Delete
-                              </button>
+                              <details className="desktop-file-options">
+                                <summary aria-label="File options">⋯ <span>Options</span></summary>
+                                <div className="desktop-file-options-menu">
+                                  <button type="button" onClick={() => openDetails(file)}>
+                                    ℹ️ <span>Details</span>
+                                  </button>
+                                  <button type="button" onClick={() => startRenameFile(file)}>
+                                    <EditIcon size={14} /> <span>Rename</span>
+                                  </button>
+                                  <button type="button" onClick={() => previewFile(file)}>
+                                    <EyeIcon size={14} /> <span>Preview</span>
+                                  </button>
+                                  <button type="button" onClick={() => downloadFile(file)}>
+                                    <DownloadIcon size={14} /> <span>Download</span>
+                                  </button>
+                                  <button type="button" onClick={() => openShareModal("file", file)}>
+                                    <UsersIcon size={14} /> <span>Share</span>
+                                  </button>
+                                  <button type="button" onClick={() => openPublicLinkModal(file)}>
+                                    🔗 <span>Public Link</span>
+                                  </button>
+                                  <button type="button" onClick={() => openVersionHistory(file)}>
+                                    🕘 <span>Versions</span>
+                                  </button>
+                                  <button type="button" onClick={() => toggleStar("file", file.id)} disabled={starLoading[starKey]}>
+                                    <StarIcon size={14} filled={isStarred("file", file.id)} />
+                                    <span>{starLoading[starKey] ? "..." : isStarred("file", file.id) ? "Unstar" : "Star"}</span>
+                                  </button>
+                                  <button type="button" className="desktop-file-delete" onClick={() => deleteFile(file)}>
+                                    <TrashIcon size={14} /> <span>Delete</span>
+                                  </button>
+                                </div>
+                              </details>
+                              </>
+                              )}
                             </div>
                           );
                         }
