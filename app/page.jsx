@@ -136,6 +136,7 @@ function Dashboard({ user, onLogout }) {
 
   const [searchQuery, setSearchQuery] = useState("");
   const [sortOption, setSortOption] = useState("name-asc");
+  const [viewMode, setViewMode] = useState("list");
 
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -1805,6 +1806,27 @@ function Dashboard({ user, onLogout }) {
                 <option value="size-asc">Smallest first</option>
               </select>
 
+              <div className="view-toggle" role="group" aria-label="View mode">
+                <button
+                  type="button"
+                  className={`view-toggle-button ${viewMode === "list" ? "active" : ""}`}
+                  onClick={() => setViewMode("list")}
+                  aria-label="List view"
+                  title="List view"
+                >
+                  ☷
+                </button>
+                <button
+                  type="button"
+                  className={`view-toggle-button ${viewMode === "grid" ? "active" : ""}`}
+                  onClick={() => setViewMode("grid")}
+                  aria-label="Grid view"
+                  title="Grid view"
+                >
+                  ▦
+                </button>
+              </div>
+
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
@@ -1845,10 +1867,10 @@ function Dashboard({ user, onLogout }) {
                       Recent files
                     </h3>
 
-                    <div className="items-list">
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredRecentFiles.map((file) => (
                           <div
-                            className="file-row"
+                            className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                             key={file.id}
                           >
                             <div className="file-icon">
@@ -2042,14 +2064,14 @@ function Dashboard({ user, onLogout }) {
                       Files
                     </h3>
 
-                    <div className="items-list">
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredStarredFiles.map(
                         (file) => {
                           const key = `file-${file.resource_id}`;
 
                           return (
                             <div
-                              className="file-row"
+                              className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.resource_id}
                             >
                               <div className="file-icon">
@@ -2215,11 +2237,11 @@ function Dashboard({ user, onLogout }) {
                       Shared items
                     </h3>
 
-                    <div className="items-list">
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredSharedResources.map(
                         (resource) => (
                           <div
-                            className="file-row"
+                            className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                             key={resource.share_id}
                           >
                             <div className="file-icon">
@@ -2516,11 +2538,11 @@ function Dashboard({ user, onLogout }) {
                           Files
                         </h3>
 
-                        <div className="items-list">
+                        <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                           {filteredSharedFiles.map(
                             (file) => (
                               <div
-                                className="file-row"
+                                className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                                 key={file.id}
                               >
                                 <div className="file-icon">
@@ -2916,7 +2938,7 @@ function Dashboard({ user, onLogout }) {
                       Files
                     </h3>
 
-                    <div className="items-list">
+                    <div className={`items-list ${viewMode === "grid" ? "grid-view" : ""}`}>
                       {filteredFiles.map(
                         (file) => {
                           const starKey =
@@ -2924,7 +2946,7 @@ function Dashboard({ user, onLogout }) {
 
                           return (
                             <div
-                              className="file-row"
+                              className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.id}
                             >
                               <div className="file-icon">
