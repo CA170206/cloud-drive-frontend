@@ -4,7 +4,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const API_URL = "http://localhost:5000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
 const recentGridMenuButtonStyle = {
   width: "100%",
@@ -281,6 +281,132 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   }, [fileTags]);
 
   useEffect(() => {
+    const dropdownSelector =
+      "details.desktop-file-options, details.recent-desktop-file-options, details.starred-desktop-file-options, details.shared-desktop-file-options, details.grid-file-options, details.mobile-file-options, .recent-grid-file-options-control";
+
+    const closeOtherDropdowns = (except) => {
+      document.querySelectorAll(dropdownSelector).forEach((details) => {
+        if (details !== except && details.open) {
+          details.removeAttribute("open");
+        }
+      });
+    };
+
+    const positionOpenDropdown = (details) => {
+      if (!details) return;
+
+      const isRecentGridControl = details.classList?.contains(
+        "recent-grid-file-options-control"
+      );
+
+      const summary = isRecentGridControl
+        ? details.querySelector("button[aria-label=\"File options\"]")
+        : details.querySelector(":scope > summary");
+
+      const menu = isRecentGridControl
+        ? details.querySelector(".recent-grid-file-options-menu")
+        : details.querySelector(
+            ":scope > .desktop-file-options-menu, :scope > .grid-file-menu-dropdown, :scope > .mobile-file-options-menu"
+          );
+
+      const isOpen = isRecentGridControl
+        ? !!menu
+        : !!details.open;
+
+      if (!summary || !menu || !isOpen) return;
+
+      const summaryRect = summary.getBoundingClientRect();
+      const menuRect = menu.getBoundingClientRect();
+      const gap = 8;
+      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      let top;
+      const spaceBelow = viewportHeight - summaryRect.bottom;
+      const spaceAbove = summaryRect.top;
+
+      if (spaceBelow >= menuRect.height + gap || spaceBelow >= spaceAbove) {
+        top = summaryRect.bottom + gap;
+      } else {
+        top = summaryRect.top - menuRect.height - gap;
+      }
+
+      top = Math.max(8, Math.min(top, viewportHeight - menuRect.height - 8));
+
+      const right = Math.max(8, viewportWidth - summaryRect.right);
+
+      menu.style.setProperty("--cd-menu-top", `${Math.round(top)}px`);
+      menu.style.setProperty("--cd-menu-right", `${Math.round(right)}px`);
+      menu.style.setProperty("--cd-menu-ready", "1");
+    };
+
+    const closeOnOutsidePointer = (event) => {
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+
+      const clickedDropdown = target.closest(dropdownSelector);
+
+      if (clickedDropdown) {
+        if (clickedDropdown.classList.contains("recent-grid-file-options-control")) {
+          // The React-controlled Recent grid menu handles its own toggle.
+          // Keep it open while clicking inside its button/menu.
+          closeOtherDropdowns(null);
+        } else {
+          // Clicking a native <details> dropdown closes the React-controlled
+          // Recent grid menu and closes every other native dropdown.
+          setRecentGridMenuOpen(null);
+          closeOtherDropdowns(clickedDropdown);
+        }
+      } else {
+        // Clicking anywhere outside a dropdown closes every file menu.
+        setRecentGridMenuOpen(null);
+        closeOtherDropdowns(null);
+      }
+    };
+
+    const handleToggle = (event) => {
+      const details = event.target;
+      if (!(details instanceof HTMLDetailsElement)) return;
+      if (!details.matches(dropdownSelector)) return;
+
+      if (details.open) {
+        closeOtherDropdowns(details);
+        requestAnimationFrame(() => positionOpenDropdown(details));
+      }
+    };
+
+    const handleViewportChange = () => {
+      document.querySelectorAll(`${dropdownSelector}[open]`).forEach(positionOpenDropdown);
+    };
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.type === "attributes" && mutation.attributeName === "open") {
+          const details = mutation.target;
+          if (details instanceof HTMLDetailsElement && details.open) {
+            closeOtherDropdowns(details);
+            requestAnimationFrame(() => positionOpenDropdown(details));
+          }
+        }
+      }
+    });
+
+    document.addEventListener("pointerdown", closeOnOutsidePointer, true);
+    document.addEventListener("toggle", handleToggle, true);
+    observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ["open"] });
+    window.addEventListener("resize", handleViewportChange);
+    window.addEventListener("scroll", handleViewportChange, true);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeOnOutsidePointer, true);
+      document.removeEventListener("toggle", handleToggle, true);
+      observer.disconnect();
+      window.removeEventListener("resize", handleViewportChange);
+      window.removeEventListener("scroll", handleViewportChange, true);
+    };
+  }, []);
+
+  useEffect(() => {
     const handler = (event) => {
       if (event.key === "Escape") { setContextMenu(null); setTagEditor(null); setShortcutHelpOpen(false); return; }
       const t = event.target;
@@ -293,6 +419,61 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [activeView, selectedFileIds]);
+
+  useEffect(() => {
+    if (!recentGridMenuOpen) return;
+
+    const frame = requestAnimationFrame(() => {
+      const control = document.querySelector(
+        ".recent-grid-file-options-control"
+      );
+      if (control) {
+        const button = control.querySelector(
+          'button[aria-label="File options"]'
+        );
+        const menu = control.querySelector(
+          ".recent-grid-file-options-menu"
+        );
+
+        if (button && menu) {
+          const buttonRect = button.getBoundingClientRect();
+          const menuRect = menu.getBoundingClientRect();
+          const gap = 8;
+          const viewportWidth =
+            document.documentElement.clientWidth || window.innerWidth;
+          const viewportHeight = window.innerHeight;
+
+          const spaceBelow = viewportHeight - buttonRect.bottom;
+          const spaceAbove = buttonRect.top;
+          let top =
+            spaceBelow >= menuRect.height + gap || spaceBelow >= spaceAbove
+              ? buttonRect.bottom + gap
+              : buttonRect.top - menuRect.height - gap;
+
+          top = Math.max(8, Math.min(
+            top,
+            viewportHeight - menuRect.height - 8
+          ));
+
+          const right = Math.max(
+            8,
+            viewportWidth - buttonRect.right
+          );
+
+          menu.style.setProperty(
+            "--cd-menu-top",
+            `${Math.round(top)}px`
+          );
+          menu.style.setProperty(
+            "--cd-menu-right",
+            `${Math.round(right)}px`
+          );
+        }
+      }
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [recentGridMenuOpen]);
 
   useEffect(() => { setVisibleFileCount(20); }, [searchQuery, fileTypeFilter, ownerFilter, sortOption, currentFolder]);
 
@@ -2300,8 +2481,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           <div className="home-dashboard">
             <header className="topbar dashboard-heading">
               <div>
-                <h2>Welcome Back</h2>
-                <p>Everything you need to manage your cloud files.</p>
+                <h2>Dashboard</h2>
+                <p>Welcome back. Everything you need to manage your cloud files.</p>
               </div>
 
               <div className="dashboard-search-wrap">
@@ -2447,7 +2628,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           <>
             <header className="topbar">
               <div>
-                <h2>Activity</h2>
+                <h2>Activities</h2>
                 <p>Recent activity on your Cloud Drive</p>
               </div>
             </header>
@@ -2741,6 +2922,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
                           {viewMode === "grid" ? (
                             <div
+                              className="recent-grid-file-options-control"
                               style={{
                                 position: "absolute",
                                 top: "9px",
@@ -2783,6 +2965,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
                               {recentGridMenuOpen === file.id && (
                                 <div
+                                  className="recent-grid-file-options-menu"
                                   style={{
                                     position: "absolute",
                                     top: "33px",
@@ -4248,7 +4431,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               </details>
 
                               <details className="desktop-file-options">
-                                <summary aria-label="File options">⋯ <span>Options</span></summary>
+                                <summary aria-label="File options">⋯</summary>
                                 <div className="desktop-file-options-menu">
                                   <button type="button" onClick={() => openDetails(file)}>
                                     ℹ️ <span>Details</span>
@@ -5395,129 +5578,169 @@ function FileIcon({
   fileName,
   size = 32,
 }) {
-  const extension =
-    getFileExtension(fileName);
+  const extension = getFileExtension(fileName);
 
-  let type = "default";
+  const extensionMap = {
+    // Images
+    jpg: { label: "JPG", color: "#38a169" },
+    jpeg: { label: "JPEG", color: "#38a169" },
+    png: { label: "PNG", color: "#1597d3" },
+    gif: { label: "GIF", color: "#38a169" },
+    webp: { label: "WEBP", color: "#38a169" },
+    bmp: { label: "BMP", color: "#1597d3" },
+    svg: { label: "SVG", color: "#1597d3" },
+    ico: { label: "ICO", color: "#1597d3" },
+    tif: { label: "TIF", color: "#38a169" },
+    tiff: { label: "TIFF", color: "#38a169" },
 
-  if (
-    [
-      "jpg",
-      "jpeg",
-      "png",
-      "gif",
-      "webp",
-      "bmp",
-      "svg",
-    ].includes(extension)
-  ) {
-    type = "image";
-  } else if (extension === "pdf") {
-    type = "pdf";
-  } else if (
-    ["doc", "docx"].includes(extension)
-  ) {
-    type = "word";
-  } else if (
-    ["xls", "xlsx", "csv"].includes(extension)
-  ) {
-    type = "excel";
-  } else if (
-    ["ppt", "pptx"].includes(extension)
-  ) {
-    type = "powerpoint";
-  } else if (
-    ["zip", "rar", "7z", "tar", "gz"].includes(
-      extension
-    )
-  ) {
-    type = "archive";
-  } else if (
-    ["mp3", "wav", "ogg", "m4a"].includes(extension)
-  ) {
-    type = "audio";
-  } else if (
-    [
-      "mp4",
-      "webm",
-      "mov",
-      "avi",
-      "mkv",
-    ].includes(extension)
-  ) {
-    type = "video";
-  } else if (
-    [
-      "txt",
-      "md",
-      "json",
-      "xml",
-      "html",
-      "css",
-      "js",
-      "jsx",
-      "ts",
-      "tsx",
-    ].includes(extension)
-  ) {
-    type = "text";
-  }
+    // Documents
+    pdf: { label: "PDF", color: "#f28c28" },
+    doc: { label: "DOC", color: "#1597d3" },
+    docx: { label: "DOCX", color: "#1597d3" },
+    odt: { label: "ODT", color: "#1597d3" },
+    rtf: { label: "RTF", color: "#7fbf3f" },
+
+    // Spreadsheets
+    xls: { label: "XLS", color: "#4caf50" },
+    xlsx: { label: "XLSX", color: "#4caf50" },
+    csv: { label: "CSV", color: "#4caf50" },
+    ods: { label: "ODS", color: "#4caf50" },
+
+    // Presentations
+    ppt: { label: "PPT", color: "#f28c28" },
+    pptx: { label: "PPTX", color: "#f28c28" },
+    odp: { label: "ODP", color: "#f28c28" },
+
+    // Text / code
+    txt: { label: "TXT", color: "#38a169" },
+    md: { label: "MD", color: "#1597d3" },
+    json: { label: "JSON", color: "#1597d3" },
+    xml: { label: "XML", color: "#1597d3" },
+    html: { label: "HTML", color: "#1597d3" },
+    htm: { label: "HTM", color: "#1597d3" },
+    css: { label: "CSS", color: "#1597d3" },
+    js: { label: "JS", color: "#eab308" },
+    jsx: { label: "JSX", color: "#1597d3" },
+    ts: { label: "TS", color: "#1597d3" },
+    tsx: { label: "TSX", color: "#1597d3" },
+    java: { label: "JAVA", color: "#e58a25" },
+    py: { label: "PY", color: "#4caf50" },
+    c: { label: "C", color: "#1597d3" },
+    cpp: { label: "CPP", color: "#1597d3" },
+    h: { label: "H", color: "#1597d3" },
+    hpp: { label: "HPP", color: "#1597d3" },
+    php: { label: "PHP", color: "#e53e3e" },
+    sql: { label: "SQL", color: "#1597d3" },
+
+    // Archives
+    zip: { label: "ZIP", color: "#1597d3" },
+    rar: { label: "RAR", color: "#e58a25" },
+    "7z": { label: "7Z", color: "#e58a25" },
+    tar: { label: "TAR", color: "#e58a25" },
+    gz: { label: "GZ", color: "#e58a25" },
+    bz2: { label: "BZ2", color: "#e58a25" },
+
+    // Audio
+    mp3: { label: "MP3", color: "#c04ad9" },
+    wav: { label: "WAV", color: "#c04ad9" },
+    ogg: { label: "OGG", color: "#c04ad9" },
+    m4a: { label: "M4A", color: "#c04ad9" },
+    aac: { label: "AAC", color: "#c04ad9" },
+    flac: { label: "FLAC", color: "#c04ad9" },
+
+    // Video
+    mp4: { label: "MP4", color: "#46a56b" },
+    webm: { label: "WEBM", color: "#46a56b" },
+    mov: { label: "MOV", color: "#46a56b" },
+    avi: { label: "AVI", color: "#46a56b" },
+    mkv: { label: "MKV", color: "#46a56b" },
+    mpg: { label: "MPG", color: "#46a56b" },
+    mpeg: { label: "MPEG", color: "#46a56b" },
+
+    // Other common file types
+    exe: { label: "EXE", color: "#7fbf3f" },
+    dmg: { label: "DMG", color: "#e58a25" },
+    eps: { label: "EPS", color: "#1597d3" },
+    psd: { label: "PSD", color: "#e53e3e" },
+    ai: { label: "AI", color: "#1597d3" },
+    dwg: { label: "DWG", color: "#e53e3e" },
+    cdr: { label: "CDR", color: "#e53e3e" },
+    sys: { label: "SYS", color: "#e58a25" },
+    rss: { label: "RSS", color: "#38a169" },
+    ini: { label: "INI", color: "#e53e3e" },
+    ps: { label: "PS", color: "#1597d3" },
+    ace: { label: "ACE", color: "#1597d3" },
+    aces: { label: "ACE", color: "#1597d3" },
+  };
+
+  const fallbackLabel = extension
+    ? extension.slice(0, 5).toUpperCase()
+    : "FILE";
+
+  const config = extensionMap[extension] || {
+    label: fallbackLabel,
+    color: "#64748b",
+  };
 
   return (
     <span
-      className={`drive-file-icon drive-file-icon-${type}`}
+      className="cloud-file-icon"
+      data-extension={extension || "file"}
       style={{
+        "--cloud-file-accent": config.color,
         width: size,
-        height: size,
+        height: Math.round(size * 1.2),
       }}
+      title={extension ? `${config.label} file` : "File"}
+      aria-label={extension ? `${config.label} file` : "File"}
     >
-      <FileShape />
+      <svg
+        viewBox="0 0 48 58"
+        className="cloud-file-shape"
+        aria-hidden="true"
+      >
+        <path
+          d="M7 2.5h22.5L41 14v39.5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-49a2 2 0 0 1 2-2Z"
+          fill="#ffffff"
+          stroke="#26313a"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M29.5 2.5V12a2 2 0 0 0 2 2H41"
+          fill="#eef2f4"
+          stroke="#26313a"
+          strokeWidth="1.5"
+        />
+        <path
+          d="M29.5 2.5L41 14"
+          fill="none"
+          stroke="#26313a"
+          strokeWidth="1.5"
+        />
 
-      <span className="drive-file-label">
-        {type === "image"
-          ? "IMG"
-          : type === "pdf"
-          ? "PDF"
-          : type === "word"
-          ? "DOC"
-          : type === "excel"
-          ? "XLS"
-          : type === "powerpoint"
-          ? "PPT"
-          : type === "archive"
-          ? "ZIP"
-          : type === "audio"
-          ? "♪"
-          : type === "video"
-          ? "▶"
-          : type === "text"
-          ? "TXT"
-          : ""}
-      </span>
+        <rect
+          x="2.5"
+          y="27"
+          width="43"
+          height="14"
+          rx="2.5"
+          fill="var(--cloud-file-accent)"
+        />
+
+        <text
+          x="24"
+          y="37.2"
+          textAnchor="middle"
+          fill="#ffffff"
+          fontSize="8"
+          fontWeight="800"
+          fontFamily="Arial, Helvetica, sans-serif"
+          letterSpacing=".15"
+        >
+          {config.label}
+        </text>
+      </svg>
     </span>
-  );
-}
-
-function FileShape() {
-  return (
-    <svg
-      viewBox="0 0 40 48"
-      className="drive-file-shape"
-      aria-hidden="true"
-    >
-      <path
-        d="M7 1h17l9 9v35a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2Z"
-        fill="currentColor"
-      />
-
-      <path
-        d="M24 1v8a2 2 0 0 0 2 2h7"
-        fill="none"
-        stroke="white"
-        strokeOpacity=".65"
-        strokeWidth="1.5"
-      />
-    </svg>
   );
 }
 
