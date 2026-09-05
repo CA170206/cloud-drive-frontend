@@ -76,8 +76,8 @@ export default function Home() {
 }
 
 function Login({ onLogin, theme, setTheme }) {
-  const [email, setEmail] = useState("test@clouddrive.com");
-  const [password, setPassword] = useState("Test@123456");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
