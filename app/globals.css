@@ -866,57 +866,9 @@ select {
   color-scheme: dark;
 }
 
-@media (max-width: 1050px) {
-  .content {
-    padding: 24px;
-  }
 
-  .file-row {
-    flex-wrap: wrap;
-  }
-}
 
-@media (max-width: 700px) {
-  .dashboard {
-    display: block;
-    height: auto;
-    overflow: visible;
-  }
 
-  .sidebar {
-    position: relative;
-    width: 100%;
-    height: auto;
-  }
-
-  .content {
-    height: auto;
-    overflow: visible;
-    padding: 18px;
-  }
-
-  .topbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .actions {
-    width: 100%;
-  }
-
-  .upload-button,
-  .new-folder-button {
-    flex: 1;
-  }
-
-  .details-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .details-item-wide {
-    grid-column: auto;
-  }
-}
 
 /* =========================================================
    CLOUDSPHERE-STYLE HOME DASHBOARD
@@ -1291,53 +1243,15 @@ select {
   color: #d8e0e9;
 }
 
-@media (max-width: 900px) {
-  .dashboard-storage-grid { grid-template-columns: 1fr; }
-  .quick-access-grid { grid-template-columns: repeat(2, 1fr); }
-  .recent-folder-grid { grid-template-columns: repeat(2, 1fr); }
-  .dashboard-search-wrap { width: 100%; }
-  .dashboard-mini-search { flex: 1; }
-}
 
-@media (max-width: 600px) {
-  .quick-access-grid,
-  .recent-folder-grid { grid-template-columns: 1fr; }
-  .dashboard-file-date { display: none; }
-}
+
+
 
 /* =========================================================
    DESKTOP UI SCALE
 ========================================================= */
 
-@media (min-width: 1000px) {
-  body {
-    zoom: 1.12;
-  }
 
-  .sidebar {
-    width: 245px;
-  }
-
-  .content {
-    padding: 30px 36px 42px;
-  }
-
-  .topbar h2 {
-    font-size: 28px;
-  }
-
-  .file-row {
-    min-height: 72px;
-  }
-
-  .file-info strong {
-    font-size: 13px;
-  }
-
-  .file-action {
-    font-size: 11px;
-  }
-}
 
 /* =========================================================
    FINAL FILE TYPE ICON SYSTEM
@@ -1995,13 +1909,7 @@ html[data-theme="light"] .version-row span { color: #64748b !important; }
 html[data-theme="light"] .version-row button { background: #ffffff !important; border-color: #dbe3ec !important; color: #475569 !important; }
 html[data-theme="light"] .version-row button:hover { background: #f1f5f9 !important; color: #172033 !important; }
 
-@media (max-width: 600px) {
-  .version-modal-overlay { padding: 12px !important; }
-  .version-modal { width: calc(100vw - 24px) !important; max-height: calc(100vh - 24px) !important; }
-  .version-modal-header { min-height: 56px !important; padding: 0 12px !important; }
-  .version-modal-header strong { font-size: 13px !important; }
-  .version-tabs button { padding: 0 11px !important; }
-}
+
 
 /* =========================================================
    FILE PREVIEW MODAL (final, canonical version)
@@ -2281,15 +2189,7 @@ html[data-theme="light"] .version-row button:hover { background: #f1f5f9 !import
   transform: translateY(-1px) !important;
 }
 
-@media (max-width: 600px) {
-  .preview-overlay { padding: 8px !important; }
-  .preview-modal { width: calc(100vw - 16px) !important; height: calc(100vh - 16px) !important; max-width: none !important; max-height: none !important; }
-  .preview-modal .preview-content { padding: 12px 10px 8px !important; }
-  .preview-modal .preview-footer,
-  .preview-modal .preview-actions { padding-left: 10px !important; padding-right: 10px !important; }
-  .preview-modal .preview-header { padding-left: 14px !important; padding-right: 10px !important; }
-  .preview-modal .preview-header strong { font-size: 13px !important; }
-}
+
 
 /* =========================================================
    SIDEBAR USER CARD — text truncation fix
@@ -2460,12 +2360,7 @@ html[data-theme="light"] .logout-confirm-modal p { color: #64748b !important; }
 html[data-theme="light"] .logout-cancel-button { border-color: #dbe3ec !important; color: #475569 !important; }
 html[data-theme="light"] .logout-cancel-button:hover { background: #f1f5f9 !important; }
 
-@media (max-width: 520px) {
-  .logout-confirm-overlay { padding: 16px !important; }
-  .logout-confirm-modal { max-width: 100% !important; padding: 20px !important; }
-  .logout-confirm-actions { flex-direction: column-reverse !important; }
-  .logout-confirm-actions button { width: 100% !important; }
-}
+
 
 /* =========================================================
    LOGIN PAGE — form details
@@ -2504,11 +2399,7 @@ html[data-theme="dark"] .login-card form label { color: #cbd5e1; }
 html[data-theme="dark"] .login-card form input { background: #111820; border-color: #34404d; color: #f8fafc; }
 html[data-theme="dark"] .login-card .login-theme-toggle { background: #202832; border-color: #34404d; color: #cbd5e1; }
 
-@media (max-width: 520px) {
-  .login-container { padding: 16px; }
-  .login-card { max-width: 100%; padding: 25px 20px; border-radius: 14px; }
-  .login-card h1 { font-size: 24px; }
-}
+
 
 /* =========================================================
    GRID VIEW — final canonical implementation
@@ -2594,21 +2485,9 @@ html[data-theme="light"] .items-list.grid-view .grid-file-menu-dropdown { backgr
 html[data-theme="light"] .items-list.grid-view .grid-file-menu-dropdown button { color: #475569 !important; }
 html[data-theme="light"] .items-list.grid-view .grid-file-menu-dropdown button:hover { background: #f1f5f9 !important; color: #172033 !important; }
 
-@media (max-width: 800px) {
-  .items-list.grid-view { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
-  .items-list.grid-view .grid-view-item { height: 130px !important; min-height: 130px !important; padding: 10px !important; }
-  .items-list.grid-view .grid-file-options { top: 7px !important; right: 7px !important; }
-  .items-list.grid-view .grid-file-menu-dropdown { width: 145px !important; }
 
-  .items-list.grid-view .grid-file-options[open] .grid-file-menu-dropdown {
-    position: absolute !important; top: auto !important; bottom: 30px !important; right: 0 !important;
-    width: 150px !important; max-height: 240px !important; overflow-y: auto !important;
-  }
-}
 
-@media (max-width: 420px) {
-  .items-list.grid-view .grid-file-options[open] .grid-file-menu-dropdown { width: 140px !important; right: -2px !important; }
-}
+
 
 /* =========================================================
    MOBILE FILE OPTIONS — LIST VIEW (My Files / Recent / Starred)
@@ -2616,100 +2495,25 @@ html[data-theme="light"] .items-list.grid-view .grid-file-menu-dropdown button:h
 
 .mobile-file-options { display: none !important; }
 
-@media (max-width: 800px) {
-  .mobile-actions-list:not(.grid-view) { overflow: visible !important; }
-  .mobile-actions-list:not(.grid-view) .file-row { position: relative !important; overflow: visible !important; padding-right: 45px !important; }
-  .mobile-actions-list:not(.grid-view) .file-action { display: none !important; }
 
-  .mobile-actions-list:not(.grid-view) .mobile-file-options {
-    display: block !important; position: absolute !important; right: 9px !important; top: 50% !important;
-    transform: translateY(-50%) !important; z-index: 5000 !important;
-  }
 
-  .mobile-file-options > summary {
-    list-style: none !important; width: 28px !important; height: 28px !important; box-sizing: border-box !important;
-    display: flex !important; align-items: center !important; justify-content: center !important;
-    border: 1px solid #dbe3ec !important; border-radius: 7px !important; background: #ffffff !important; color: #64748b !important;
-    font-size: 18px !important; font-weight: 700 !important; line-height: 1 !important; cursor: pointer !important;
-  }
-  .mobile-file-options > summary::-webkit-details-marker { display: none !important; }
 
-  .mobile-file-options-menu {
-    position: absolute !important; right: 0 !important; bottom: 33px !important; top: auto !important;
-    width: 155px !important; max-height: 250px !important; overflow-y: auto !important; box-sizing: border-box !important; padding: 5px !important;
-    display: flex !important; flex-direction: column !important; gap: 2px !important;
-    background: #ffffff !important; border: 1px solid #dbe3ec !important; border-radius: 9px !important;
-    box-shadow: 0 12px 30px rgba(15, 23, 42, .18) !important; z-index: 99999 !important;
-  }
-
-  .mobile-file-options-menu button {
-    width: 100% !important; height: 30px !important; min-height: 30px !important; box-sizing: border-box !important;
-    display: flex !important; align-items: center !important; justify-content: flex-start !important; gap: 8px !important;
-    padding: 0 9px !important; margin: 0 !important; border: 0 !important; border-radius: 6px !important; background: transparent !important;
-    color: #475569 !important; font-size: 10px !important; font-weight: 500 !important; text-align: left !important; white-space: nowrap !important; cursor: pointer !important;
-  }
-  .mobile-file-options-menu button:hover { background: #f1f5f9 !important; color: #172033 !important; }
-  .mobile-file-options-menu .mobile-file-delete { color: #dc2626 !important; }
-
-  html[data-theme="dark"] .mobile-file-options > summary { background: #202832 !important; border-color: #34404d !important; color: #cbd5e1 !important; }
-  html[data-theme="dark"] .mobile-file-options-menu { background: #1b222b !important; border-color: #35404d !important; box-shadow: 0 12px 30px rgba(0,0,0,.4) !important; }
-  html[data-theme="dark"] .mobile-file-options-menu button { color: #cbd5e1 !important; }
-  html[data-theme="dark"] .mobile-file-options-menu button:hover { background: #293340 !important; color: #ffffff !important; }
-
-  .mobile-actions-list:not(.grid-view) .file-row:has(.mobile-file-options[open]) { z-index: 10000 !important; }
-}
-
-@media (max-width: 420px) {
-  .mobile-actions-list:not(.grid-view) .file-row { padding-right: 42px !important; }
-  .mobile-file-options-menu { width: 145px !important; }
-}
 
 /* =========================================================
    MOBILE ACTIVITY LIST
 ========================================================= */
 
-@media (max-width: 800px) {
-  .activity-list { width: 100% !important; display: flex !important; flex-direction: column !important; gap: 6px !important; }
-  .activity-row { width: 100% !important; min-width: 0 !important; display: flex !important; align-items: flex-start !important; gap: 10px !important; padding: 11px 10px !important; border-radius: 9px !important; overflow: hidden !important; }
-  .activity-icon { width: 22px !important; min-width: 22px !important; height: 22px !important; display: flex !important; align-items: center !important; justify-content: center !important; flex: 0 0 22px !important; }
-  .activity-info { min-width: 0 !important; flex: 1 1 auto !important; display: flex !important; flex-direction: column !important; gap: 3px !important; }
-  .activity-info strong { display: block !important; width: 100% !important; min-width: 0 !important; font-size: 12px !important; line-height: 1.35 !important; overflow-wrap: anywhere !important; }
-  .activity-info span { display: block !important; width: 100% !important; min-width: 0 !important; font-size: 10px !important; line-height: 1.3 !important; color: #94a3b8 !important; white-space: normal !important; }
-}
 
-@media (max-width: 520px) {
-  .activity-row { padding: 9px 8px !important; }
-  .activity-info strong { font-size: 11px !important; }
-  .activity-info span { font-size: 9px !important; }
-}
+
+
 
 /* =========================================================
    MOBILE FOLDER CARDS
 ========================================================= */
 
-@media (max-width: 800px) {
-  .items-grid { width: 100% !important; display: grid !important; grid-template-columns: 1fr !important; gap: 9px !important; }
-  .item-card { width: 100% !important; min-width: 0 !important; min-height: 0 !important; box-sizing: border-box !important; padding: 12px !important; display: flex !important; flex-direction: column !important; gap: 10px !important; border-radius: 12px !important; }
-  .item-main { width: 100% !important; min-width: 0 !important; display: flex !important; align-items: center !important; gap: 11px !important; }
-  .item-icon { width: 42px !important; min-width: 42px !important; height: 42px !important; display: flex !important; align-items: center !important; justify-content: center !important; border-radius: 9px !important; }
-  .item-icon svg { width: 27px !important; height: 27px !important; }
-  .item-info { min-width: 0 !important; flex: 1 1 auto !important; }
-  .item-info strong { font-size: 13px !important; line-height: 1.3 !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; }
-  .item-info span { margin-top: 3px !important; font-size: 10px !important; line-height: 1.2 !important; }
-  .folder-actions { width: 100% !important; display: grid !important; grid-template-columns: repeat(4, 1fr) !important; gap: 6px !important; margin-top: 0 !important; }
-  .folder-actions .folder-action { width: 100% !important; min-width: 0 !important; height: 32px !important; min-height: 32px !important; padding: 0 4px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; border-radius: 7px !important; font-size: 9px !important; line-height: 1 !important; white-space: nowrap !important; }
-  .folder-actions .folder-action svg { width: 12px !important; height: 12px !important; flex: 0 0 auto !important; }
-  .folder-actions .folder-action.delete { color: #dc2626 !important; }
-}
 
-@media (max-width: 420px) {
-  .item-card { padding: 10px !important; }
-  .item-icon { width: 38px !important; min-width: 38px !important; height: 38px !important; }
-  .item-icon svg { width: 24px !important; height: 24px !important; }
-  .folder-actions { gap: 5px !important; }
-  .folder-actions .folder-action { height: 30px !important; min-height: 30px !important; font-size: 8px !important; }
-  .folder-actions .folder-action svg { width: 11px !important; height: 11px !important; }
-}
+
+
 
 /* =========================================================
    MOBILE NAVBAR + SIDEBAR DROPDOWN
@@ -2719,127 +2523,27 @@ html[data-theme="light"] .items-list.grid-view .grid-file-menu-dropdown button:h
 
 .mobile-header { display: none !important; }
 
-@media (max-width: 800px) {
-  .dashboard { position: relative !important; display: block !important; height: auto !important; min-height: 100vh !important; overflow: visible !important; width: 100% !important; background: #11161d !important; }
 
-  .mobile-header {
-    position: sticky !important; top: 0 !important; z-index: 950 !important;
-    width: 100% !important; height: 58px !important;
-    display: flex !important; align-items: center !important;
-    padding: 0 12px !important; gap: 10px !important;
-    background: #171d25 !important; border-bottom: 1px solid #29313d !important;
-  }
 
-  .mobile-menu-button {
-    width: 36px !important; height: 36px !important; flex: 0 0 36px !important;
-    display: flex !important; flex-direction: column !important; align-items: center !important; justify-content: center !important; gap: 4px !important;
-    padding: 0 !important; border: 1px solid #303b49 !important; border-radius: 8px !important;
-    background: #202833 !important; color: #dbe5ef !important;
-  }
-  .mobile-menu-button span { width: 16px !important; height: 2px !important; border-radius: 2px !important; background: currentColor !important; transition: .15s ease !important; }
-  .mobile-menu-button.open span:nth-child(1) { transform: translateY(6px) rotate(45deg) !important; }
-  .mobile-menu-button.open span:nth-child(2) { opacity: 0 !important; }
-  .mobile-menu-button.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg) !important; }
 
-  .mobile-brand { min-width: 0 !important; flex: 1 1 auto !important; display: flex !important; align-items: center !important; gap: 8px !important; }
-  .mobile-brand .brand-icon { width: 30px !important; height: 30px !important; flex: 0 0 30px !important; border-radius: 8px !important; }
-  .mobile-brand strong { overflow: hidden !important; white-space: nowrap !important; text-overflow: ellipsis !important; color: #f4f7fb !important; font-size: 15px !important; font-weight: 700 !important; }
-
-  .mobile-profile { flex: 0 0 auto !important; display: flex !important; align-items: center !important; }
-  .mobile-profile .avatar { width: 34px !important; height: 34px !important; border-radius: 9px !important; font-size: 13px !important; }
-
-  .dashboard > .sidebar {
-    position: absolute !important; top: 58px !important; left: 10px !important; right: 10px !important;
-    width: auto !important; height: auto !important; max-height: calc(100vh - 70px) !important;
-    display: none !important; overflow-y: auto !important; z-index: 940 !important; padding: 12px !important;
-    background: #171d25 !important; border: 1px solid #303b49 !important; border-radius: 12px !important;
-    box-shadow: 0 18px 45px rgba(0, 0, 0, .38) !important;
-    grid-template-columns: none !important; flex-wrap: nowrap !important;
-  }
-  .dashboard > .sidebar.mobile-open { display: block !important; }
-  .dashboard > .sidebar .brand,
-  .dashboard > .sidebar .sidebar-user { display: none !important; }
-
-  .dashboard > .sidebar .sidebar-item,
-  .dashboard > .sidebar .theme-toggle {
-    width: 100% !important; height: 40px !important; display: flex !important; align-items: center !important;
-    margin: 2px 0 !important; padding: 0 11px !important; gap: 10px !important; border-radius: 8px !important; font-size: 13px !important;
-  }
-  .dashboard > .sidebar .sidebar-item span,
-  .dashboard > .sidebar .theme-toggle span:last-child { display: block !important; }
-
-  .content { width: 100% !important; min-width: 0 !important; height: auto !important; overflow-x: hidden !important; overflow-y: visible !important; padding: 18px 14px 30px !important; }
-}
-
-@media (max-width: 800px) {
-  html[data-theme="light"] .dashboard { background: #f4f7fb !important; }
-  html[data-theme="light"] .mobile-header { background: #ffffff !important; border-bottom-color: #e2e8f0 !important; }
-  html[data-theme="light"] .mobile-menu-button { background: #f8fafc !important; border-color: #dbe3ec !important; color: #475569 !important; }
-  html[data-theme="light"] .mobile-brand strong { color: #172033 !important; }
-  html[data-theme="light"] .dashboard > .sidebar { background: #ffffff !important; border-color: #e2e8f0 !important; box-shadow: 0 18px 45px rgba(15, 23, 42, .16) !important; }
-}
 
 /* Mobile dashboard search */
-@media (max-width: 800px) {
-  .dashboard-mini-search { width: 100% !important; height: 40px !important; min-height: 40px !important; max-height: 40px !important; display: flex !important; align-items: center !important; padding: 0 11px !important; box-sizing: border-box !important; }
-  .dashboard-mini-search input { width: 100% !important; height: 38px !important; min-height: 38px !important; max-height: 38px !important; padding: 0 8px !important; margin: 0 !important; box-sizing: border-box !important; }
-  .dashboard-search-wrap { width: 100% !important; height: auto !important; min-height: 40px !important; display: flex !important; flex-direction: row !important; align-items: center !important; gap: 8px !important; }
-}
-@media (max-width: 520px) {
-  .dashboard-search-wrap { flex-direction: row !important; }
-  .dashboard-mini-search { flex: 1 1 auto !important; }
-  .dashboard-upload { width: auto !important; flex: 0 0 auto !important; height: 40px !important; }
-}
+
+
 
 /* =========================================================
    MOBILE FILE LIST — clean card layout (My Files / Recent)
 ========================================================= */
 
-@media (max-width: 800px) {
-  .search-bar { width: 100% !important; min-height: 42px !important; height: auto !important; display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 8px !important; margin-bottom: 16px !important; }
-  .search-bar > svg { flex: 0 0 auto !important; }
-  .search-bar > input { flex: 1 1 160px !important; width: auto !important; min-width: 0 !important; height: 40px !important; min-height: 40px !important; margin: 0 !important; }
-  .search-bar .sort-select { flex: 1 1 100% !important; width: 100% !important; height: 40px !important; min-height: 40px !important; margin: 0 !important; }
-  .search-bar .view-toggle { display: none !important; }
 
-  .file-area { width: 100% !important; margin-top: 6px !important; }
-  .file-area .section-title { display: block !important; margin: 0 0 9px 0 !important; padding: 0 !important; font-size: 13px !important; line-height: 1.3 !important; }
-  .file-area .items-list { width: 100% !important; display: flex !important; flex-direction: column !important; gap: 8px !important; }
 
-  .file-area .file-row { width: 100% !important; min-width: 0 !important; display: grid !important; grid-template-columns: 42px minmax(0, 1fr) !important; align-items: center !important; gap: 10px !important; padding: 10px !important; border-radius: 11px !important; overflow: hidden !important; }
-  .file-area .file-row .file-icon { width: 42px !important; min-width: 42px !important; height: 48px !important; grid-column: 1 !important; grid-row: 1 !important; }
-  .file-area .file-row .file-info { min-width: 0 !important; grid-column: 2 !important; grid-row: 1 !important; overflow: hidden !important; }
-  .file-area .file-row .file-info strong { display: block !important; width: 100% !important; max-width: 100% !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: 12px !important; line-height: 1.35 !important; }
-  .file-area .file-row .file-info span { display: block !important; width: 100% !important; max-width: 100% !important; margin-top: 3px !important; overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important; font-size: 10px !important; line-height: 1.3 !important; }
 
-  .file-area .file-row .file-action { min-width: 0 !important; height: 32px !important; min-height: 32px !important; padding: 0 8px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 5px !important; font-size: 10px !important; white-space: nowrap !important; }
-  .file-area .file-row .file-action:nth-of-type(1) { grid-column: 1 !important; grid-row: 2 !important; }
-  .file-area .file-row .file-action:nth-of-type(2) { grid-column: 2 !important; grid-row: 2 !important; }
-  .file-area .file-row .file-action:nth-of-type(3) { grid-column: 1 !important; grid-row: 3 !important; }
-  .file-area .file-row .file-action:nth-of-type(4) { grid-column: 2 !important; grid-row: 3 !important; }
-  .file-area .file-row .file-action:nth-of-type(5) { grid-column: 1 / -1 !important; grid-row: 4 !important; }
-}
-
-@media (max-width: 520px) {
-  .file-area .file-row { padding: 9px !important; }
-  .file-area .file-row .file-action { height: 30px !important; min-height: 30px !important; font-size: 9px !important; }
-}
 
 /* =========================================================
    BREADCRUMBS — horizontal scroll on mobile
 ========================================================= */
 
-@media (max-width: 800px) {
-  .breadcrumbs {
-    width: 100%;
-    min-width: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-  }
-  .breadcrumb-item { flex: 0 0 auto; }
-}
+
 
 /* =========================================================
    FINAL CONTENT-ONLY SCROLL
@@ -2847,82 +2551,13 @@ html[data-theme="light"] .items-list.grid-view .grid-file-menu-dropdown button:h
    Main content scrolls completely from top to bottom.
 ========================================================= */
 
-@media (min-width: 801px) {
-  html,
-  body {
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-  }
 
-  .dashboard {
-    display: flex !important;
-    width: 100% !important;
-    height: 100vh !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
-  }
-
-  .sidebar {
-    flex: 0 0 245px !important;
-    width: 245px !important;
-    height: 100vh !important;
-    min-height: 0 !important;
-    max-height: 100vh !important;
-    overflow: hidden !important;
-  }
-
-  .content {
-    flex: 1 1 auto !important;
-    width: auto !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
-
-    height: 100vh !important;
-    max-height: 100vh !important;
-
-    margin: 0 !important;
-
-    overflow-x: hidden !important;
-    overflow-y: scroll !important;
-
-    box-sizing: border-box !important;
-
-    padding-bottom: 80px !important;
-  }
-}
 
 /* =========================================================
    MOBILE — keep normal page scrolling
 ========================================================= */
 
-@media (max-width: 800px) {
-  html,
-  body {
-    width: 100% !important;
-    height: auto !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-  }
 
-  .dashboard {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow: visible !important;
-  }
-
-  .content {
-    width: 100% !important;
-    height: auto !important;
-    max-height: none !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    margin: 0 !important;
-  }
-}
 
 /* =========================================================
    FIX FILE ICONS INSIDE GRID CARDS
@@ -3111,193 +2746,12 @@ html[data-theme="light"] .items-list.grid-view .grid-file-menu-dropdown button:h
    FILE ICON FIX — LIST VIEW
 ========================================================= */
 
-@media (min-width: 701px) {
-  .file-row:not(.grid-view) .file-icon {
-    position: relative !important;
 
-    width: 48px !important;
-    min-width: 48px !important;
-    height: 58px !important;
-    min-height: 58px !important;
-
-    flex: 0 0 48px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    overflow: visible !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    border: 0 !important;
-    border-radius: 0 !important;
-
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon > .drive-file-icon {
-    position: relative !important;
-
-    left: auto !important;
-    top: auto !important;
-
-    transform: none !important;
-
-    width: 42px !important;
-    height: 51px !important;
-
-    min-width: 42px !important;
-    min-height: 51px !important;
-
-    max-width: 42px !important;
-    max-height: 51px !important;
-
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    flex: 0 0 42px !important;
-
-    overflow: visible !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    border: 0 !important;
-    border-radius: 0 !important;
-
-    background: transparent !important;
-    box-shadow: none !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon
-    > .drive-file-shape {
-    position: relative !important;
-
-    width: 38px !important;
-    height: 47px !important;
-
-    min-width: 38px !important;
-    min-height: 47px !important;
-
-    max-width: 38px !important;
-    max-height: 47px !important;
-
-    display: block !important;
-
-    flex: 0 0 auto !important;
-
-    left: auto !important;
-    top: auto !important;
-
-    transform: none !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    color: currentColor !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon
-    > .drive-file-label {
-    position: absolute !important;
-
-    left: 50% !important;
-    top: 63% !important;
-
-    transform: translate(-50%, -50%) !important;
-
-    width: 29px !important;
-    max-width: 29px !important;
-    height: 10px !important;
-    min-height: 10px !important;
-
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-
-    margin: 0 !important;
-    padding: 0 !important;
-
-    overflow: hidden !important;
-
-    color: #ffffff !important;
-
-    font-size: 7px !important;
-    font-weight: 900 !important;
-    line-height: 10px !important;
-
-    text-align: center !important;
-    white-space: nowrap !important;
-
-    pointer-events: none !important;
-  }
-
-  /* File type colors */
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-image {
-    color: #34d399 !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-pdf {
-    color: #f87171 !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-word {
-    color: #60a5fa !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-excel {
-    color: #4ade80 !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-powerpoint {
-    color: #fb923c !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-archive {
-    color: #c084fc !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-audio {
-    color: #e879f9 !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-video {
-    color: #a78bfa !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-text {
-    color: #60a5fa !important;
-  }
-
-  .file-row:not(.grid-view) .file-icon
-    > .drive-file-icon-default {
-    color: #94a3b8 !important;
-  }
-}
 /* =========================================================
    EXTRA BREATHING ROOM BELOW CONTENT
 ========================================================= */
 
-@media (min-width: 701px) {
-  .content {
-    padding-bottom: 140px !important;
-  }
-}
+
 /* =========================================================
    ACTIVITY — FILTER + LIST UI
 ========================================================= */
@@ -3558,48 +3012,9 @@ html[data-theme="dark"] .activity-filter-footer strong {
   color: #cbd5e1;
 }
 
-@media (max-width: 800px) {
-  .activity-filter-card {
-    padding: 13px;
-  }
 
-  .activity-filter-grid {
-    grid-template-columns: 1fr 1fr;
-  }
 
-  .activity-row {
-    align-items: flex-start;
-    padding: 11px 10px;
-  }
 
-  .activity-info strong {
-    white-space: normal;
-    overflow-wrap: anywhere;
-  }
-
-  .activity-filter-footer {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
-  }
-}
-
-@media (max-width: 520px) {
-  .activity-filter-heading {
-    align-items: flex-start;
-  }
-
-  .activity-filter-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .activity-icon {
-    width: 32px;
-    min-width: 32px;
-    height: 32px;
-    flex-basis: 32px;
-  }
-}
 
 /* =========================================================
    UPLOAD — DRAG & DROP + PROGRESS
@@ -3688,115 +3103,37 @@ html[data-theme="light"] .upload-progress-track {
   background: #dbe5ef;
 }
 
-@media (max-width: 700px) {
-  .upload-dropzone {
-    min-height: 64px;
-    padding: 10px 12px;
-    gap: 9px;
-  }
 
-  .upload-progress-track {
-    width: 90px;
-  }
-}
 /* =========================================================
    UPLOAD — DRAG & DROP + PROGRESS
 ========================================================= */
-.upload-dropzone {
-  width: 100%;
-  min-height: 74px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 0 0 16px;
-  padding: 12px 16px;
-  box-sizing: border-box;
-  border: 1px dashed #3b82f6;
-  border-radius: 10px;
-  background: rgba(37, 99, 235, 0.06);
-  color: #60a5fa;
-  transition: .15s ease;
-}
 
-.upload-dropzone:hover,
-.upload-dropzone.active {
-  border-color: #60a5fa;
-  background: rgba(37, 99, 235, 0.12);
-}
 
-.upload-dropzone.uploading {
-  border-style: solid;
-}
 
-.upload-dropzone > div:not(.upload-progress-track) {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
 
-.upload-dropzone strong {
-  color: #dce8f5;
-  font-size: 11px;
-  font-weight: 650;
-}
 
-.upload-dropzone span {
-  color: #77899e;
-  font-size: 9px;
-}
 
-.upload-progress-track {
-  width: 150px;
-  height: 6px;
-  margin-left: auto;
-  overflow: hidden;
-  border-radius: 99px;
-  background: #293544;
-}
 
-.upload-progress-fill {
-  height: 100%;
-  border-radius: inherit;
-  background: #3b82f6;
-  transition: width .12s ease;
-}
 
-html[data-theme="light"] .upload-dropzone {
-  border-color: #93c5fd;
-  background: #eff6ff;
-  color: #2563eb;
-}
 
-html[data-theme="light"] .upload-dropzone:hover,
-html[data-theme="light"] .upload-dropzone.active {
-  background: #dbeafe;
-  border-color: #60a5fa;
-}
 
-html[data-theme="light"] .upload-dropzone strong {
-  color: #1e3a5f;
-}
 
-html[data-theme="light"] .upload-dropzone span {
-  color: #64748b;
-}
 
-html[data-theme="light"] .upload-progress-track {
-  background: #dbe5ef;
-}
 
-@media (max-width: 700px) {
-  .upload-dropzone {
-    min-height: 64px;
-    padding: 10px 12px;
-    gap: 9px;
-  }
 
-  .upload-progress-track {
-    width: 90px;
-  }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Drop anywhere in My Files */
@@ -3835,10 +3172,7 @@ html[data-theme="light"] .file-drop-overlay { background: rgba(37,99,235,.08); }
 html[data-theme="light"] .file-drop-overlay-card { background: #fff; }
 html[data-theme="light"] .file-drop-overlay-card strong { color: #172033; }
 html[data-theme="light"] .file-drop-overlay-card span { color: #64748b; }
-@media (max-width: 700px) {
-  .file-drop-overlay { margin: 6px; }
-  .file-drop-overlay-card { min-width: 190px; padding: 20px 22px; }
-}
+
 
 .pptx-preview-shell {
   width: 100%;
@@ -3947,35 +3281,9 @@ html[data-theme="light"] .file-drop-overlay-card span { color: #64748b; }
   white-space: nowrap !important;
 }
 
-@media (max-width: 1100px) {
-  .shared-items-section .shared-resource-row {
-    grid-template-columns: minmax(180px, 1fr) minmax(160px, 200px) 100px auto auto !important;
-  }
-  .shared-items-section .shared-resource-row > .file-action.delete {
-    grid-column: 5 !important;
-  }
-}
 
-@media (max-width: 800px) {
-  .shared-items-section .shared-resource-row {
-    display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-    padding: 12px !important;
-  }
-  .shared-items-section .shared-resource-row > .file-icon,
-  .shared-items-section .shared-resource-row > .file-info {
-    grid-column: 1 / -1 !important;
-  }
-  .shared-items-section .shared-owner,
-  .shared-items-section .shared-role {
-    width: 100% !important;
-  }
-  .shared-items-section .shared-resource-row > .file-action {
-    width: 100% !important;
-    justify-content: center !important;
-  }
-}
+
+
 
 [data-theme="dark"] .shared-items-section .shared-resource-row,
 .dark .shared-items-section .shared-resource-row {
@@ -4086,23 +3394,7 @@ html[data-theme="dark"] .advanced-filter-panel {
 html[data-theme="dark"] .advanced-filter-field label {
   color: #94a3b8;
 }
-@media (max-width: 800px) {
-  .advanced-filter-button {
-    min-width: 72px;
-  }
-  .advanced-filter-panel {
-    align-items: stretch;
-    flex-direction: column;
-  }
-  .advanced-filter-field {
-    width: 100%;
-    min-width: 0;
-  }
-  .advanced-filter-field select,
-  .advanced-filter-clear {
-    width: 100%;
-  }
-}
+
 
 /* TRASH / RECYCLE BIN - FINAL */
 .trash-page {
@@ -4244,51 +3536,9 @@ html[data-theme="dark"] .advanced-filter-field label {
   border-color: #93c5fd !important;
 }
 
-@media (max-width: 800px) {
-  .trash-page {
-    padding: 20px 16px 40px;
-  }
 
-  .trash-row {
-    grid-template-columns: 42px minmax(0, 1fr) 80px;
-    gap: 10px;
-    padding: 12px;
-  }
 
-  .trash-item-icon {
-    width: 42px;
-    height: 42px;
-  }
 
-  .trash-expiry {
-    grid-column: 2;
-    justify-self: start;
-    min-height: 28px;
-  }
-
-  .trash-restore-button {
-    grid-column: 3;
-    grid-row: 1 / span 2;
-    width: 80px !important;
-    min-width: 80px !important;
-  }
-}
-
-@media (max-width: 520px) {
-  .trash-row {
-    grid-template-columns: 42px minmax(0, 1fr);
-  }
-
-  .trash-expiry {
-    grid-column: 2;
-  }
-
-  .trash-restore-button {
-    grid-column: 1 / -1;
-    grid-row: auto;
-    width: 100% !important;
-  }
-}
 
 html[data-theme="dark"] .trash-retention-banner {
   background: #172033;
@@ -4458,28 +3708,7 @@ html[data-theme="dark"] .trash-restore-button {
 }
 
 /* Mobile */
-@media (max-width: 700px) {
-  .share-modal {
-    max-width: calc(100vw - 24px) !important;
-  }
 
-  .share-modal form {
-    padding: 18px !important;
-  }
-
-  .share-modal-header {
-    padding: 16px 18px !important;
-  }
-
-  .share-modal form .share-modal-actions,
-  .share-modal form > div:last-child {
-    justify-content: stretch !important;
-  }
-
-  .share-modal form button {
-    flex: 1 !important;
-  }
-}
 
 /* Dark mode */
 html[data-theme="dark"] .share-modal {
@@ -4607,26 +3836,7 @@ html[data-theme="dark"] .share-modal form button[type="button"] {
   margin: 0 auto !important;
 }
 
-@media (max-width: 700px) {
-  .rename-form,
-  .rename-file-form {
-    padding: 14px !important;
-  }
 
-  .rename-file-form {
-    max-width: none !important;
-  }
-
-  .rename-actions,
-  .rename-file-actions {
-    justify-content: stretch !important;
-  }
-
-  .rename-actions button,
-  .rename-file-actions button {
-    flex: 1 1 0 !important;
-  }
-}
 
 html[data-theme="dark"] .rename-form,
 html[data-theme="dark"] .rename-file-form {
@@ -4745,21 +3955,7 @@ html[data-theme="dark"] .new-folder-form button:last-child {
 }
 
 /* Mobile */
-@media (max-width: 700px) {
-  .new-folder-form {
-    grid-template-columns: 1fr 1fr !important;
-    gap: 10px !important;
-    padding: 14px !important;
-  }
 
-  .new-folder-form input {
-    grid-column: 1 / -1 !important;
-  }
-
-  .new-folder-form button {
-    width: 100% !important;
-  }
-}
 
 /* DESKTOP FILE OPTIONS DROPDOWN */
 .desktop-file-options {
@@ -4863,11 +4059,7 @@ html[data-theme="dark"] .new-folder-form button:last-child {
   margin-top: auto !important;
 }
 
-@media (max-width: 700px) {
-  .desktop-file-options {
-    display: none !important;
-  }
-}
+
 
 html[data-theme="dark"] .desktop-file-options > summary {
   background: #111827 !important;
@@ -4901,280 +4093,31 @@ html[data-theme="dark"] .desktop-file-options-menu .desktop-file-delete:hover {
   background: #2a1618 !important;
 }
 /* FILE ACTIONS - COMPACT DROPDOWN */
-@media (min-width: 701px) {
-  .file-row {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 14px !important;
-    overflow: visible !important;
-  }
 
-  .file-row .file-info {
-    flex: 1 1 auto !important;
-    min-width: 0 !important;
-  }
 
-  .file-row .file-info strong,
-  .file-row .file-info span {
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-  }
 
-  .desktop-file-options {
-    position: relative !important;
-    flex: 0 0 auto !important;
-    margin-left: auto !important;
-    z-index: 100 !important;
-  }
 
-  .desktop-file-options > summary {
-    list-style: none !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 42px !important;
-    height: 38px !important;
-    padding: 0 !important;
-    border: 1px solid #d5deea !important;
-    border-radius: 8px !important;
-    background: #fff !important;
-    color: #475569 !important;
-    font-size: 21px !important;
-    line-height: 1 !important;
-    font-weight: 700 !important;
-    cursor: pointer !important;
-  }
 
-  .desktop-file-options > summary span {
-    display: none !important;
-  }
 
-  .desktop-file-options > summary::-webkit-details-marker {
-    display: none !important;
-  }
 
-  .desktop-file-options > summary:hover {
-    background: #f8fafc !important;
-    border-color: #bfcbd9 !important;
-  }
-
-  .desktop-file-options-menu {
-    position: absolute !important;
-    top: calc(100% + 8px) !important;
-    right: 0 !important;
-    width: 190px !important;
-    max-width: 190px !important;
-    padding: 6px !important;
-    box-sizing: border-box !important;
-    border: 1px solid #dbe3ec !important;
-    border-radius: 10px !important;
-    background: #fff !important;
-    box-shadow: 0 14px 30px rgba(15, 23, 42, .15) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-    z-index: 9999 !important;
-  }
-
-  .desktop-file-options-menu button {
-    width: 100% !important;
-    min-height: 36px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 0 10px !important;
-    border: 0 !important;
-    border-radius: 7px !important;
-    background: transparent !important;
-    color: #334155 !important;
-    font-size: 12px !important;
-    font-weight: 500 !important;
-    text-align: left !important;
-    cursor: pointer !important;
-  }
-
-  .desktop-file-options-menu button:hover {
-    background: #f1f5f9 !important;
-  }
-
-  .desktop-file-options-menu button svg {
-    flex: 0 0 auto !important;
-  }
-
-  .desktop-file-options-menu .desktop-file-delete {
-    color: #dc2626 !important;
-  }
-
-  .desktop-file-options-menu .desktop-file-delete:hover {
-    background: #fef2f2 !important;
-  }
-
-  /* Hide any legacy inline file actions if an older stylesheet is still present */
-  .file-row > .file-action {
-    display: none !important;
-  }
-}
-
-@media (max-width: 700px) {
-  .desktop-file-options {
-    display: none !important;
-  }
-}
-
-html[data-theme="dark"] .desktop-file-options > summary {
-  background: #111827 !important;
-  border-color: #334155 !important;
-  color: #cbd5e1 !important;
-}
-
-html[data-theme="dark"] .desktop-file-options > summary:hover {
-  background: #172033 !important;
-}
 
 html[data-theme="dark"] .desktop-file-options-menu {
   background: #111827 !important;
   border-color: #334155 !important;
 }
 
-html[data-theme="dark"] .desktop-file-options-menu button {
-  color: #cbd5e1 !important;
-}
 
-html[data-theme="dark"] .desktop-file-options-menu button:hover {
-  background: #1e293b !important;
-}
 
-html[data-theme="dark"] .desktop-file-options-menu .desktop-file-delete {
-  color: #f87171 !important;
-}
+
+
+
 
 
 /* =========================================================
    RECENT LIST VIEW DROPDOWN — FORCE VISIBLE
 ========================================================= */
 
-@media (min-width: 701px) {
-  .items-list {
-    overflow: visible !important;
-  }
 
-  .items-list .file-row {
-    position: relative !important;
-    overflow: visible !important;
-  }
-
-  .recent-desktop-file-options {
-    display: block !important;
-    position: relative !important;
-    flex: 0 0 auto !important;
-    margin-left: auto !important;
-    z-index: 99999 !important;
-  }
-
-  .recent-desktop-file-options > summary {
-    list-style: none !important;
-    -webkit-appearance: none !important;
-    appearance: none !important;
-    width: 40px !important;
-    height: 36px !important;
-    min-width: 40px !important;
-    min-height: 36px !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: 1px solid #d5deea !important;
-    border-radius: 8px !important;
-    background: #fff !important;
-    color: #475569 !important;
-    font-size: 20px !important;
-    font-weight: 700 !important;
-    line-height: 1 !important;
-    cursor: pointer !important;
-    user-select: none !important;
-  }
-
-  .recent-desktop-file-options > summary::-webkit-details-marker {
-    display: none !important;
-  }
-
-  .recent-desktop-file-options[open] {
-    z-index: 100000 !important;
-  }
-
-  .recent-desktop-file-options[open] > summary {
-    background: #f8fafc !important;
-    border-color: #b9c7d8 !important;
-  }
-
-  .recent-desktop-file-options[open] .desktop-file-options-menu {
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-  }
-
-  .recent-desktop-file-options .desktop-file-options-menu {
-    position: absolute !important;
-    top: calc(100% + 7px) !important;
-    right: 0 !important;
-    width: 180px !important;
-    min-width: 180px !important;
-    padding: 6px !important;
-    box-sizing: border-box !important;
-    display: none !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-    border: 1px solid #dbe3ec !important;
-    border-radius: 10px !important;
-    background: #fff !important;
-    box-shadow: 0 16px 34px rgba(15,23,42,.18) !important;
-    z-index: 100001 !important;
-  }
-
-  .recent-desktop-file-options .desktop-file-options-menu button {
-    width: 100% !important;
-    min-height: 36px !important;
-    height: 36px !important;
-    display: flex !important;
-    align-items: center !important;
-    gap: 9px !important;
-    margin: 0 !important;
-    padding: 0 10px !important;
-    box-sizing: border-box !important;
-    border: 0 !important;
-    border-radius: 7px !important;
-    background: transparent !important;
-    color: #334155 !important;
-    font-size: 12px !important;
-    font-weight: 500 !important;
-    text-align: left !important;
-    cursor: pointer !important;
-  }
-
-  .recent-desktop-file-options .desktop-file-options-menu button:hover {
-    background: #f1f5f9 !important;
-  }
-
-  .recent-desktop-file-options .desktop-file-options-menu button span {
-    display: inline !important;
-  }
-
-  .recent-desktop-file-options .desktop-file-options-menu button svg {
-    flex: 0 0 auto !important;
-  }
-
-  .recent-desktop-file-options .desktop-file-options-menu button,
-  .recent-desktop-file-options .desktop-file-options-menu button * {
-    pointer-events: auto !important;
-  }
-
-  .file-row:has(.recent-desktop-file-options[open]) {
-    z-index: 100000 !important;
-  }
-}
 
 html[data-theme="dark"] .recent-desktop-file-options > summary {
   background: #111827 !important;
@@ -5411,22 +4354,9 @@ html[data-theme="dark"] .recent-desktop-file-options .desktop-file-options-menu 
 }
 
 /* Keep modal layers above these menus */
-.details-modal-overlay,
-.preview-modal-overlay,
-.share-modal-overlay,
-.public-link-modal-overlay,
-.version-modal-overlay {
-  z-index: 10000 !important;
-}
 
-.details-modal,
-.preview-modal,
-.share-modal,
-.public-link-modal,
-.version-modal {
-  position: relative !important;
-  z-index: 10001 !important;
-}
+
+
 
 html[data-theme="dark"] .starred-desktop-file-options > summary,
 html[data-theme="dark"] .shared-desktop-file-options > summary {
@@ -5465,33 +4395,11 @@ html[data-theme="dark"] .shared-remove-option {
   color: #f87171 !important;
 }
 
-@media (max-width: 800px) {
-  .starred-desktop-file-options,
-  .shared-desktop-file-options {
-    display: block !important;
-  }
 
-  .starred-desktop-file-options > summary,
-  .shared-desktop-file-options > summary {
-    width: 30px !important;
-    height: 30px !important;
-    min-width: 30px !important;
-    min-height: 30px !important;
-    font-size: 18px !important;
-  }
-
-  .starred-desktop-file-options .desktop-file-options-menu,
-  .shared-desktop-file-options .desktop-file-options-menu {
-    width: 160px !important;
-    max-width: 160px !important;
-    top: auto !important;
-    bottom: calc(100% + 6px) !important;
-  }
-}
 
 .bulk-actions-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;margin:0 0 14px;padding:10px 12px;border:1px solid #2b3440;border-radius:10px;background:#181f28;box-sizing:border-box}.bulk-select-toggle{display:flex;align-items:center;gap:8px;color:#cbd5e1;font-size:12px;font-weight:600;cursor:pointer}.bulk-select-toggle input,.file-select-checkbox input{width:15px;height:15px;margin:0;accent-color:#2563eb;cursor:pointer}.bulk-action-buttons{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.bulk-action-buttons button{height:32px;padding:0 11px;border:1px solid #303947;border-radius:7px;background:#202731;color:#cbd5e1;font-size:11px;font-weight:600;cursor:pointer}.bulk-action-buttons button:hover{background:#293340;color:#fff}.bulk-action-buttons .danger{border-color:#5b2b31;background:#321f24;color:#f87171}.bulk-action-buttons .danger:hover{background:#402329}.bulk-action-buttons .clear{background:transparent}.file-select-checkbox{width:20px;min-width:20px;height:32px;display:flex;align-items:center;justify-content:center;flex:0 0 20px;margin:0;cursor:pointer}.grid-view .file-select-checkbox{position:absolute;top:10px;left:10px;width:24px;height:24px;z-index:5}.grid-view .file-row{position:relative!important}.grid-view .file-info{padding-top:20px!important}
 html[data-theme="light"] .bulk-actions-toolbar{background:#fff;border-color:#e0e7ef}.bulk-select-toggle{color:#475569}.bulk-action-buttons button{background:#fff;border-color:#dbe3ec;color:#475569}.bulk-action-buttons button:hover{background:#f1f5f9;color:#172033}.bulk-action-buttons .danger{background:#fef2f2;border-color:#fecaca;color:#dc2626}.bulk-action-buttons .danger:hover{background:#fee2e2}.file-select-checkbox{color:#475569}
-@media(max-width:700px){.bulk-actions-toolbar{align-items:flex-start;flex-direction:column;padding:10px}.bulk-action-buttons{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.bulk-action-buttons button{width:100%}.file-select-checkbox{width:22px;min-width:22px}.grid-view .file-select-checkbox{top:8px;left:8px}}
+
 
 
 /* FRONTEND REMAINING FEATURES */
@@ -5509,7 +4417,7 @@ html[data-theme="light"] .bulk-actions-toolbar{background:#fff;border-color:#e0e
 .skeleton-line{height:10px}
 .skeleton-line.wide{width:55%}
 .skeleton-line.short{width:80px}
-@keyframes frontendSkeleton{100%{transform:translateX(100%)}}
+
 
 .infinite-scroll-more{display:flex;justify-content:center;padding:14px 0 4px}
 .infinite-scroll-more button{height:34px;padding:0 14px;border:1px solid #303947;border-radius:8px;background:#202731;color:#aeb9c7;font-size:11px;font-weight:650;cursor:pointer}
@@ -5565,9 +4473,3349 @@ html[data-theme="light"] .frontend-shortcuts-header button:hover{background:#f1f
 html[data-theme="light"] .shortcut-grid>div{background:#f8fafc;border-color:#e2e8f0}
 html[data-theme="light"] .shortcut-grid kbd{background:#fff;border-color:#dbe3ec;color:#334155}
 html[data-theme="light"] .shortcut-grid span{color:#64748b}
+/* =========================================================
+   FINAL LAYOUT NORMALIZATION
+   One canonical layout layer. This intentionally overrides
+   conflicting legacy rules above.
+========================================================= */
 
-@media(max-width:700px){
-  .frontend-skeleton-row{grid-template-columns:42px minmax(0,1fr)}
-  .skeleton-line.short{display:none}
-  .shortcut-grid{grid-template-columns:1fr}
+:root {
+  --cd-sidebar-width: 245px;
+  --cd-content-max: 1440px;
+  --cd-gap: 18px;
+  --cd-border: #2a333f;
+  --cd-panel: #1a212a;
+  --cd-panel-2: #181f28;
+  --cd-bg: #11161d;
+  --cd-text: #e7edf5;
+  --cd-muted: #7f8b9b;
+  --cd-blue: #2563eb;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden !important;
+  zoom: 1 !important;
+}
+
+button,
+input,
+select,
+textarea {
+  box-sizing: border-box;
+}
+
+button,
+summary {
+  user-select: none;
+}
+
+/* ---------- DESKTOP APP SHELL ---------- */
+
+@media (min-width: 801px) {
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden !important;
+  }
+
+  .dashboard {
+    position: relative !important;
+    display: flex !important;
+    width: 100% !important;
+    height: 100vh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: var(--cd-bg) !important;
+  }
+
+  .sidebar {
+    position: relative !important;
+    inset: auto !important;
+    z-index: 100 !important;
+    flex: 0 0 var(--cd-sidebar-width) !important;
+    width: var(--cd-sidebar-width) !important;
+    height: 100vh !important;
+    min-height: 0 !important;
+    max-height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding: 20px 12px !important;
+  }
+
+  .content {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding: 28px 34px 70px !important;
+  }
+
+  .content > * {
+    min-width: 0;
+  }
+
+  .home-dashboard,
+  .file-area,
+  .shared-items-section,
+  .activity-page,
+  .trash-page {
+    width: 100%;
+    max-width: var(--cd-content-max);
+    min-width: 0;
+    margin-right: auto;
+  }
+
+  .topbar {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .topbar .actions {
+    flex: 0 0 auto;
+  }
+
+  .search-bar {
+    width: min(100%, 720px) !important;
+  }
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+  scrollbar-width: thin;
+  scrollbar-color: #34404d transparent;
+}
+
+.sidebar > * {
+  min-width: 0;
+}
+
+.brand,
+.sidebar-user,
+.sidebar-item,
+.theme-toggle {
+  max-width: 100%;
+}
+
+.sidebar-item,
+.theme-toggle {
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-item > svg,
+.sidebar-item > span:first-of-type,
+.theme-toggle > svg,
+.theme-toggle > .theme-toggle-icon {
+  flex: 0 0 auto;
+}
+
+.sidebar-item span,
+.theme-toggle span {
+  min-width: 0;
+}
+
+.sidebar-item span:last-child,
+.theme-toggle span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- DESKTOP FILE LIST ---------- */
+
+@media (min-width: 801px) {
+  .items-list:not(.grid-view) {
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  .items-list:not(.grid-view) .file-row {
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 70px !important;
+    height: auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    overflow: visible !important;
+  }
+
+  .items-list:not(.grid-view) .file-icon {
+    flex: 0 0 42px !important;
+  }
+
+  .items-list:not(.grid-view) .file-info {
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+  }
+
+  .items-list:not(.grid-view) .file-info strong,
+  .items-list:not(.grid-view) .file-info span {
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* ---------- ONE CANONICAL DESKTOP DROPDOWN ---------- */
+
+@media (min-width: 701px) {
+  .desktop-file-options,
+  .recent-desktop-file-options,
+  .starred-desktop-file-options,
+  .shared-desktop-file-options,
+  .grid-file-options {
+    position: relative !important;
+    flex: 0 0 auto !important;
+    margin-left: auto !important;
+    z-index: 300 !important;
+  }
+
+  .desktop-file-options > summary,
+  .recent-desktop-file-options > summary,
+  .starred-desktop-file-options > summary,
+  .shared-desktop-file-options > summary,
+  .grid-file-options > summary {
+    list-style: none !important;
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px !important;
+    background: #111827 !important;
+    color: #cbd5e1 !important;
+    cursor: pointer !important;
+    line-height: 1 !important;
+  }
+
+  .desktop-file-options > summary::-webkit-details-marker,
+  .recent-desktop-file-options > summary::-webkit-details-marker,
+  .starred-desktop-file-options > summary::-webkit-details-marker,
+  .shared-desktop-file-options > summary::-webkit-details-marker,
+  .grid-file-options > summary::-webkit-details-marker {
+    display: none !important;
+  }
+
+  .desktop-file-options > summary:hover,
+  .desktop-file-options[open] > summary,
+  .recent-desktop-file-options > summary:hover,
+  .recent-desktop-file-options[open] > summary,
+  .starred-desktop-file-options > summary:hover,
+  .starred-desktop-file-options[open] > summary,
+  .shared-desktop-file-options > summary:hover,
+  .shared-desktop-file-options[open] > summary,
+  .grid-file-options > summary:hover,
+  .grid-file-options[open] > summary {
+    background: #172033 !important;
+    border-color: #475569 !important;
+  }
+
+  .desktop-file-options-menu,
+  .recent-desktop-file-options .desktop-file-options-menu,
+  .starred-desktop-file-options .desktop-file-options-menu,
+  .shared-desktop-file-options .desktop-file-options-menu,
+  .grid-file-options .grid-file-menu-dropdown {
+    position: absolute !important;
+    top: calc(100% + 6px) !important;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 350 !important;
+    width: 170px !important;
+    min-width: 170px !important;
+    max-width: calc(100vw - 24px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+    margin: 0 !important;
+    padding: 5px !important;
+    border: 1px solid #334155 !important;
+    border-radius: 9px !important;
+    background: #111827 !important;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, .38) !important;
+  }
+
+  .desktop-file-options-menu button,
+  .recent-desktop-file-options .desktop-file-options-menu button,
+  .starred-desktop-file-options .desktop-file-options-menu button,
+  .shared-desktop-file-options .desktop-file-options-menu button,
+  .grid-file-options .grid-file-menu-dropdown button {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 32px !important;
+    height: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    padding: 0 9px !important;
+    border: 0 !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    color: #cbd5e1 !important;
+    font-size: 10px !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    white-space: nowrap !important;
+    cursor: pointer !important;
+  }
+
+  .desktop-file-options-menu button:hover,
+  .recent-desktop-file-options .desktop-file-options-menu button:hover,
+  .starred-desktop-file-options .desktop-file-options-menu button:hover,
+  .shared-desktop-file-options .desktop-file-options-menu button:hover,
+  .grid-file-options .grid-file-menu-dropdown button:hover {
+    background: #1e293b !important;
+    color: #fff !important;
+  }
+
+  .desktop-file-options-menu button svg,
+  .recent-desktop-file-options .desktop-file-options-menu button svg,
+  .starred-desktop-file-options .desktop-file-options-menu button svg,
+  .shared-desktop-file-options .desktop-file-options-menu button svg,
+  .grid-file-options .grid-file-menu-dropdown button svg {
+    flex: 0 0 auto !important;
+  }
+
+  .desktop-file-options-menu .desktop-file-delete,
+  .starred-desktop-file-options .desktop-file-options-menu .desktop-file-delete,
+  .shared-desktop-file-options .desktop-file-options-menu .desktop-file-delete,
+  .grid-file-options .grid-file-menu-dropdown .grid-file-delete {
+    color: #f87171 !important;
+  }
+
+  .file-row:has(.desktop-file-options[open]),
+  .file-row:has(.recent-desktop-file-options[open]),
+  .file-row:has(.starred-desktop-file-options[open]),
+  .file-row:has(.shared-desktop-file-options[open]) {
+    z-index: 20 !important;
+  }
+
+  .items-list.grid-view .grid-view-item:has(.grid-file-options[open]),
+  .items-list.grid-view .grid-view-item:has(.desktop-file-options[open]) {
+    z-index: 40 !important;
+  }
+
+  .file-row > .file-action {
+    display: none !important;
+  }
+}
+
+/* ---------- GRID FILE CARDS ---------- */
+
+@media (min-width: 701px) {
+  .items-list.grid-view {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important;
+    gap: 12px !important;
+    width: 100% !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .items-list.grid-view .grid-view-item {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 154px !important;
+    height: 154px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    overflow: visible !important;
+    padding: 13px !important;
+    border: 1px solid #2a333f !important;
+    border-radius: 11px !important;
+    background: #181f28 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,.10) !important;
+  }
+
+  .items-list.grid-view .grid-view-item:hover {
+    border-color: #3a4655 !important;
+    background: #1d252f !important;
+  }
+
+  .items-list.grid-view .grid-view-item > .file-action {
+    display: none !important;
+  }
+
+  .items-list.grid-view .grid-view-item > .file-icon {
+    flex: 0 0 auto !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    height: 48px !important;
+    min-height: 48px !important;
+    margin: 0 auto 8px !important;
+  }
+
+  .items-list.grid-view .grid-view-item > .file-info {
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
+  }
+
+  .items-list.grid-view .grid-view-item > .file-info strong,
+  .items-list.grid-view .grid-view-item > .file-info span {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .items-list.grid-view .grid-file-options {
+    position: absolute !important;
+    top: 9px !important;
+    right: 9px !important;
+    margin: 0 !important;
+    z-index: 50 !important;
+  }
+}
+
+/* ---------- MODALS ALWAYS ABOVE DROPDOWNS ---------- */
+
+.details-modal-overlay,
+.preview-modal-overlay,
+.preview-overlay,
+.share-modal-overlay,
+.public-link-modal-overlay,
+.version-modal-overlay,
+.frontend-modal-overlay {
+  z-index: 10000 !important;
+}
+
+.details-modal,
+.preview-modal,
+.share-modal,
+.public-link-modal,
+.version-modal,
+.frontend-shortcuts-modal,
+.frontend-tag-popover {
+  position: relative;
+  z-index: 10001 !important;
+}
+
+/* ---------- LIGHT MODE DROPDOWNS ---------- */
+
+html[data-theme="light"] .desktop-file-options > summary,
+html[data-theme="light"] .recent-desktop-file-options > summary,
+html[data-theme="light"] .starred-desktop-file-options > summary,
+html[data-theme="light"] .shared-desktop-file-options > summary,
+html[data-theme="light"] .grid-file-options > summary {
+  background: #fff !important;
+  border-color: #dbe3ec !important;
+  color: #475569 !important;
+}
+
+html[data-theme="light"] .desktop-file-options > summary:hover,
+html[data-theme="light"] .desktop-file-options[open] > summary,
+html[data-theme="light"] .recent-desktop-file-options > summary:hover,
+html[data-theme="light"] .recent-desktop-file-options[open] > summary,
+html[data-theme="light"] .starred-desktop-file-options > summary:hover,
+html[data-theme="light"] .starred-desktop-file-options[open] > summary,
+html[data-theme="light"] .shared-desktop-file-options > summary:hover,
+html[data-theme="light"] .shared-desktop-file-options[open] > summary,
+html[data-theme="light"] .grid-file-options > summary:hover,
+html[data-theme="light"] .grid-file-options[open] > summary {
+  background: #f8fafc !important;
+  border-color: #b9c7d8 !important;
+  color: #172033 !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu,
+html[data-theme="light"] .recent-desktop-file-options .desktop-file-options-menu,
+html[data-theme="light"] .starred-desktop-file-options .desktop-file-options-menu,
+html[data-theme="light"] .shared-desktop-file-options .desktop-file-options-menu,
+html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown {
+  background: #fff !important;
+  border-color: #dbe3ec !important;
+  box-shadow: 0 14px 35px rgba(15,23,42,.16) !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu button,
+html[data-theme="light"] .recent-desktop-file-options .desktop-file-options-menu button,
+html[data-theme="light"] .starred-desktop-file-options .desktop-file-options-menu button,
+html[data-theme="light"] .shared-desktop-file-options .desktop-file-options-menu button,
+html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown button {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu button:hover,
+html[data-theme="light"] .recent-desktop-file-options .desktop-file-options-menu button:hover,
+html[data-theme="light"] .starred-desktop-file-options .desktop-file-options-menu button:hover,
+html[data-theme="light"] .shared-desktop-file-options .desktop-file-options-menu button:hover,
+html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown button:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+/* ---------- MOBILE SHELL ---------- */
+
+.mobile-header {
+  display: none !important;
+}
+
+@media (max-width: 800px) {
+  html,
+  body,
+  #root {
+    width: 100%;
+    min-height: 100%;
+    height: auto;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .dashboard {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .mobile-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 9500 !important;
+    width: 100% !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 0 12px !important;
+    background: #171d25 !important;
+    border-bottom: 1px solid #29313d !important;
+  }
+
+  .mobile-menu-button {
+    flex: 0 0 36px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid #303b49 !important;
+    border-radius: 8px !important;
+    background: #202833 !important;
+    color: #dbe5ef !important;
+  }
+
+  .mobile-brand {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    overflow: hidden !important;
+  }
+
+  .mobile-brand strong {
+    min-width: 0 !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .mobile-profile {
+    flex: 0 0 auto !important;
+  }
+
+  .mobile-profile .avatar {
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
+    min-height: 34px !important;
+  }
+
+  /* Mobile sidebar is a true dropdown, not part of page flow. */
+  .dashboard > .sidebar {
+    position: absolute !important;
+    top: 64px !important;
+    left: 10px !important;
+    right: 10px !important;
+    z-index: 9400 !important;
+    display: none !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: calc(100vh - 76px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    border: 1px solid #303b49 !important;
+    border-radius: 12px !important;
+    background: #171d25 !important;
+    box-shadow: 0 18px 45px rgba(0,0,0,.38) !important;
+  }
+
+  .dashboard > .sidebar.mobile-open {
+    display: block !important;
+  }
+
+  .dashboard > .sidebar .brand,
+  .dashboard > .sidebar .sidebar-user {
+    display: none !important;
+  }
+
+  .dashboard > .sidebar .sidebar-item,
+  .dashboard > .sidebar .theme-toggle {
+    width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    margin: 2px 0 !important;
+    padding: 0 11px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    border-radius: 8px !important;
+  }
+
+  .content {
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: calc(100vh - 58px) !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 18px 14px 36px !important;
+  }
+
+  .home-dashboard,
+  .file-area,
+  .shared-items-section,
+  .activity-page,
+  .trash-page {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+  }
+
+  .topbar {
+    width: 100% !important;
+    min-width: 0 !important;
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .actions {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  .upload-button,
+  .new-folder-button {
+    flex: 1 1 160px !important;
+  }
+
+  .search-bar {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .items-list,
+  .items-list.grid-view {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* ---------- MOBILE FILE/FOLDER CARDS ---------- */
+
+@media (max-width: 800px) {
+  .items-list:not(.grid-view) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    overflow: visible !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .items-list:not(.grid-view) .file-row {
+    position: relative !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 70px !important;
+    height: auto !important;
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 10px !important;
+    overflow: visible !important;
+    border: 1px solid #2a333f !important;
+    border-radius: 11px !important;
+    background: #181f28 !important;
+  }
+
+  .items-list:not(.grid-view) .file-row .file-icon {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .items-list:not(.grid-view) .file-row .file-info {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    min-width: 0 !important;
+    width: auto !important;
+    overflow: hidden !important;
+  }
+
+  .items-list:not(.grid-view) .file-row .file-info strong,
+  .items-list:not(.grid-view) .file-row .file-info span {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .items-list:not(.grid-view) .desktop-file-options,
+  .items-list:not(.grid-view) .recent-desktop-file-options,
+  .items-list:not(.grid-view) .starred-desktop-file-options,
+  .items-list:not(.grid-view) .shared-desktop-file-options {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    margin-left: 0 !important;
+    z-index: 300 !important;
+  }
+
+  .items-list:not(.grid-view) .file-row > .file-action {
+    display: none !important;
+  }
+
+  .items-list.grid-view {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .items-list.grid-view .grid-view-item {
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 150px !important;
+    height: 150px !important;
+    padding: 11px !important;
+  }
+
+  .items-list.grid-view .grid-file-options {
+    top: 7px !important;
+    right: 7px !important;
+  }
+
+  .items-list.grid-view .grid-file-options > summary {
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+  }
+
+  .folder-actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    margin-top: 12px !important;
+  }
+
+  .folder-actions .folder-action {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 32px !important;
+    min-height: 32px !important;
+    padding: 0 4px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* ---------- MOBILE DROPDOWN MENUS ---------- */
+
+@media (max-width: 700px) {
+  .desktop-file-options,
+  .recent-desktop-file-options,
+  .starred-desktop-file-options,
+  .shared-desktop-file-options {
+    display: none !important;
+  }
+
+  .grid-file-options {
+    display: block !important;
+  }
+
+  .grid-file-options .grid-file-menu-dropdown {
+    position: absolute !important;
+    top: calc(100% + 5px) !important;
+    right: 0 !important;
+    left: auto !important;
+    z-index: 9500 !important;
+    width: 155px !important;
+    min-width: 155px !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+}
+
+/* ---------- MOBILE DASHBOARD ---------- */
+
+@media (max-width: 900px) {
+  .dashboard-storage-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .quick-access-grid,
+  .recent-folder-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-search-wrap {
+    width: 100% !important;
+  }
+
+  .dashboard-mini-search {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .quick-access-grid,
+  .recent-folder-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .dashboard-file-date {
+    display: none !important;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .details-item-wide {
+    grid-column: auto !important;
+  }
+}
+
+/* ---------- LIGHT MOBILE ---------- */
+
+@media (max-width: 800px) {
+  html[data-theme="light"] .mobile-header {
+    background: #fff !important;
+    border-bottom-color: #e2e8f0 !important;
+  }
+
+  html[data-theme="light"] .mobile-menu-button {
+    background: #f8fafc !important;
+    border-color: #dbe3ec !important;
+    color: #475569 !important;
+  }
+
+  html[data-theme="light"] .dashboard > .sidebar {
+    background: #fff !important;
+    border-color: #dbe3ec !important;
+    box-shadow: 0 18px 45px rgba(15,23,42,.18) !important;
+  }
+
+  html[data-theme="light"] .items-list:not(.grid-view) .file-row,
+  html[data-theme="light"] .items-list.grid-view .grid-view-item {
+    background: #fff !important;
+    border-color: #e0e7ef !important;
+  }
+}
+
+/* ---------- FORMS / SELECTS ---------- */
+
+select,
+.sort-select {
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+select {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] select {
+  color-scheme: light;
+}
+
+/* ---------- SCROLLBARS ---------- */
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #34404d transparent;
+}
+
+html[data-theme="light"] * {
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+/* ---------- PREVENT HORIZONTAL BREAKOUT ---------- */
+
+img,
+svg,
+video,
+iframe,
+embed {
+  max-width: 100%;
+}
+
+.home-dashboard,
+.dashboard-storage-grid,
+.quick-access-grid,
+.recent-folder-grid,
+.file-area,
+.items-list,
+.shared-items-section,
+.activity-list,
+.activity-filter-grid {
+  min-width: 0;
+}
+/* =========================================================
+   CLOUD DRIVE — FINAL RESPONSIVE / OVERLAP / DROPDOWN FIX
+   Canonical rules appended last so legacy duplicate rules
+   cannot break the layout.
+========================================================= */
+
+/* ---------- GLOBAL BOX / OVERFLOW NORMALIZATION ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+body {
+  overflow-x: hidden !important;
+}
+
+img,
+svg,
+video,
+canvas,
+iframe,
+embed {
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  max-width: 100%;
+}
+
+button {
+  flex-shrink: 0;
+}
+
+/* Never let an inner flex/grid child force horizontal overflow. */
+.dashboard *,
+.content *,
+.sidebar *,
+.home-dashboard *,
+.file-area *,
+.items-list *,
+.activity-page *,
+.trash-page *,
+.shared-items-section * {
+  min-width: 0;
+}
+
+/* ---------- ONE GLOBAL LAYER SYSTEM ---------- */
+
+:root {
+  --cd-sidebar: 245px;
+  --cd-page-gap: 18px;
+  --cd-menu-z: 7000;
+  --cd-mobile-z: 8000;
+  --cd-modal-z: 10000;
+}
+
+.frontend-context-menu,
+.frontend-tag-popover {
+  z-index: var(--cd-menu-z) !important;
+}
+
+.details-modal-overlay,
+.preview-modal-overlay,
+.preview-overlay,
+.share-modal-overlay,
+.public-link-modal-overlay,
+.version-modal-overlay,
+.frontend-modal-overlay {
+  z-index: var(--cd-modal-z) !important;
+}
+
+.details-modal,
+.preview-modal,
+.share-modal,
+.public-link-modal,
+.version-modal,
+.frontend-shortcuts-modal {
+  z-index: calc(var(--cd-modal-z) + 1) !important;
+}
+
+/* ---------- DESKTOP SHELL ---------- */
+
+@media (min-width: 801px) {
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden !important;
+  }
+
+  .dashboard {
+    width: 100% !important;
+    height: 100vh !important;
+    min-height: 0 !important;
+    display: flex !important;
+    flex-direction: row !important;
+    overflow: hidden !important;
+  }
+
+  .sidebar {
+    position: relative !important;
+    z-index: 100 !important;
+    flex: 0 0 var(--cd-sidebar) !important;
+    width: var(--cd-sidebar) !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .content {
+    position: relative !important;
+    flex: 1 1 auto !important;
+    width: auto !important;
+    min-width: 0 !important;
+    height: 100vh !important;
+    max-height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    padding: 28px clamp(18px, 3vw, 42px) 60px !important;
+  }
+
+  .content > * {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .home-dashboard {
+    width: 100% !important;
+    max-width: 1440px !important;
+    margin: 0 auto !important;
+  }
+
+  .file-area,
+  .shared-items-section,
+  .activity-page,
+  .trash-page {
+    width: 100% !important;
+    max-width: 1440px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  .topbar {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 18px !important;
+  }
+
+  .topbar > *,
+  .actions > * {
+    min-width: 0;
+  }
+
+  .actions {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+}
+
+/* ---------- SIDEBAR ---------- */
+
+.sidebar {
+  scrollbar-width: thin;
+}
+
+.sidebar-item,
+.theme-toggle {
+  position: relative !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.sidebar-item span,
+.theme-toggle span {
+  min-width: 0 !important;
+}
+
+.sidebar-item span:last-child,
+.theme-toggle span:last-child {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.sidebar-user {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.sidebar-user > div:last-child {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.sidebar-user strong,
+.sidebar-user small {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* ---------- TOOLBAR / SEARCH ---------- */
+
+.search-bar,
+.dashboard-search-wrap,
+.dashboard-mini-search {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.search-bar input,
+.dashboard-mini-search input {
+  min-width: 0 !important;
+  width: 100% !important;
+}
+
+.actions,
+.dashboard-search-wrap {
+  min-width: 0 !important;
+}
+
+/* ---------- LIST VIEW ---------- */
+
+.items-list:not(.grid-view) {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.items-list:not(.grid-view) .file-row {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 68px !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  overflow: visible !important;
+}
+
+.items-list:not(.grid-view) .file-icon {
+  flex: 0 0 42px !important;
+}
+
+.items-list:not(.grid-view) .file-info {
+  flex: 1 1 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.items-list:not(.grid-view) .file-info strong,
+.items-list:not(.grid-view) .file-info span {
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.items-list:not(.grid-view) .file-row > .file-action {
+  display: none !important;
+}
+
+/* ---------- GRID VIEW ---------- */
+
+.items-list.grid-view {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)) !important;
+  gap: 12px !important;
+  overflow: visible !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.items-list.grid-view .grid-view-item {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 154px !important;
+  min-height: 154px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  overflow: visible !important;
+  padding: 13px !important;
+}
+
+.items-list.grid-view .grid-view-item > .file-icon {
+  flex: 0 0 auto !important;
+  margin: 0 auto 8px !important;
+}
+
+.items-list.grid-view .grid-view-item > .file-info {
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.items-list.grid-view .grid-view-item > .file-info strong,
+.items-list.grid-view .grid-view-item > .file-info span {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* ---------- ALL THREE-DOT DROPDOWNS ---------- */
+
+.desktop-file-options,
+.recent-desktop-file-options,
+.starred-desktop-file-options,
+.shared-desktop-file-options,
+.grid-file-options {
+  position: relative !important;
+  flex: 0 0 auto !important;
+  z-index: var(--cd-menu-z) !important;
+}
+
+/* summary is used by <details> dropdowns */
+.desktop-file-options > summary,
+.recent-desktop-file-options > summary,
+.starred-desktop-file-options > summary,
+.shared-desktop-file-options > summary,
+.grid-file-options > summary {
+  list-style: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  cursor: pointer !important;
+  user-select: none !important;
+}
+
+.desktop-file-options > summary::-webkit-details-marker,
+.recent-desktop-file-options > summary::-webkit-details-marker,
+.starred-desktop-file-options > summary::-webkit-details-marker,
+.shared-desktop-file-options > summary::-webkit-details-marker,
+.grid-file-options > summary::-webkit-details-marker {
+  display: none !important;
+}
+
+/* Every menu uses the same geometry. */
+.desktop-file-options-menu,
+.recent-desktop-file-options .desktop-file-options-menu,
+.starred-desktop-file-options .desktop-file-options-menu,
+.shared-desktop-file-options .desktop-file-options-menu,
+.grid-file-options .grid-file-menu-dropdown {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  right: 0 !important;
+  left: auto !important;
+  z-index: calc(var(--cd-menu-z) + 1) !important;
+  width: 178px !important;
+  min-width: 178px !important;
+  max-width: calc(100vw - 24px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  margin: 0 !important;
+  padding: 5px !important;
+  overflow: visible !important;
+  border-radius: 9px !important;
+}
+
+/* Prevent a dropdown from being clipped by the row/card. */
+.file-row:has(.desktop-file-options[open]),
+.file-row:has(.recent-desktop-file-options[open]),
+.file-row:has(.starred-desktop-file-options[open]),
+.file-row:has(.shared-desktop-file-options[open]),
+.grid-view-item:has(.grid-file-options[open]) {
+  z-index: calc(var(--cd-menu-z) - 1) !important;
+  overflow: visible !important;
+}
+
+/* Menu buttons never overlap each other. */
+.desktop-file-options-menu button,
+.recent-desktop-file-options .desktop-file-options-menu button,
+.starred-desktop-file-options .desktop-file-options-menu button,
+.shared-desktop-file-options .desktop-file-options-menu button,
+.grid-file-options .grid-file-menu-dropdown button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  margin: 0 !important;
+  padding: 0 9px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+.desktop-file-options-menu button span,
+.recent-desktop-file-options .desktop-file-options-menu button span,
+.starred-desktop-file-options .desktop-file-options-menu button span,
+.shared-desktop-file-options .desktop-file-options-menu button span,
+.grid-file-options .grid-file-menu-dropdown button span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* ---------- CONTEXT MENU ---------- */
+
+.frontend-context-menu {
+  position: fixed !important;
+  width: 190px !important;
+  max-width: calc(100vw - 20px) !important;
+  max-height: calc(100vh - 20px) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.frontend-context-menu button {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 36px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  overflow: hidden !important;
+}
+
+.frontend-context-menu button span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* ---------- FORM DROPDOWNS / SELECTS ---------- */
+
+select,
+.sort-select,
+.activity-filter-grid select,
+.advanced-filter-field select,
+.share-form select,
+.public-link-modal select {
+  width: 100%;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.sort-select {
+  width: auto !important;
+  min-width: 130px !important;
+}
+
+.activity-filter-grid,
+.advanced-filter-grid,
+.advanced-filter-fields {
+  min-width: 0 !important;
+}
+
+.activity-filter-grid > *,
+.advanced-filter-grid > *,
+.advanced-filter-fields > * {
+  min-width: 0 !important;
+}
+
+/* ---------- FILE TYPE ICONS — ALL SUPPORTED TYPES ---------- */
+
+.file-row .file-icon,
+.drive-file-icon,
+.dashboard-file-type {
+  flex-shrink: 0 !important;
+  overflow: hidden !important;
+}
+
+.file-row .file-icon svg,
+.drive-file-icon .drive-file-shape,
+.dashboard-file-type svg {
+  display: block !important;
+  flex-shrink: 0 !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+}
+
+/* Make extension labels readable inside the document icon. */
+.file-row .file-icon > span,
+.drive-file-icon .drive-file-label {
+  pointer-events: none !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* Explicit icon categories including the fallback. */
+.file-row .file-icon[data-type="pdf"],
+.drive-file-icon-pdf {
+  color: #f87171 !important;
+}
+
+.file-row .file-icon[data-type="image"],
+.drive-file-icon-image {
+  color: #4ade80 !important;
+}
+
+.file-row .file-icon[data-type="text"],
+.drive-file-icon-text {
+  color: #60a5fa !important;
+}
+
+.file-row .file-icon[data-type="word"],
+.drive-file-icon-word {
+  color: #60a5fa !important;
+}
+
+.file-row .file-icon[data-type="excel"],
+.drive-file-icon-excel {
+  color: #4ade80 !important;
+}
+
+.file-row .file-icon[data-type="powerpoint"],
+.drive-file-icon-powerpoint {
+  color: #fb923c !important;
+}
+
+.file-row .file-icon[data-type="archive"],
+.drive-file-icon-archive {
+  color: #c084fc !important;
+}
+
+.file-row .file-icon[data-type="audio"],
+.drive-file-icon-audio {
+  color: #e879f9 !important;
+}
+
+.file-row .file-icon[data-type="video"],
+.drive-file-icon-video {
+  color: #a78bfa !important;
+}
+
+.drive-file-icon-default,
+.file-row .file-icon[data-type="default"] {
+  color: #94a3b8 !important;
+}
+
+/* ---------- DASHBOARD CARDS ---------- */
+
+.dashboard-storage-grid {
+  width: 100% !important;
+  min-width: 0 !important;
+  grid-template-columns: minmax(0, 2fr) minmax(220px, 1fr) !important;
+}
+
+.dashboard-storage-card,
+.dashboard-transfer-card,
+.quick-card,
+.recent-folder-card {
+  min-width: 0 !important;
+}
+
+.quick-access-grid,
+.recent-folder-grid {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* ---------- TABLE/LIST-LIKE AREAS ---------- */
+
+.activity-list,
+.trash-list,
+.items-list,
+.dashboard-file-list {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.activity-row,
+.trash-row,
+.dashboard-file-row {
+  min-width: 0 !important;
+}
+
+.activity-info,
+.trash-item-info,
+.dashboard-file-name {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.activity-info strong,
+.activity-info span,
+.trash-item-info strong,
+.trash-item-info span,
+.dashboard-file-name strong,
+.dashboard-file-name small {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+/* ---------- MODALS / POPOVERS ---------- */
+
+.details-modal-overlay,
+.preview-modal-overlay,
+.preview-overlay,
+.share-modal-overlay,
+.public-link-modal-overlay,
+.version-modal-overlay,
+.frontend-modal-overlay {
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  overflow: auto !important;
+}
+
+.details-modal,
+.preview-modal,
+.share-modal,
+.public-link-modal,
+.version-modal,
+.frontend-shortcuts-modal,
+.frontend-tag-popover {
+  max-width: calc(100vw - 24px) !important;
+}
+
+/* ---------- MOBILE HEADER ---------- */
+
+.mobile-header {
+  display: none !important;
+}
+
+@media (max-width: 800px) {
+  html,
+  body,
+  #root {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+  }
+
+  .dashboard {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    min-height: 100vh !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .mobile-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: var(--cd-mobile-z) !important;
+    width: 100% !important;
+    height: 58px !important;
+    min-height: 58px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 0 12px !important;
+  }
+
+  .mobile-menu-button {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+  }
+
+  .mobile-brand {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+
+  .mobile-profile {
+    flex: 0 0 auto !important;
+  }
+
+  /* Mobile sidebar is a floating dropdown. */
+  .dashboard > .sidebar {
+    position: fixed !important;
+    top: 64px !important;
+    left: 10px !important;
+    right: 10px !important;
+    z-index: calc(var(--cd-mobile-z) + 1) !important;
+    display: none !important;
+    width: auto !important;
+    height: auto !important;
+    max-height: calc(100vh - 76px) !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    margin: 0 !important;
+    padding: 12px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 18px 45px rgba(0, 0, 0, .38) !important;
+  }
+
+  .dashboard > .sidebar.mobile-open {
+    display: block !important;
+  }
+
+  .dashboard > .sidebar .brand,
+  .dashboard > .sidebar .sidebar-user {
+    display: none !important;
+  }
+
+  .dashboard > .sidebar .sidebar-item,
+  .dashboard > .sidebar .theme-toggle {
+    width: 100% !important;
+    height: 42px !important;
+    min-height: 42px !important;
+  }
+
+  .content {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: calc(100vh - 58px) !important;
+    overflow: visible !important;
+    padding: 18px 14px 40px !important;
+  }
+
+  .home-dashboard,
+  .file-area,
+  .shared-items-section,
+  .activity-page,
+  .trash-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .topbar {
+    width: 100% !important;
+    align-items: stretch !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .topbar > div:first-child {
+    min-width: 0 !important;
+  }
+
+  .actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: stretch !important;
+  }
+
+  .upload-button,
+  .new-folder-button {
+    flex: 1 1 150px !important;
+    min-width: 0 !important;
+  }
+
+  .search-bar {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .dashboard-search-wrap {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+  }
+
+  .dashboard-mini-search {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+
+  .dashboard-upload {
+    flex: 1 1 120px !important;
+    justify-content: center !important;
+  }
+
+  .dashboard-storage-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .quick-access-grid,
+  .recent-folder-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .items-list.grid-view {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .items-list.grid-view .grid-view-item {
+    height: 150px !important;
+    min-height: 150px !important;
+    padding: 10px !important;
+  }
+
+  /* Mobile list cards: icon + text + menu. */
+  .items-list:not(.grid-view) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+  }
+
+  .items-list:not(.grid-view) .file-row {
+    display: grid !important;
+    grid-template-columns: 42px minmax(0, 1fr) 34px !important;
+    align-items: center !important;
+    gap: 10px !important;
+    width: 100% !important;
+    min-height: 68px !important;
+    padding: 10px !important;
+    overflow: visible !important;
+    border-radius: 11px !important;
+  }
+
+  .items-list:not(.grid-view) .file-row .file-icon {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+
+  .items-list:not(.grid-view) .file-row .file-info {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+  }
+
+  .items-list:not(.grid-view) .desktop-file-options,
+  .items-list:not(.grid-view) .recent-desktop-file-options,
+  .items-list:not(.grid-view) .starred-desktop-file-options,
+  .items-list:not(.grid-view) .shared-desktop-file-options {
+    grid-column: 3 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    margin: 0 !important;
+  }
+
+  .items-list:not(.grid-view) .desktop-file-options-menu,
+  .items-list:not(.grid-view) .recent-desktop-file-options .desktop-file-options-menu,
+  .items-list:not(.grid-view) .starred-desktop-file-options .desktop-file-options-menu,
+  .items-list:not(.grid-view) .shared-desktop-file-options .desktop-file-options-menu {
+    position: fixed !important;
+    top: auto !important;
+    right: 12px !important;
+    left: auto !important;
+    width: 178px !important;
+    max-width: calc(100vw - 24px) !important;
+  }
+
+  /* Grid menus stay attached to their card. */
+  .items-list.grid-view .grid-file-options {
+    position: absolute !important;
+    top: 7px !important;
+    right: 7px !important;
+    margin: 0 !important;
+    z-index: calc(var(--cd-menu-z) + 1) !important;
+  }
+
+  .items-list.grid-view .grid-file-menu-dropdown {
+    position: absolute !important;
+    top: calc(100% + 5px) !important;
+    right: 0 !important;
+    left: auto !important;
+    width: 165px !important;
+  }
+
+  .sort-select {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .activity-filter-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .advanced-filter-field {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .trash-page {
+    padding: 18px 0 40px !important;
+  }
+
+  .trash-row {
+    grid-template-columns: 44px minmax(0, 1fr) auto !important;
+    gap: 10px !important;
+  }
+
+  .trash-expiry {
+    display: none !important;
+  }
+
+  .trash-restore-button {
+    width: auto !important;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .details-item-wide {
+    grid-column: auto !important;
+  }
+
+  .preview-modal {
+    width: min(436px, calc(100vw - 20px)) !important;
+    height: min(586px, calc(100vh - 20px)) !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 20px) !important;
+  }
+
+  .version-modal,
+  .share-modal,
+  .public-link-modal,
+  .details-modal {
+    width: min(620px, calc(100vw - 20px)) !important;
+    max-width: calc(100vw - 20px) !important;
+    max-height: calc(100vh - 20px) !important;
+  }
+
+  .frontend-shortcuts-modal,
+  .frontend-tag-popover {
+    width: min(440px, calc(100vw - 20px)) !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+}
+
+/* ---------- SMALL PHONES ---------- */
+
+@media (max-width: 520px) {
+  .content {
+    padding: 14px 10px 30px !important;
+  }
+
+  .topbar h2 {
+    font-size: 21px !important;
+  }
+
+  .actions {
+    gap: 7px !important;
+  }
+
+  .upload-button,
+  .new-folder-button {
+    flex: 1 1 100% !important;
+  }
+
+  .quick-access-grid,
+  .recent-folder-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .items-list.grid-view {
+    grid-template-columns: 1fr !important;
+  }
+
+  .items-list.grid-view .grid-view-item {
+    height: 142px !important;
+    min-height: 142px !important;
+  }
+
+  .activity-filter-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .file-row .file-icon,
+  .drive-file-icon {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+  }
+
+  .file-row .file-icon svg,
+  .drive-file-icon .drive-file-shape {
+    width: 27px !important;
+    height: 33px !important;
+  }
+
+  .file-row .file-icon > span,
+  .drive-file-icon .drive-file-label {
+    width: 25px !important;
+    max-width: 25px !important;
+    font-size: 6.5px !important;
+  }
+
+  .frontend-context-menu {
+    width: 170px !important;
+  }
+
+  .preview-modal .preview-header {
+    padding-left: 12px !important;
+    padding-right: 10px !important;
+  }
+
+  .preview-modal .preview-content {
+    padding: 10px !important;
+  }
+
+  .preview-modal .preview-footer,
+  .preview-modal .preview-actions {
+    min-height: 64px !important;
+    height: 64px !important;
+    padding: 6px 10px 10px !important;
+    gap: 6px !important;
+  }
+
+  .preview-modal .preview-footer .file-action,
+  .preview-modal .preview-actions .file-action {
+    min-width: 76px !important;
+    padding: 0 7px !important;
+  }
+}
+
+/* ---------- VERY SMALL PHONES ---------- */
+
+@media (max-width: 380px) {
+  .items-list:not(.grid-view) .file-row {
+    grid-template-columns: 38px minmax(0, 1fr) 30px !important;
+    gap: 7px !important;
+    padding: 8px !important;
+  }
+
+  .file-row .file-icon,
+  .drive-file-icon {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+  }
+
+  .items-list.grid-view .grid-view-item {
+    padding: 9px !important;
+  }
+
+  .file-info strong {
+    font-size: 11px !important;
+  }
+
+  .file-info span {
+    font-size: 9px !important;
+  }
+
+  .dashboard-file-row {
+    gap: 7px !important;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+  }
+}
+
+/* ---------- LANDSCAPE PHONES ---------- */
+
+@media (max-width: 800px) and (orientation: landscape) {
+  .dashboard > .sidebar {
+    max-height: calc(100vh - 72px) !important;
+  }
+
+  .content {
+    padding-bottom: 28px !important;
+  }
+
+  .preview-modal,
+  .version-modal,
+  .share-modal,
+  .public-link-modal,
+  .details-modal {
+    max-height: calc(100vh - 14px) !important;
+  }
+}
+
+/* ---------- LIGHT THEME FOR NEW LAYOUT LAYER ---------- */
+
+html[data-theme="light"] .frontend-context-menu {
+  background: #ffffff !important;
+  border-color: #dbe3ec !important;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, .16) !important;
+}
+
+html[data-theme="light"] .frontend-context-menu button {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .frontend-context-menu button:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+html[data-theme="light"] .dashboard > .sidebar {
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .18) !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu,
+html[data-theme="light"] .recent-desktop-file-options .desktop-file-options-menu,
+html[data-theme="light"] .starred-desktop-file-options .desktop-file-options-menu,
+html[data-theme="light"] .shared-desktop-file-options .desktop-file-options-menu,
+html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown {
+  background: #ffffff !important;
+  border-color: #dbe3ec !important;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, .16) !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu button,
+html[data-theme="light"] .recent-desktop-file-options .desktop-file-options-menu button,
+html[data-theme="light"] .starred-desktop-file-options .desktop-file-options-menu button,
+html[data-theme="light"] .shared-desktop-file-options .desktop-file-options-menu button,
+html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown button {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu button:hover,
+html[data-theme="light"] .recent-desktop-file-options .desktop-file-options-menu button:hover,
+html[data-theme="light"] .starred-desktop-file-options .desktop-file-options-menu button:hover,
+html[data-theme="light"] .shared-desktop-file-options .desktop-file-options-menu button:hover,
+html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown button:hover {
+  background: #f1f5f9 !important;
+  color: #172033 !important;
+}
+
+/* ---------- NO ACCIDENTAL HORIZONTAL SCROLL ---------- */
+
+@media (min-width: 801px) {
+  .dashboard,
+  .sidebar,
+  .content {
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-width: 800px) {
+  .dashboard,
+  .content {
+    overscroll-behavior-x: none;
+  }
+}
+
+
+/* =========================================================
+   CLOUD DRIVE — REFERENCE FILE ICONS
+   Canonical icon system matching the supplied document-icon
+   reference: white folded document + colored extension tab.
+   This intentionally uses new class names so legacy icon CSS
+   cannot change the appearance.
+========================================================= */
+
+.cloud-file-icon {
+  --cloud-file-accent: #64748b;
+
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: 34px !important;
+  height: 41px !important;
+  min-width: 34px !important;
+  min-height: 41px !important;
+
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: visible !important;
+
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+
+  color: var(--cloud-file-accent) !important;
+  line-height: 1 !important;
+}
+
+.cloud-file-shape {
+  position: relative !important;
+  display: block !important;
+
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow: visible !important;
+
+  flex: 0 0 auto !important;
+  pointer-events: none !important;
+}
+
+.cloud-file-icon text {
+  font-family: Arial, Helvetica, sans-serif !important;
+  font-weight: 800 !important;
+  pointer-events: none !important;
+}
+
+/* Remove the old dark tile surrounding the new document icon. */
+.file-row .file-icon:has(.cloud-file-icon),
+.dashboard-file-type:has(.cloud-file-icon),
+.item-icon:has(.cloud-file-icon) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+
+  overflow: visible !important;
+  color: inherit !important;
+}
+
+/* Normal list view */
+.file-row .file-icon:has(.cloud-file-icon) {
+  width: 42px !important;
+  min-width: 42px !important;
+  height: 48px !important;
+  min-height: 48px !important;
+  flex: 0 0 42px !important;
+}
+
+.file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+  width: 34px !important;
+  height: 41px !important;
+}
+
+/* Grid view */
+.grid-view .file-row .file-icon:has(.cloud-file-icon) {
+  width: 48px !important;
+  min-width: 48px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  flex-basis: 48px !important;
+}
+
+.grid-view .file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+  width: 40px !important;
+  height: 48px !important;
+}
+
+/* Dashboard recent files */
+.dashboard-file-type:has(.cloud-file-icon) {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 38px !important;
+  min-height: 38px !important;
+}
+
+.dashboard-file-type:has(.cloud-file-icon) .cloud-file-icon {
+  width: 28px !important;
+  height: 34px !important;
+}
+
+/* Cards / starred / other compact icon containers */
+.item-icon:has(.cloud-file-icon) .cloud-file-icon {
+  width: 34px !important;
+  height: 41px !important;
+}
+
+/* Preview icon */
+.constant-preview-icon .cloud-file-icon {
+  width: 64px !important;
+  height: 77px !important;
+}
+
+/* Small screens */
+@media (max-width: 700px) {
+  .file-row .file-icon:has(.cloud-file-icon) {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    flex-basis: 40px !important;
+  }
+
+  .file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+    width: 32px !important;
+    height: 39px !important;
+  }
+
+  .grid-view .file-row .file-icon:has(.cloud-file-icon) {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    flex-basis: 44px !important;
+  }
+
+  .grid-view .file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+    width: 37px !important;
+    height: 44px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .file-row .file-icon:has(.cloud-file-icon) {
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    flex-basis: 38px !important;
+  }
+
+  .file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+    width: 30px !important;
+    height: 36px !important;
+  }
+}
+
+/* Light mode: the document remains white, while its outline
+   stays visible against the light application background. */
+html[data-theme="light"] .cloud-file-icon {
+  filter: none !important;
+}
+
+/* =========================================================
+   LEGACY ICON SAFETY
+   No old extension badge or generic dark document is allowed
+   to affect the new reference icon.
+========================================================= */
+
+.cloud-file-icon .drive-file-shape,
+.cloud-file-icon .drive-file-label {
+  display: none !important;
+}
+
+.file-row .file-icon:has(.cloud-file-icon) > span:not(.cloud-file-icon),
+.dashboard-file-type:has(.cloud-file-icon) > span:not(.cloud-file-icon),
+.item-icon:has(.cloud-file-icon) > span:not(.cloud-file-icon) {
+  position: static !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+
+/* =========================================================
+   FINAL UI SCALE — LARGER, MORE COMFORTABLE DESKTOP UI
+   Canonical sizing override. Keeps the existing responsive
+   structure while making the application feel less zoomed out.
+========================================================= */
+
+.sidebar {
+  width: 260px;
+  padding: 24px 14px;
+}
+
+.brand {
+  gap: 11px;
+  margin: 2px 8px 28px;
+  padding: 8px 6px;
+  font-size: 21px;
+}
+
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+}
+
+.sidebar-user {
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 12px;
+  border-radius: 11px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.sidebar-item {
+  height: 44px;
+  gap: 12px;
+  margin: 4px 0;
+  padding: 0 13px;
+  border-radius: 9px;
+  font-size: 14px;
+}
+
+.theme-toggle {
+  min-height: 44px;
+  gap: 11px;
+  padding: 10px 13px;
+  font-size: 14px;
+}
+
+.content {
+  padding: 32px 42px 48px;
+}
+
+.topbar {
+  gap: 28px;
+  margin-bottom: 22px;
+}
+
+.topbar h2 {
+  font-size: 30px;
+  letter-spacing: -.5px;
+}
+
+.topbar p {
+  margin-top: 6px;
+  font-size: 13px;
+}
+
+.actions {
+  gap: 10px;
+}
+
+.upload-button,
+.new-folder-button {
+  height: 44px;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.search-bar {
+  max-width: 780px;
+  height: 48px;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding: 0 14px;
+  border-radius: 10px;
+}
+
+.search-bar input {
+  font-size: 14px;
+}
+
+.sort-select {
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.view-toggle {
+  padding: 4px;
+  border-radius: 9px;
+}
+
+.view-toggle-button {
+  width: 34px;
+  height: 32px;
+  border-radius: 7px;
+}
+
+.storage-card {
+  width: min(100%, 760px);
+  margin-bottom: 32px;
+  padding: 22px;
+  border-radius: 15px;
+}
+
+.storage-card-header {
+  gap: 24px;
+  margin-bottom: 18px;
+}
+
+.storage-title {
+  gap: 12px;
+}
+
+.storage-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+}
+
+.storage-title strong {
+  font-size: 15px;
+}
+
+.storage-title span,
+.storage-percentage {
+  font-size: 12px;
+}
+
+.storage-progress {
+  height: 8px;
+  margin-bottom: 13px;
+}
+
+.storage-details {
+  font-size: 12px;
+}
+
+.storage-stats {
+  gap: 18px;
+}
+
+.section-title {
+  margin: 28px 0 13px;
+  font-size: 12px;
+}
+
+.items-grid,
+.grid-view {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 15px;
+}
+
+.item-card,
+.folder-card {
+  min-height: 145px;
+  padding: 17px;
+  border-radius: 13px;
+}
+
+.item-main {
+  gap: 13px;
+}
+
+.item-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 10px;
+}
+
+.item-info strong {
+  font-size: 14px;
+}
+
+.item-info span {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.folder-actions {
+  gap: 7px;
+  margin-top: 16px;
+}
+
+.folder-actions button {
+  height: 34px;
+  padding: 0 9px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.items-list {
+  border-radius: 14px;
+}
+
+.file-row {
+  min-height: 78px !important;
+  height: 78px !important;
+  gap: 15px;
+  padding: 12px 17px;
+}
+
+.file-info strong {
+  max-width: 600px;
+  font-size: 14px;
+}
+
+.file-info span {
+  margin-top: 4px;
+  font-size: 11px;
+}
+
+.file-action {
+  height: 36px;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 11px;
+}
+
+.file-row .file-icon {
+  width: 48px !important;
+  min-width: 48px !important;
+  height: 55px !important;
+  min-height: 55px !important;
+  flex-basis: 48px !important;
+}
+
+.file-row .file-icon:has(.cloud-file-icon) {
+  width: 48px !important;
+  min-width: 48px !important;
+  height: 55px !important;
+  min-height: 55px !important;
+  flex-basis: 48px !important;
+}
+
+.file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+  width: 39px !important;
+  height: 47px !important;
+}
+
+.grid-view .file-row {
+  min-height: 220px !important;
+  padding: 18px;
+}
+
+.grid-view .file-row .file-icon {
+  width: 56px !important;
+  min-width: 56px !important;
+  height: 65px !important;
+  min-height: 65px !important;
+  flex-basis: 56px !important;
+}
+
+.grid-view .file-row .file-icon:has(.cloud-file-icon) {
+  width: 56px !important;
+  min-width: 56px !important;
+  height: 65px !important;
+  min-height: 65px !important;
+  flex-basis: 56px !important;
+}
+
+.grid-view .file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+  width: 46px !important;
+  height: 55px !important;
+}
+
+.breadcrumbs {
+  gap: 5px;
+  margin-bottom: 21px;
+}
+
+.breadcrumb-item button,
+.back-button {
+  font-size: 13px;
+  padding: 4px 6px;
+}
+
+.empty-state {
+  min-height: 330px;
+}
+
+.empty-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 16px;
+  border-radius: 16px;
+}
+
+.empty-state h3 {
+  margin-bottom: 6px;
+  font-size: 16px;
+}
+
+.empty-state p {
+  font-size: 13px;
+}
+
+/* Dashboard */
+.home-dashboard {
+  max-width: 1320px;
+}
+
+.dashboard-heading {
+  margin-bottom: 18px;
+}
+
+.dashboard-mini-search {
+  width: 290px;
+  height: 42px;
+  gap: 9px;
+  padding: 0 13px;
+  border-radius: 9px;
+}
+
+.dashboard-mini-search input {
+  font-size: 12px;
+}
+
+.dashboard-upload {
+  height: 42px;
+  gap: 7px;
+  padding: 0 15px;
+  border-radius: 9px;
+  font-size: 12px;
+}
+
+.dashboard-notice {
+  min-height: 40px;
+  margin-bottom: 16px;
+  padding: 0 13px;
+  gap: 10px;
+  border-radius: 9px;
+  font-size: 11px;
+}
+
+.dashboard-storage-grid {
+  grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.dashboard-storage-card,
+.dashboard-transfer-card {
+  border-radius: 13px;
+}
+
+.dashboard-storage-card,
+.dashboard-transfer-card {
+  min-height: 150px;
+}
+
+.dashboard-storage-card {
+  padding: 19px 21px;
+}
+
+.dashboard-eyebrow {
+  margin-bottom: 5px;
+  font-size: 10px;
+}
+
+.dashboard-storage-card strong {
+  font-size: 30px;
+}
+
+.dashboard-storage-sub {
+  font-size: 11px;
+}
+
+.dashboard-badge {
+  padding: 6px 10px;
+  font-size: 9px;
+}
+
+.dashboard-storage-track {
+  height: 6px;
+  margin: 20px 0 11px;
+}
+
+.dashboard-storage-meta {
+  gap: 22px;
+  font-size: 10px;
+}
+
+.dashboard-transfer-card {
+  padding: 19px;
+}
+
+.dashboard-transfer-card strong {
+  margin: 20px 0 6px;
+  font-size: 15px;
+}
+
+.dashboard-transfer-card > span:last-child {
+  font-size: 11px;
+}
+
+.dashboard-section-title {
+  font-size: 10px;
+}
+
+.dashboard-section-heading {
+  margin-bottom: 10px;
+}
+
+.dashboard-section-heading button {
+  font-size: 11px;
+}
+
+.quick-access-grid {
+  gap: 12px;
+  margin-top: 11px;
+}
+
+.quick-card {
+  min-height: 102px;
+  padding: 15px;
+  border-radius: 11px;
+}
+
+.quick-icon {
+  width: 34px;
+  height: 34px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.quick-card strong {
+  font-size: 12px;
+}
+
+.quick-card small {
+  margin-top: 3px;
+  font-size: 9px;
+}
+
+.recent-folder-grid {
+  gap: 12px;
+}
+
+.recent-folder-card {
+  padding: 10px;
+  border-radius: 11px;
+}
+
+.folder-preview {
+  height: 100px;
+  margin-bottom: 9px;
+  border-radius: 9px;
+}
+
+.recent-folder-card strong {
+  font-size: 11px;
+}
+
+.recent-folder-card small {
+  font-size: 9px;
+}
+
+.dashboard-file-list {
+  border-radius: 12px;
+}
+
+.dashboard-file-row {
+  min-height: 56px;
+  gap: 12px;
+  padding: 9px 13px;
+}
+
+.dashboard-file-type {
+  width: 34px !important;
+  min-width: 34px !important;
+  height: 39px !important;
+  min-height: 39px !important;
+}
+
+.dashboard-file-type:has(.cloud-file-icon) {
+  width: 38px !important;
+  min-width: 38px !important;
+  height: 43px !important;
+  min-height: 43px !important;
+}
+
+.dashboard-file-type:has(.cloud-file-icon) .cloud-file-icon {
+  width: 31px !important;
+  height: 37px !important;
+}
+
+.dashboard-file-name strong {
+  font-size: 11px;
+}
+
+.dashboard-file-name small,
+.dashboard-file-date {
+  font-size: 9px;
+}
+
+.dashboard-row-action {
+  height: 32px;
+  padding: 0 8px;
+  border-radius: 7px;
+  font-size: 10px;
+}
+
+/* Modals and forms */
+.details-modal,
+.share-modal,
+.public-link-modal,
+.version-modal {
+  border-radius: 17px;
+}
+
+.details-header,
+.share-modal-header,
+.preview-header {
+  padding: 19px 22px;
+}
+
+.details-header h2,
+.share-modal-header h2,
+.preview-header h2 {
+  font-size: 19px;
+}
+
+.details-header p {
+  font-size: 12px;
+}
+
+.details-content {
+  padding: 22px;
+}
+
+.details-grid {
+  gap: 11px;
+}
+
+.details-item {
+  padding: 14px;
+  border-radius: 10px;
+}
+
+.details-item span {
+  font-size: 11px;
+}
+
+.details-item strong {
+  font-size: 13px;
+}
+
+.login-card {
+  max-width: 440px;
+  padding: 34px;
+  border-radius: 18px;
+}
+
+.login-card h1 {
+  font-size: 27px;
+}
+
+.subtitle {
+  margin-bottom: 27px;
+  font-size: 13px;
+}
+
+/* Keep the larger scale comfortable on tablets and phones. */
+@media (max-width: 1100px) {
+  .content {
+    padding: 28px 30px 40px;
+  }
+
+  .sidebar {
+    width: 240px;
+  }
+
+  .dashboard-storage-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-access-grid,
+  .recent-folder-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    width: 78px;
+    padding: 18px 9px;
+  }
+
+  .brand {
+    justify-content: center;
+    margin: 2px 0 22px;
+    padding: 6px 0;
+  }
+
+  .brand > span {
+    display: none;
+  }
+
+  .sidebar-user {
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .sidebar-user > div:last-child {
+    display: none;
+  }
+
+  .sidebar-item {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar-item span {
+    display: none;
+  }
+
+  .theme-toggle {
+    justify-content: center;
+    padding: 9px 0;
+  }
+
+  .theme-toggle > span:not(.theme-toggle-icon) {
+    display: none;
+  }
+
+  .content {
+    padding: 22px 18px 32px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .topbar h2 {
+    font-size: 25px;
+  }
+
+  .actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .upload-button,
+  .new-folder-button {
+    flex: 1;
+    min-width: 130px;
+  }
+
+  .search-bar {
+    max-width: none;
+    height: 46px;
+  }
+
+  .items-grid,
+  .grid-view {
+    grid-template-columns: 1fr;
+  }
+
+  .file-row {
+    min-height: 72px !important;
+    height: auto !important;
+    padding: 11px 12px;
+    gap: 11px;
+  }
+
+  .file-action {
+    width: 36px;
+    min-width: 36px;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .file-action svg {
+    margin: 0;
+  }
+
+  .grid-view .file-row {
+    min-height: 195px !important;
+  }
+
+  .dashboard-search-wrap {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-mini-search {
+    width: 100%;
+  }
+
+  .dashboard-upload {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .quick-access-grid,
+  .recent-folder-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .details-item-wide {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 64px;
+  }
+
+  .content {
+    padding: 18px 12px 28px;
+  }
+
+  .topbar h2 {
+    font-size: 22px;
+  }
+
+  .upload-button,
+  .new-folder-button {
+    min-width: 0;
+    font-size: 12px;
+  }
+
+  .quick-access-grid,
+  .recent-folder-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-storage-card,
+  .dashboard-transfer-card {
+    min-height: 135px;
+  }
+
+  .dashboard-file-date {
+    display: none;
+  }
+
+  .file-row .file-icon,
+  .file-row .file-icon:has(.cloud-file-icon) {
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 51px !important;
+    min-height: 51px !important;
+    flex-basis: 44px !important;
+  }
+
+  .file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+    width: 35px !important;
+    height: 42px !important;
+  }
+
+  .file-info strong {
+    font-size: 13px;
+  }
+
+  .file-info span {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 380px) {
+  .sidebar {
+    width: 58px;
+  }
+
+  .content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .topbar h2 {
+    font-size: 20px;
+  }
+
+  .file-row {
+    gap: 8px;
+    padding-left: 9px;
+    padding-right: 9px;
+  }
+
+  .file-row .file-icon,
+  .file-row .file-icon:has(.cloud-file-icon) {
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 47px !important;
+    min-height: 47px !important;
+    flex-basis: 40px !important;
+  }
+
+  .file-row .file-icon:has(.cloud-file-icon) .cloud-file-icon {
+    width: 32px !important;
+    height: 39px !important;
+  }
+}
+
+/* =========================================================
+   FINAL FILE DROPDOWN POSITIONING
+   The menu is positioned from the actual three-dot button.
+   It never covers the button and flips above when needed.
+========================================================= */
+
+.desktop-file-options-menu,
+.recent-desktop-file-options .desktop-file-options-menu,
+.starred-desktop-file-options .desktop-file-options-menu,
+.shared-desktop-file-options .desktop-file-options-menu,
+.grid-file-options .grid-file-menu-dropdown,
+.mobile-file-options .mobile-file-options-menu {
+  position: fixed !important;
+  top: var(--cd-menu-top, -10000px) !important;
+  right: var(--cd-menu-right, 8px) !important;
+  left: auto !important;
+  z-index: 9000 !important;
+  max-height: calc(100vh - 16px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+/* Keep the three-dot control itself visible above the menu. */
+.desktop-file-options,
+.recent-desktop-file-options,
+.starred-desktop-file-options,
+.shared-desktop-file-options,
+.grid-file-options,
+.mobile-file-options {
+  position: relative !important;
+  z-index: 9001 !important;
+}
+
+/* The menu must always leave a real gap from the button. */
+.desktop-file-options-menu,
+.recent-desktop-file-options .desktop-file-options-menu,
+.starred-desktop-file-options .desktop-file-options-menu,
+.shared-desktop-file-options .desktop-file-options-menu,
+.grid-file-options .grid-file-menu-dropdown,
+.mobile-file-options .mobile-file-options-menu {
+  margin: 0 !important;
+}
+
+/* Do not let row/card stacking contexts interfere with the fixed menu. */
+.file-row:has(.desktop-file-options[open]),
+.file-row:has(.recent-desktop-file-options[open]),
+.file-row:has(.starred-desktop-file-options[open]),
+.file-row:has(.shared-desktop-file-options[open]),
+.grid-view-item:has(.grid-file-options[open]) {
+  z-index: auto !important;
+}
+
+/* =========================================================
+   FILE MENU — REAL VIEWPORT POSITIONING
+   Menus are anchored to the actual three-dot control.
+   They leave an 8px gap and flip upward when required.
+========================================================= */
+
+.desktop-file-options-menu,
+.recent-desktop-file-options .desktop-file-options-menu,
+.starred-desktop-file-options .desktop-file-options-menu,
+.shared-desktop-file-options .desktop-file-options-menu,
+.grid-file-options .grid-file-menu-dropdown,
+.mobile-file-options .mobile-file-options-menu,
+.recent-grid-file-options-menu {
+  position: fixed !important;
+  top: var(--cd-menu-top, -10000px) !important;
+  right: var(--cd-menu-right, 8px) !important;
+  left: auto !important;
+  z-index: 9000 !important;
+  max-height: calc(100vh - 16px) !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
+.desktop-file-options,
+.recent-desktop-file-options,
+.starred-desktop-file-options,
+.shared-desktop-file-options,
+.grid-file-options,
+.mobile-file-options,
+.recent-grid-file-options-control {
+  z-index: 9001 !important;
+}
+
+.file-row:has(.desktop-file-options[open]),
+.file-row:has(.recent-desktop-file-options[open]),
+.file-row:has(.starred-desktop-file-options[open]),
+.file-row:has(.shared-desktop-file-options[open]),
+.grid-view-item:has(.grid-file-options[open]),
+.recent-grid-file-options-control {
+  overflow: visible !important;
+}
+/* =========================================================
+   STARRED — THREE-DOT MENU POSITION FIX
+   Menu opens to the LEFT of the three-dot button.
+   The three-dot button disappears while the menu is open.
+========================================================= */
+
+@media (min-width: 701px) {
+
+  /* Keep the starred options container as the positioning anchor */
+  .starred-desktop-file-options {
+    position: relative !important;
+    overflow: visible !important;
+    z-index: 9999 !important;
+  }
+
+  /* Normal three-dot button */
+  .starred-desktop-file-options > summary {
+    position: relative !important;
+    z-index: 10000 !important;
+  }
+
+  /* Hide the three dots completely while their menu is open */
+  .starred-desktop-file-options[open] > summary {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  /*
+    Move the popup to the LEFT of the three-dot button.
+
+    Button width = 34px
+    Gap = 12px
+
+    Therefore:
+    right: calc(100% + 12px)
+
+    This guarantees the popup never sits on top of
+    the three-dot button.
+  */
+  .starred-desktop-file-options .desktop-file-options-menu {
+    position: absolute !important;
+
+    right: calc(100% + 12px) !important;
+    left: auto !important;
+
+    /*
+      Bottom alignment keeps the popup above the row's
+      bottom edge instead of covering the three dots.
+    */
+    top: auto !important;
+    bottom: 0 !important;
+
+    width: 178px !important;
+    min-width: 178px !important;
+    max-width: calc(100vw - 24px) !important;
+
+    margin: 0 !important;
+    padding: 5px !important;
+
+    z-index: 10001 !important;
+
+    box-sizing: border-box !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+
+    overflow: visible !important;
+  }
+
+  /* Make sure the popup itself remains clickable */
+  .starred-desktop-file-options .desktop-file-options-menu,
+  .starred-desktop-file-options .desktop-file-options-menu * {
+    pointer-events: auto !important;
+  }
+}
+
+/* =========================================================
+   STARRED — LIGHT MODE
+========================================================= */
+
+@media (min-width: 701px) {
+  html[data-theme="light"]
+  .starred-desktop-file-options[open]
+  .desktop-file-options-menu {
+    background: #ffffff !important;
+    border-color: #dbe3ec !important;
+    box-shadow: 0 14px 35px rgba(15, 23, 42, .16) !important;
+  }
+}
+
+/* =========================================================
+   STARRED — DARK MODE
+========================================================= */
+
+@media (min-width: 701px) {
+  html[data-theme="dark"]
+  .starred-desktop-file-options[open]
+  .desktop-file-options-menu {
+    background: #111827 !important;
+    border-color: #334155 !important;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, .35) !important;
+  }
 }
