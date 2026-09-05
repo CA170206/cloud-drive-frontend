@@ -7819,3 +7819,60 @@ html[data-theme="light"] .cloud-file-icon {
     box-shadow: 0 14px 35px rgba(0, 0, 0, .35) !important;
   }
 }
+
+/* =========================================================
+   LOGIN / REGISTER SWITCH
+========================================================= */
+
+.login-switch {
+  width: 100%;
+  margin-top: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 18px;
+  color: #718096;
+  text-align: center;
+}
+
+.login-switch button {
+  border: 0;
+  background: transparent;
+  color: #2563eb;
+  font: inherit;
+  font-weight: 600;
+  padding: 0;
+  cursor: pointer;
+}
+
+.login-switch button:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.login-switch button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.register-card {
+  max-width: 440px;
+}
+
+.register-card form input {
+  margin-bottom: 14px;
+}
+
+html[data-theme="dark"] .login-switch {
+  color: #94a3b8;
+}
+
+html[data-theme="dark"] .login-switch button {
+  color: #60a5fa;
+}
+
+html[data-theme="dark"] .login-switch button:hover {
+  color: #93c5fd;
+}

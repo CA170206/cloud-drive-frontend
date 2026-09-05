@@ -76,10 +76,28 @@ export default function Home() {
 }
 
 function Login({ onLogin, theme, setTheme }) {
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setMessage("");
+  };
+
+  const switchMode = () => {
+    setIsRegistering((current) => !current);
+    resetForm();
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -109,6 +127,69 @@ function Login({ onLogin, theme, setTheme }) {
 
       onLogin(data.user);
     } catch (error) {
+      console.error("Login failed:", error);
+      setMessage("Unable to connect to server");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    setMessage("");
+
+    const trimmedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!trimmedName || !normalizedEmail || !password) {
+      setMessage("Name, email and password are required");
+      return;
+    }
+
+    if (password.length < 6) {
+      setMessage("Password must be at least 6 characters");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setMessage("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          name: trimmedName,
+          email: normalizedEmail,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setMessage(data.error?.message || "Registration failed");
+        return;
+      }
+
+      if (data.user) {
+        onLogin(data.user);
+        return;
+      }
+
+      setMessage("Account created successfully. Please sign in.");
+      setIsRegistering(false);
+      resetForm();
+    } catch (error) {
+      console.error("Registration failed:", error);
       setMessage("Unable to connect to server");
     } finally {
       setLoading(false);
@@ -117,45 +198,137 @@ function Login({ onLogin, theme, setTheme }) {
 
   return (
     <main className="login-container">
-      <div className="login-card">
+      <div className={`login-card ${isRegistering ? "register-card" : ""}`}>
         <h1>Cloud Drive</h1>
-        <p className="subtitle">Sign in to your account</p>
+
+        <p className="subtitle">
+          {isRegistering
+            ? "Create your account"
+            : "Sign in to your account"}
+        </p>
 
         <button
           type="button"
           className="theme-toggle login-theme-toggle"
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          onClick={() =>
+            setTheme(theme === "dark" ? "light" : "dark")
+          }
           aria-label="Toggle theme"
         >
-          <span className="theme-toggle-icon">{theme === "dark" ? "☀" : "☾"}</span>
-          <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>
+          <span className="theme-toggle-icon">
+            {theme === "dark" ? "☀" : "☾"}
+          </span>
+
+          <span>
+            {theme === "dark" ? "Light mode" : "Dark mode"}
+          </span>
         </button>
 
-        <form onSubmit={handleLogin}>
-          <label>Email</label>
+        <form onSubmit={isRegistering ? handleRegister : handleLogin}>
+          {isRegistering && (
+            <>
+              <label htmlFor="register-name">Name</label>
+
+              <input
+                id="register-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                autoComplete="name"
+                required
+                disabled={loading}
+              />
+            </>
+          )}
+
+          <label htmlFor="auth-email">Email</label>
 
           <input
+            id="auth-email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            autoComplete={
+              isRegistering ? "email" : "username"
+            }
             required
+            disabled={loading}
           />
 
-          <label>Password</label>
+          <label htmlFor="auth-password">Password</label>
 
           <input
+            id="auth-password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            placeholder={
+              isRegistering
+                ? "At least 6 characters"
+                : "Enter your password"
+            }
+            autoComplete={
+              isRegistering ? "new-password" : "current-password"
+            }
             required
+            disabled={loading}
           />
 
+          {isRegistering && (
+            <>
+              <label htmlFor="register-confirm-password">
+                Confirm Password
+              </label>
+
+              <input
+                id="register-confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) =>
+                  setConfirmPassword(e.target.value)
+                }
+                placeholder="Re-enter your password"
+                autoComplete="new-password"
+                required
+                disabled={loading}
+              />
+            </>
+          )}
+
           <button type="submit" disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
+            {loading
+              ? isRegistering
+                ? "Creating account..."
+                : "Signing in..."
+              : isRegistering
+              ? "Create Account"
+              : "Sign In"}
           </button>
         </form>
 
-        {message && <p className="message error">{message}</p>}
+        {message && (
+          <p className="message error">
+            {message}
+          </p>
+        )}
+
+        <div className="login-switch">
+          <span>
+            {isRegistering
+              ? "Already have an account?"
+              : "Don't have an account?"}
+          </span>
+
+          <button
+            type="button"
+            onClick={switchMode}
+            disabled={loading}
+          >
+            {isRegistering ? "Sign In" : "Register"}
+          </button>
+        </div>
       </div>
     </main>
   );
