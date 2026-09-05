@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { upload } from "@vercel/blob/client";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
 
@@ -1352,64 +1353,51 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     }
   };
 
-  const uploadSelectedFile = (file) => {
-    return new Promise((resolve, reject) => {
-      if (!file) {
-        resolve(false);
-        return;
+  const uploadSelectedFile = async (file) => {
+    if (!file) return false;
+
+    setUploading(true);
+    setUploadProgress(0);
+
+    try {
+      const pathname = `users/${user.id}/files/${file.name}`;
+
+      const blob = await upload(pathname, file, {
+        access: "private",
+        handleUploadUrl: `${API_URL}/api/files/blob-upload`,
+        clientPayload: JSON.stringify({
+          purpose: "file",
+          userId: user.id,
+          folderId: currentFolder?.id || null,
+          fileName: file.name,
+          contentType: file.type || "application/octet-stream",
+        }),
+        multipart: true,
+        onUploadProgress: ({ percentage }) => {
+          setUploadProgress(Math.round(percentage));
+        },
+      });
+
+      if (!blob?.url) {
+        throw new Error("Upload completed without a Blob URL");
       }
 
-      setUploading(true);
-      setUploadProgress(0);
+      setUploadProgress(100);
 
-      const formData = new FormData();
-      formData.append("file", file);
+      await Promise.all([
+        loadContents(currentFolder?.id || null),
+        loadStorageStats(),
+        loadActivities(),
+      ]);
 
-      if (currentFolder?.id) {
-        formData.append("folderId", currentFolder.id);
-      }
-
-      const xhr = new XMLHttpRequest();
-
-      xhr.open("POST", `${API_URL}/api/files/upload`, true);
-      xhr.withCredentials = true;
-
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          setUploadProgress(Math.round((event.loaded / event.total) * 100));
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          setUploadProgress(100);
-          loadContents(currentFolder?.id || null);
-          loadStorageStats();
-          loadActivities();
-          resolve(true);
-        } else {
-          let message = "Upload failed";
-          try {
-            const data = JSON.parse(xhr.responseText);
-            message = data.error?.message || message;
-          } catch {}
-          alert(message);
-          resolve(false);
-        }
-      };
-
-      xhr.onerror = () => {
-        console.error("Upload failed: network error");
-        alert("Unable to upload file");
-        reject(new Error("Upload failed"));
-      };
-
-      xhr.onloadend = () => {
-        setUploading(false);
-      };
-
-      xhr.send(formData);
-    });
+      return true;
+    } catch (error) {
+      console.error("Upload failed:", error);
+      alert(error?.message || "Unable to upload file");
+      return false;
+    } finally {
+      setUploading(false);
+    }
   };
 
   const uploadFile = async (e) => {
@@ -2132,32 +2120,26 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       setVersionMessage("");
 
       try {
-        const formData = new FormData();
-        formData.append("file", selectedFile);
+        const pathname = `users/${user.id}/versions/${versionTarget.id}/${selectedFile.name}`;
 
-        const response = await fetch(
-          `${API_URL}/api/files/${versionTarget.id}/versions`,
-          {
-            method: "POST",
-            credentials: "include",
-            body: formData,
-          }
-        );
+        const blob = await upload(pathname, selectedFile, {
+          access: "private",
+          handleUploadUrl: `${API_URL}/api/files/blob-upload`,
+          clientPayload: JSON.stringify({
+            purpose: "version",
+            userId: user.id,
+            fileId: versionTarget.id,
+            fileName: selectedFile.name,
+            contentType: selectedFile.type || "application/octet-stream",
+          }),
+          multipart: true,
+        });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          setVersionMessage(
-            data.error?.message ||
-              "Unable to upload new version"
-          );
-          return;
+        if (!blob?.url) {
+          throw new Error("Version upload completed without a Blob URL");
         }
 
-        setVersionMessage(
-          data.message ||
-            "New version uploaded successfully"
-        );
+        setVersionMessage("New version uploaded successfully");
 
         await loadContents(
           currentFolder ? currentFolder.id : null
@@ -2172,21 +2154,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         );
 
         if (versionsResponse.ok) {
-          const versionsData =
-            await versionsResponse.json();
-
-          setFileVersions(
-            versionsData.versions || []
-          );
+          const versionsData = await versionsResponse.json();
+          setFileVersions(versionsData.versions || []);
         }
 
         loadActivities();
       } catch (error) {
-        console.error(
-          "Upload new version failed:",
-          error
-        );
-        setVersionMessage("Unable to connect to server");
+        console.error("Upload new version failed:", error);
+        setVersionMessage(error?.message || "Unable to upload new version");
       } finally {
         setVersionUploading(false);
       }
