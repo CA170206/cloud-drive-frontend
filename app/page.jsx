@@ -150,8 +150,8 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
     {
       num: "01",
       stepTag: "STEP 01",
-      pillTag: "● Smarter way to store",
-      title: "Store any file format.",
+      pillTag: "⚡ High-Performance Storage powered by Vercel Edge",
+      title: "Store & Manage Any File Format.",
       subtitle: "Upload documents, 4K videos, and archives effortlessly with Vercel Blob direct edge streaming and 15 GB free storage.",
       tabName: "FILES",
     },
@@ -159,7 +159,7 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
       num: "02",
       stepTag: "STEP 02",
       pillTag: "● Complete Version Control",
-      title: "Organize & restore.",
+      title: "Organize & Restore File Versions.",
       subtitle: "Create nested folder trees, search with instant filters, track file revisions, and restore earlier versions in seconds.",
       tabName: "VERSIONS",
     },
@@ -167,7 +167,7 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
       num: "03",
       stepTag: "STEP 03",
       pillTag: "● Public Link Sharing",
-      title: "Share anywhere.",
+      title: "Share Anywhere with Instant Links.",
       subtitle: "Generate secure public links, set expiration dates, manage download permissions, and collaborate with zero latency.",
       tabName: "SHARING",
     },
@@ -185,53 +185,55 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
   return (
     <div className="landing-container">
       {/* Floating Pill Navbar */}
-      <header className="landing-navbar-pill">
-        <div className="landing-brand">
-          <div className="landing-brand-icon">
-            <CloudIcon size={20} />
+      <div className="landing-pill-nav-container">
+        <header className="landing-navbar-pill">
+          <a href="#overview" className="landing-brand-logo">
+            <div className="landing-logo-icon">
+              <CloudIcon size={20} />
+            </div>
+            <span className="landing-brand-title">Cloud Drive</span>
+          </a>
+
+          <div className="landing-nav-pill-links">
+            <a href="#overview" className="landing-nav-pill-item active">Home</a>
+            <a href="#features" className="landing-nav-pill-item">Features</a>
+            <a href="#how-it-works" className="landing-nav-pill-item">How It Works</a>
+            <a href="#stats" className="landing-nav-pill-item">Stats</a>
           </div>
-          <span className="landing-brand-title">Cloud Drive</span>
-        </div>
 
-        <nav className="landing-pill-nav">
-          <a href="#overview" className="pill-link active">Home</a>
-          <a href="#features" className="pill-link">Features</a>
-          <a href="#how-it-works" className="pill-link">How It Works</a>
-          <a href="#stats" className="pill-link">Stats</a>
-        </nav>
+          <div className="landing-nav-actions">
+            <button
+              type="button"
+              className="landing-theme-toggle-pill"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? "☀️ Light" : "☾ Dark"}
+            </button>
 
-        <div className="landing-navbar-actions">
-          <button
-            type="button"
-            className="landing-theme-btn"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            aria-label="Toggle theme"
-          >
-            {theme === "dark" ? "☀️ Light" : "☾ Dark"}
-          </button>
+            <button
+              type="button"
+              className="landing-nav-action-pill secondary"
+              onClick={onGoToLogin}
+            >
+              Sign In
+            </button>
 
-          <button
-            type="button"
-            className="landing-nav-login-btn"
-            onClick={onGoToLogin}
-          >
-            Sign In
-          </button>
-
-          <button
-            type="button"
-            className="landing-nav-cta-btn"
-            onClick={onGoToRegister}
-          >
-            Get Started →
-          </button>
-        </div>
-      </header>
+            <button
+              type="button"
+              className="landing-nav-action-pill primary"
+              onClick={onGoToRegister}
+            >
+              Get Started →
+            </button>
+          </div>
+        </header>
+      </div>
 
       {/* Hero Section */}
       <section className="landing-hero" id="overview">
         <div className="landing-badge-pill">
-          <span className="badge-dot"></span>
+          <span className="pulse-dot"></span>
           <span>{currentStep.pillTag}</span>
         </div>
 
@@ -240,15 +242,17 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
         </h1>
 
         <div className="landing-step-indicator">
-          <span className="step-num-badge">{currentStep.num}</span>
-          <span className="step-tag-text">{currentStep.stepTag}</span>
+          <span className="step-num-pill">{currentStep.num}</span>
+          <span style={{ fontSize: "12px", fontWeight: 700, color: "#94a3b8", letterSpacing: "0.05em" }}>
+            {currentStep.stepTag}
+          </span>
           <div className="step-dash-dots">
             {steps.map((_, idx) => (
               <button
                 key={idx}
                 type="button"
                 onClick={() => setActiveStep(idx)}
-                className={`dash-dot ${activeStep === idx ? "active" : ""}`}
+                className={`dash-dot-btn ${activeStep === idx ? "active" : ""}`}
                 aria-label={`Go to step ${idx + 1}`}
               />
             ))}
@@ -265,14 +269,14 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
             className="landing-primary-btn"
             onClick={onGoToRegister}
           >
-            Get Started →
+            Get Started Free →
           </button>
           <button
             type="button"
             className="landing-secondary-btn"
             onClick={onGoToLogin}
           >
-            Sign In
+            Sign In to Drive
           </button>
         </div>
 
@@ -284,8 +288,8 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
 
         {/* Hero Interactive App Mockup */}
         <div className="landing-mockup-card">
-          <div className="mockup-header">
-            <div className="mockup-brand">
+          <div className="mockup-header-bar">
+            <div className="mockup-brand-title">
               <CloudIcon size={18} />
               <strong>Cloud Drive</strong>
               <small>Store. Version. Share.</small>
@@ -296,7 +300,7 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
                   key={s.tabName}
                   type="button"
                   onClick={() => setActiveStep(idx)}
-                  className={`mockup-tab ${activeStep === idx ? "active" : ""}`}
+                  className={`mockup-tab-pill ${activeStep === idx ? "active" : ""}`}
                 >
                   {s.tabName}
                 </button>
@@ -360,27 +364,27 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
 
       {/* Everything You Need / Features Section */}
       <section className="landing-features-section" id="features">
-        <div className="section-centered-header">
+        <div className="section-header">
           <span className="section-pill-tag">EVERYTHING YOU NEED</span>
-          <h2>Built for better productivity</h2>
+          <h2>Built for better cloud productivity</h2>
           <p>Practice, organize, version, and share your cloud files with zero friction.</p>
         </div>
 
         <div className="landing-features-grid-3">
-          <div className="landing-card-item">
-            <div className="card-emoji-box">☁️</div>
+          <div className="feature-card-pill">
+            <div className="feature-emoji-box blue">☁️</div>
             <h3>Vercel Blob Edge Uploads</h3>
             <p>Direct client-to-blob chunked uploads. Zero server bottlenecking, maximum throughput for files of all sizes.</p>
           </div>
 
-          <div className="landing-card-item">
-            <div className="card-emoji-box">📊</div>
+          <div className="feature-card-pill">
+            <div className="feature-emoji-box purple">📊</div>
             <h3>Track Performance & Versions</h3>
             <p>Review version histories, download earlier revisions, compare file changes, and restore prior iterations with 1 click.</p>
           </div>
 
-          <div className="landing-card-item">
-            <div className="card-emoji-box">🏆</div>
+          <div className="feature-card-pill">
+            <div className="feature-emoji-box cyan">🏆</div>
             <h3>Public Link Sharing</h3>
             <p>Generate shareable links with customizable expiration times, instant downloads, and public access controls.</p>
           </div>
@@ -388,27 +392,27 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
       </section>
 
       {/* How It Works Section */}
-      <section className="landing-steps-section" id="how-it-works">
-        <div className="section-centered-header">
+      <section className="landing-features-section" id="how-it-works">
+        <div className="section-header">
           <span className="section-pill-tag">HOW IT WORKS</span>
           <h2>Three simple steps to control your cloud</h2>
         </div>
 
-        <div className="landing-steps-grid">
+        <div className="how-it-works-grid">
           <div className="step-card">
-            <div className="step-badge-num">01</div>
+            <div className="step-num">01</div>
             <h3>Create Account</h3>
             <p>Sign up in seconds to claim your 15 GB high-performance storage workspace.</p>
           </div>
 
           <div className="step-card">
-            <div className="step-badge-num">02</div>
+            <div className="step-num">02</div>
             <h3>Upload & Organize</h3>
             <p>Drag and drop files, organize nested folders, add tag labels, and star key items.</p>
           </div>
 
           <div className="step-card">
-            <div className="step-badge-num">03</div>
+            <div className="step-num">03</div>
             <h3>Share & Restore</h3>
             <p>Generate public links for your team or restore past version revisions anytime.</p>
           </div>
@@ -416,21 +420,17 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
       </section>
 
       {/* Platform Stats Section */}
-      <section className="landing-stats-banner" id="stats">
+      <section className="landing-features-section" id="stats">
         <div className="stats-pill-container">
-          <div className="stat-unit">
+          <div className="stat-box">
             <h4>15 GB</h4>
             <p>Free Storage Per Account</p>
           </div>
-          <div className="stat-unit">
+          <div className="stat-box">
             <h4>&lt;10ms</h4>
             <p>Direct Vercel Edge Response</p>
           </div>
-          <div className="stat-unit">
-            <h4>100%</h4>
-            <p>Zero Disk Byte Waste</p>
-          </div>
-          <div className="stat-unit">
+          <div className="stat-box">
             <h4>Unlimited</h4>
             <p>Public Share Links</p>
           </div>
@@ -439,28 +439,26 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
 
       {/* CTA Banner */}
       <section className="landing-cta-banner">
-        <div className="cta-content">
-          <h2>Ready to transform your cloud storage experience?</h2>
-          <p>Join thousands of users organizing and sharing files effortlessly.</p>
-          <div className="cta-button-group">
-            <button type="button" className="landing-primary-btn" onClick={onGoToRegister}>
-              Get Started Free →
-            </button>
-            <button type="button" className="landing-secondary-btn" onClick={onGoToLogin}>
-              Sign In to Account
-            </button>
-          </div>
+        <h2>Ready to transform your cloud storage experience?</h2>
+        <p>Join thousands of users organizing and sharing files effortlessly.</p>
+        <div className="cta-banner-buttons">
+          <button type="button" className="landing-primary-btn" onClick={onGoToRegister}>
+            Get Started Free →
+          </button>
+          <button type="button" className="landing-secondary-btn" onClick={onGoToLogin}>
+            Sign In to Account
+          </button>
         </div>
       </section>
 
       {/* Footer */}
       <footer className="landing-footer">
-        <div className="footer-inner">
-          <div className="footer-brand-row">
+        <div className="footer-content">
+          <div className="footer-brand">
             <CloudIcon size={22} />
             <span>Cloud Drive</span>
           </div>
-          <p className="footer-copy">
+          <p>
             © 2026 Cloud Drive. All rights reserved. Built for modern cloud productivity.
           </p>
         </div>
