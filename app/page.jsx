@@ -477,6 +477,9 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
           {currentStep.subtitle}
         </p>
 
+        {/* Hero Animated Dashboard App Mockup */}
+        <AnimatedDashboardMockup />
+
         <div className="landing-hero-cta">
           <button
             type="button"
@@ -499,9 +502,6 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
           <span>✓ Version Control & Restore</span>
           <span>✓ Instant Public Sharing</span>
         </div>
-
-        {/* Hero Animated Dashboard App Mockup */}
-        <AnimatedDashboardMockup />
       </section>
 
       {/* Everything You Need / Features Section */}
