@@ -12,6 +12,8 @@
 html,
 body {
   min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 body {
@@ -8209,11 +8211,16 @@ html[data-theme="light"] .mini-card {
 ========================================================= */
 
 .landing-container {
+  width: 100% !important;
   min-height: 100vh !important;
+  height: auto !important;
+  position: relative !important;
   background: #08090c !important;
   color: #f5f2eb !important;
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif !important;
   overflow-x: hidden !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
 html[data-theme="light"] .landing-container {
