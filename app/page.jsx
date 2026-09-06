@@ -5,10 +5,18 @@
 import { useEffect, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 
-const API_URL =
-  process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim() !== ""
-    ? process.env.NEXT_PUBLIC_API_URL.trim()
-    : "";
+const getSanitizedApiUrl = () => {
+  const envUrl = process.env.NEXT_PUBLIC_API_URL ? process.env.NEXT_PUBLIC_API_URL.trim() : "";
+  if (!envUrl) {
+    return "https://cloud-drive-internship.vercel.app";
+  }
+  if (envUrl.startsWith("http://") || envUrl.startsWith("https://")) {
+    return envUrl;
+  }
+  return `https://${envUrl}`;
+};
+
+const API_URL = getSanitizedApiUrl();
 
 const authenticatedFetch = (url, options = {}) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("cloud-drive-token") : null;
