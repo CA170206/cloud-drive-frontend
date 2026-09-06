@@ -5,7 +5,11 @@
 import { useEffect, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ||
+  (typeof window !== "undefined" && window.location.hostname.includes("vercel.app")
+    ? `https://${window.location.hostname.replace("-frontend-", "-backend-").replace("frontend", "backend")}`
+    : "http://localhost:5000");
 
 const recentGridMenuButtonStyle = {
   width: "100%",
