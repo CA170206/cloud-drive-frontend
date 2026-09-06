@@ -32,6 +32,7 @@ const recentGridMenuButtonStyle = {
 export default function Home() {
   const [user, setUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authView, setAuthView] = useState("landing"); // "landing" | "login" | "register"
 
   const [theme, setTheme] = useState(() => {
     if (typeof window === "undefined") return "dark";
@@ -69,15 +70,259 @@ export default function Home() {
     return <div className="loading-screen">Loading...</div>;
   }
 
-  if (!user) {
-    return <Login onLogin={setUser} theme={theme} setTheme={setTheme} />;
+  if (user) {
+    return <Dashboard user={user} onLogout={() => setUser(null)} theme={theme} setTheme={setTheme} />;
   }
 
-  return <Dashboard user={user} onLogout={() => setUser(null)} theme={theme} setTheme={setTheme} />;
+  if (authView === "login" || authView === "register") {
+    return (
+      <Login
+        initialRegistering={authView === "register"}
+        onBackToLanding={() => setAuthView("landing")}
+        onLogin={setUser}
+        theme={theme}
+        setTheme={setTheme}
+      />
+    );
+  }
+
+  return (
+    <LandingPage
+      onGoToLogin={() => setAuthView("login")}
+      onGoToRegister={() => setAuthView("register")}
+      theme={theme}
+      setTheme={setTheme}
+    />
+  );
 }
 
-function Login({ onLogin, theme, setTheme }) {
-  const [isRegistering, setIsRegistering] = useState(false);
+function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
+  return (
+    <div className="landing-container">
+      <header className="landing-navbar">
+        <div className="landing-brand">
+          <div className="landing-brand-icon">
+            <CloudIcon size={22} />
+          </div>
+          <span className="landing-brand-title">Cloud Drive</span>
+        </div>
+
+        <nav className="landing-nav-links">
+          <a href="#overview">Overview</a>
+          <a href="#features">Features</a>
+          <a href="#storage">Storage</a>
+          <a href="#security">Security</a>
+        </nav>
+
+        <div className="landing-navbar-actions">
+          <button
+            type="button"
+            className="landing-theme-btn"
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? "☀ Light" : "☾ Dark"}
+          </button>
+
+          <button
+            type="button"
+            className="landing-nav-btn login-btn"
+            onClick={onGoToLogin}
+          >
+            Login
+          </button>
+
+          <button
+            type="button"
+            className="landing-nav-btn register-btn"
+            onClick={onGoToRegister}
+          >
+            Sign In / Sign Up
+          </button>
+        </div>
+      </header>
+
+      <section className="landing-hero" id="overview">
+        <div className="landing-badge">
+          <span className="badge-pulse"></span>
+          <span>⚡ High-Performance Storage powered by Vercel Blob & PostgreSQL</span>
+        </div>
+
+        <h1 className="landing-title">
+          Secure, Fast & Seamless <br />
+          <span className="gradient-text">Cloud File Storage</span>
+        </h1>
+
+        <p className="landing-subtitle">
+          Upload large files effortlessly, organize with smart folders, track full version history, and share files instantly with zero latency.
+        </p>
+
+        <div className="landing-hero-cta">
+          <button
+            type="button"
+            className="landing-primary-btn"
+            onClick={onGoToRegister}
+          >
+            Get Started Free →
+          </button>
+          <button
+            type="button"
+            className="landing-secondary-btn"
+            onClick={onGoToLogin}
+          >
+            Sign In to Drive
+          </button>
+        </div>
+
+        <div className="landing-hero-preview">
+          <div className="preview-top-bar">
+            <div className="dots">
+              <span className="dot red"></span>
+              <span className="dot yellow"></span>
+              <span className="dot green"></span>
+            </div>
+            <div className="preview-url-bar">https://cloud-drive.app/dashboard</div>
+          </div>
+          <div className="preview-content">
+            <div className="preview-sidebar">
+              <div className="preview-sidebar-item active">📁 My Files</div>
+              <div className="preview-sidebar-item">👥 Shared with me</div>
+              <div className="preview-sidebar-item">🕒 Recent</div>
+              <div className="preview-sidebar-item">⭐ Starred</div>
+              <div className="preview-sidebar-item">⚡ Activity</div>
+              <div className="preview-sidebar-item">🗑️ Trash</div>
+            </div>
+            <div className="preview-main">
+              <div className="preview-header-row">
+                <h3>My Storage Workspace</h3>
+                <span className="preview-badge">15 GB Storage Available</span>
+              </div>
+              <div className="preview-cards-row">
+                <div className="mini-card">
+                  <span className="card-icon">📂</span>
+                  <div>
+                    <strong>Projects & Assets</strong>
+                    <small>18 items • 1.4 GB</small>
+                  </div>
+                </div>
+                <div className="mini-card">
+                  <span className="card-icon">📄</span>
+                  <div>
+                    <strong>Annual_Report.pdf</strong>
+                    <small>Uploaded 5m ago • Shared</small>
+                  </div>
+                </div>
+                <div className="mini-card">
+                  <span className="card-icon">🖼️</span>
+                  <div>
+                    <strong>Banner_Design.png</strong>
+                    <small>4.2 MB • Version 2</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="landing-features-section" id="features">
+        <div className="section-header">
+          <h2>Enterprise Features Built for Productivity</h2>
+          <p>Everything you need to store, manage, version, and share digital content securely.</p>
+        </div>
+
+        <div className="landing-features-grid">
+          <div className="landing-feature-card">
+            <div className="feature-icon-wrapper blue">☁️</div>
+            <h3>Vercel Blob Edge Storage</h3>
+            <p>Direct client-to-blob streaming. Zero server buffer delays, multi-part chunk handling for large files.</p>
+          </div>
+
+          <div className="landing-feature-card">
+            <div className="feature-icon-wrapper purple">🔄</div>
+            <h3>Version Control & Restore</h3>
+            <p>Keep track of file revisions. Compare changes, download earlier versions, or restore prior iterations anytime.</p>
+          </div>
+
+          <div className="landing-feature-card">
+            <div className="feature-icon-wrapper green">🔗</div>
+            <h3>Instant Link Sharing</h3>
+            <p>Generate shareable public links with customizable view and download permissions for seamless collaboration.</p>
+          </div>
+
+          <div className="landing-feature-card">
+            <div className="feature-icon-wrapper orange">📁</div>
+            <h3>Smart Organization</h3>
+            <p>Nested folder trees, quick access, starred files, instant live search filtering, and grid/list view toggles.</p>
+          </div>
+
+          <div className="landing-feature-card">
+            <div className="feature-icon-wrapper red">📊</div>
+            <h3>Real-Time Audit Activity</h3>
+            <p>Track every upload, rename, deletion, and share event with detailed timestamped activity audit logs.</p>
+          </div>
+
+          <div className="landing-feature-card">
+            <div className="feature-icon-wrapper cyan">🛡️</div>
+            <h3>Security & Role Control</h3>
+            <p>HTTP-only session cookie protection, encrypted file access keys, and secure metadata verification in PostgreSQL.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="landing-stats-section" id="storage">
+        <div className="landing-stats-grid">
+          <div className="stat-box">
+            <h4>100%</h4>
+            <p>Vercel Edge Streaming</p>
+          </div>
+          <div className="stat-box">
+            <h4>&lt;50ms</h4>
+            <p>Direct Edge Latency</p>
+          </div>
+          <div className="stat-box">
+            <h4>256-bit</h4>
+            <p>AES Access Security</p>
+          </div>
+          <div className="stat-box">
+            <h4>Unlimited</h4>
+            <p>File Versioning</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="landing-cta-banner" id="security">
+        <h2>Start Storing & Sharing Your Files Today</h2>
+        <p>Experience ultra-fast cloud file management powered by Vercel Blob.</p>
+        <div className="cta-banner-buttons">
+          <button type="button" className="landing-primary-btn" onClick={onGoToRegister}>
+            Create Free Account
+          </button>
+          <button type="button" className="landing-secondary-btn" onClick={onGoToLogin}>
+            Sign In to Existing Account
+          </button>
+        </div>
+      </section>
+
+      <footer className="landing-footer">
+        <div className="footer-content">
+          <div className="footer-brand">
+            <CloudIcon size={20} />
+            <span>Cloud Drive</span>
+          </div>
+          <p>© 2026 Cloud Drive. All rights reserved. Ultra-fast Cloud File Storage System.</p>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, setTheme }) {
+  const [isRegistering, setIsRegistering] = useState(initialRegistering);
+
+  useEffect(() => {
+    setIsRegistering(initialRegistering);
+  }, [initialRegistering]);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -200,6 +445,16 @@ function Login({ onLogin, theme, setTheme }) {
   return (
     <main className="login-container">
       <div className={`login-card ${isRegistering ? "register-card" : ""}`}>
+        {onBackToLanding && (
+          <button
+            type="button"
+            className="back-to-landing-btn"
+            onClick={onBackToLanding}
+          >
+            ← Back to Home
+          </button>
+        )}
+
         <h1>Cloud Drive</h1>
 
         <p className="subtitle">
@@ -1360,26 +1615,51 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setUploadProgress(0);
 
     try {
-      const pathname = `users/${user.id}/files/${file.name}`;
+      let uploadSuccess = false;
 
-      const blob = await upload(pathname, file, {
-        access: "private",
-        handleUploadUrl: `${API_URL}/api/files/blob-upload`,
-        clientPayload: JSON.stringify({
-          purpose: "file",
-          userId: user.id,
-          folderId: currentFolder?.id || null,
-          fileName: file.name,
-          contentType: file.type || "application/octet-stream",
-        }),
-        multipart: true,
-        onUploadProgress: ({ percentage }) => {
-          setUploadProgress(Math.round(percentage));
-        },
-      });
+      try {
+        const pathname = `users/${user.id}/files/${file.name}`;
 
-      if (!blob?.url) {
-        throw new Error("Upload completed without a Blob URL");
+        const blob = await upload(pathname, file, {
+          access: "private",
+          handleUploadUrl: `${API_URL}/api/files/blob-upload`,
+          clientPayload: JSON.stringify({
+            purpose: "file",
+            userId: user.id,
+            folderId: currentFolder?.id || null,
+            fileName: file.name,
+            contentType: file.type || "application/octet-stream",
+          }),
+          multipart: true,
+          onUploadProgress: ({ percentage }) => {
+            setUploadProgress(Math.round(percentage));
+          },
+        });
+
+        if (blob?.url) {
+          uploadSuccess = true;
+        }
+      } catch (blobErr) {
+        console.warn("Vercel Blob client upload unavailable, falling back to direct upload:", blobErr);
+      }
+
+      if (!uploadSuccess) {
+        const formData = new FormData();
+        formData.append("file", file);
+        if (currentFolder?.id) {
+          formData.append("folderId", currentFolder.id);
+        }
+
+        const res = await fetch(`${API_URL}/api/files/upload`, {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data?.error?.message || "Unable to upload file");
+        }
       }
 
       setUploadProgress(100);
@@ -2120,23 +2400,45 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       setVersionMessage("");
 
       try {
-        const pathname = `users/${user.id}/versions/${versionTarget.id}/${selectedFile.name}`;
+        let versionSuccess = false;
 
-        const blob = await upload(pathname, selectedFile, {
-          access: "private",
-          handleUploadUrl: `${API_URL}/api/files/blob-upload`,
-          clientPayload: JSON.stringify({
-            purpose: "version",
-            userId: user.id,
-            fileId: versionTarget.id,
-            fileName: selectedFile.name,
-            contentType: selectedFile.type || "application/octet-stream",
-          }),
-          multipart: true,
-        });
+        try {
+          const pathname = `users/${user.id}/versions/${versionTarget.id}/${selectedFile.name}`;
 
-        if (!blob?.url) {
-          throw new Error("Version upload completed without a Blob URL");
+          const blob = await upload(pathname, selectedFile, {
+            access: "private",
+            handleUploadUrl: `${API_URL}/api/files/blob-upload`,
+            clientPayload: JSON.stringify({
+              purpose: "version",
+              userId: user.id,
+              fileId: versionTarget.id,
+              fileName: selectedFile.name,
+              contentType: selectedFile.type || "application/octet-stream",
+            }),
+            multipart: true,
+          });
+
+          if (blob?.url) {
+            versionSuccess = true;
+          }
+        } catch (blobErr) {
+          console.warn("Vercel Blob version upload unavailable, falling back to direct upload:", blobErr);
+        }
+
+        if (!versionSuccess) {
+          const formData = new FormData();
+          formData.append("file", selectedFile);
+
+          const res = await fetch(`${API_URL}/api/files/${versionTarget.id}/versions`, {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+            throw new Error(data?.error?.message || "Unable to upload new version");
+          }
         }
 
         setVersionMessage("New version uploaded successfully");
@@ -2466,6 +2768,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           aria-label="Open navigation menu"
           aria-expanded={mobileMenuOpen}
         >
+          {mobileMenuOpen ? (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          ) : (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+          )}
           <span></span>
           <span></span>
           <span></span>

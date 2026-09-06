@@ -5022,21 +5022,53 @@ html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown button:hove
   }
 
   .mobile-menu-button {
-    flex: 0 0 36px !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-height: 36px !important;
+    flex: 0 0 38px !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
     display: flex !important;
-    flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: 4px !important;
     margin: 0 !important;
     padding: 0 !important;
-    border: 1px solid #303b49 !important;
+    border: 1px solid #cbd5e1 !important;
     border-radius: 8px !important;
+    background: #f8fafc !important;
+    color: #0f172a !important;
+    cursor: pointer !important;
+  }
+
+  .mobile-menu-button svg {
+    display: block !important;
+    width: 20px !important;
+    height: 20px !important;
+    stroke: currentColor !important;
+  }
+
+  .mobile-menu-button span {
+    display: none !important;
+  }
+
+  html[data-theme="dark"] .mobile-header {
+    background: #171d25 !important;
+    border-bottom: 1px solid #29313d !important;
+  }
+
+  html[data-theme="dark"] .mobile-menu-button {
     background: #202833 !important;
-    color: #dbe5ef !important;
+    border: 1px solid #303b49 !important;
+    color: #f8fafc !important;
+  }
+
+  html[data-theme="light"] .mobile-header {
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  html[data-theme="light"] .mobile-menu-button {
+    background: #f1f5f9 !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
   }
 
   .mobile-brand {
@@ -5099,14 +5131,22 @@ html[data-theme="light"] .grid-file-options .grid-file-menu-dropdown button:hove
   .dashboard > .sidebar .sidebar-item,
   .dashboard > .sidebar .theme-toggle {
     width: 100% !important;
-    height: 40px !important;
-    min-height: 40px !important;
+    height: 42px !important;
+    min-height: 42px !important;
     margin: 2px 0 !important;
-    padding: 0 11px !important;
+    padding: 0 14px !important;
     display: flex !important;
     align-items: center !important;
-    gap: 10px !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
     border-radius: 8px !important;
+  }
+
+  .dashboard > .sidebar.mobile-open .sidebar-item span,
+  .dashboard > .sidebar.mobile-open .theme-toggle > span {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .content {
@@ -6162,6 +6202,18 @@ select,
     width: 100% !important;
     height: 42px !important;
     min-height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 12px !important;
+    padding: 0 14px !important;
+  }
+
+  .dashboard > .sidebar.mobile-open .sidebar-item span,
+  .dashboard > .sidebar.mobile-open .theme-toggle > span {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
   }
 
   .content {
@@ -7445,6 +7497,21 @@ html[data-theme="light"] .cloud-file-icon {
     display: none;
   }
 
+  .sidebar.mobile-open .sidebar-item,
+  .sidebar.mobile-open .theme-toggle {
+    justify-content: flex-start !important;
+    padding: 0 14px !important;
+    gap: 12px !important;
+  }
+
+  .sidebar.mobile-open .sidebar-item span,
+  .sidebar.mobile-open .theme-toggle > span,
+  .sidebar.mobile-open .theme-toggle > span:not(.theme-toggle-icon) {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
   .content {
     padding: 22px 18px 32px;
   }
@@ -7622,202 +7689,241 @@ html[data-theme="light"] .cloud-file-icon {
 }
 
 /* =========================================================
-   FINAL FILE DROPDOWN POSITIONING
-   The menu is positioned from the actual three-dot button.
-   It never covers the button and flips above when needed.
+   PREMIUM THREE-DOT DROPDOWN MENU SYSTEM
+   Robust relative/absolute positioning for all file & folder dropdowns
 ========================================================= */
 
-.desktop-file-options-menu,
-.recent-desktop-file-options .desktop-file-options-menu,
-.starred-desktop-file-options .desktop-file-options-menu,
-.shared-desktop-file-options .desktop-file-options-menu,
-.grid-file-options .grid-file-menu-dropdown,
-.mobile-file-options .mobile-file-options-menu {
-  position: fixed !important;
-  top: var(--cd-menu-top, -10000px) !important;
-  right: var(--cd-menu-right, 8px) !important;
-  left: auto !important;
-  z-index: 9000 !important;
-  max-height: calc(100vh - 16px) !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
-
-/* Keep the three-dot control itself visible above the menu. */
 .desktop-file-options,
-.recent-desktop-file-options,
-.starred-desktop-file-options,
-.shared-desktop-file-options,
-.grid-file-options,
-.mobile-file-options {
-  position: relative !important;
-  z-index: 9001 !important;
-}
-
-/* The menu must always leave a real gap from the button. */
-.desktop-file-options-menu,
-.recent-desktop-file-options .desktop-file-options-menu,
-.starred-desktop-file-options .desktop-file-options-menu,
-.shared-desktop-file-options .desktop-file-options-menu,
-.grid-file-options .grid-file-menu-dropdown,
-.mobile-file-options .mobile-file-options-menu {
-  margin: 0 !important;
-}
-
-/* Do not let row/card stacking contexts interfere with the fixed menu. */
-.file-row:has(.desktop-file-options[open]),
-.file-row:has(.recent-desktop-file-options[open]),
-.file-row:has(.starred-desktop-file-options[open]),
-.file-row:has(.shared-desktop-file-options[open]),
-.grid-view-item:has(.grid-file-options[open]) {
-  z-index: auto !important;
-}
-
-/* =========================================================
-   FILE MENU — REAL VIEWPORT POSITIONING
-   Menus are anchored to the actual three-dot control.
-   They leave an 8px gap and flip upward when required.
-========================================================= */
-
-.desktop-file-options-menu,
-.recent-desktop-file-options .desktop-file-options-menu,
-.starred-desktop-file-options .desktop-file-options-menu,
-.shared-desktop-file-options .desktop-file-options-menu,
-.grid-file-options .grid-file-menu-dropdown,
-.mobile-file-options .mobile-file-options-menu,
-.recent-grid-file-options-menu {
-  position: fixed !important;
-  top: var(--cd-menu-top, -10000px) !important;
-  right: var(--cd-menu-right, 8px) !important;
-  left: auto !important;
-  z-index: 9000 !important;
-  max-height: calc(100vh - 16px) !important;
-  overflow-x: hidden !important;
-  overflow-y: auto !important;
-}
-
-.desktop-file-options,
-.recent-desktop-file-options,
-.starred-desktop-file-options,
-.shared-desktop-file-options,
-.grid-file-options,
 .mobile-file-options,
+.recent-desktop-file-options,
+.starred-desktop-file-options,
+.shared-desktop-file-options,
+.grid-file-options,
 .recent-grid-file-options-control {
-  z-index: 9001 !important;
+  position: relative !important;
+  z-index: 1000 !important;
 }
 
-.file-row:has(.desktop-file-options[open]),
-.file-row:has(.recent-desktop-file-options[open]),
-.file-row:has(.starred-desktop-file-options[open]),
-.file-row:has(.shared-desktop-file-options[open]),
-.grid-view-item:has(.grid-file-options[open]),
-.recent-grid-file-options-control {
+@media (min-width: 701px) {
+  .mobile-file-options {
+    display: none !important;
+  }
+  .desktop-file-options,
+  .recent-desktop-file-options,
+  .starred-desktop-file-options,
+  .shared-desktop-file-options,
+  .grid-file-options,
+  .recent-grid-file-options-control {
+    display: inline-block !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .desktop-file-options,
+  .recent-desktop-file-options,
+  .starred-desktop-file-options,
+  .shared-desktop-file-options {
+    display: none !important;
+  }
+  .mobile-file-options {
+    display: inline-block !important;
+  }
+}
+
+.file-row,
+.shared-resource-row,
+.grid-view-item,
+.item-card,
+.dashboard-file-row {
+  position: relative !important;
+}
+
+.file-row:has([open]),
+.shared-resource-row:has([open]),
+.grid-view-item:has([open]),
+.item-card:has([open]),
+.dashboard-file-row:has([open]),
+.file-row:has(.recent-grid-file-options-menu),
+.grid-view-item:has(.recent-grid-file-options-menu) {
+  z-index: 2000 !important;
   overflow: visible !important;
 }
-/* =========================================================
-   STARRED — THREE-DOT MENU POSITION FIX
-   Menu opens to the LEFT of the three-dot button.
-   The three-dot button disappears while the menu is open.
-========================================================= */
 
-@media (min-width: 701px) {
-
-  /* Keep the starred options container as the positioning anchor */
-  .starred-desktop-file-options {
-    position: relative !important;
-    overflow: visible !important;
-    z-index: 9999 !important;
-  }
-
-  /* Normal three-dot button */
-  .starred-desktop-file-options > summary {
-    position: relative !important;
-    z-index: 10000 !important;
-  }
-
-  /* Hide the three dots completely while their menu is open */
-  .starred-desktop-file-options[open] > summary {
-    visibility: hidden !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-  }
-
-  /*
-    Move the popup to the LEFT of the three-dot button.
-
-    Button width = 34px
-    Gap = 12px
-
-    Therefore:
-    right: calc(100% + 12px)
-
-    This guarantees the popup never sits on top of
-    the three-dot button.
-  */
-  .starred-desktop-file-options .desktop-file-options-menu {
-    position: absolute !important;
-
-    right: calc(100% + 12px) !important;
-    left: auto !important;
-
-    /*
-      Bottom alignment keeps the popup above the row's
-      bottom edge instead of covering the three dots.
-    */
-    top: auto !important;
-    bottom: 0 !important;
-
-    width: 178px !important;
-    min-width: 178px !important;
-    max-width: calc(100vw - 24px) !important;
-
-    margin: 0 !important;
-    padding: 5px !important;
-
-    z-index: 10001 !important;
-
-    box-sizing: border-box !important;
-
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 2px !important;
-
-    overflow: visible !important;
-  }
-
-  /* Make sure the popup itself remains clickable */
-  .starred-desktop-file-options .desktop-file-options-menu,
-  .starred-desktop-file-options .desktop-file-options-menu * {
-    pointer-events: auto !important;
-  }
+/* Dropdown Menu Popup Box */
+.desktop-file-options-menu,
+.mobile-file-options-menu,
+.recent-desktop-file-options .desktop-file-options-menu,
+.starred-desktop-file-options .desktop-file-options-menu,
+.shared-desktop-file-options .desktop-file-options-menu,
+.grid-file-options .grid-file-menu-dropdown,
+.recent-grid-file-options-menu {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  right: 0 !important;
+  left: auto !important;
+  bottom: auto !important;
+  width: 175px !important;
+  min-width: 175px !important;
+  z-index: 10000 !important;
+  margin: 0 !important;
+  padding: 6px !important;
+  border-radius: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+  box-sizing: border-box !important;
+  animation: dropdownFadeIn 0.15s ease-out !important;
 }
 
-/* =========================================================
-   STARRED — LIGHT MODE
-========================================================= */
-
-@media (min-width: 701px) {
-  html[data-theme="light"]
-  .starred-desktop-file-options[open]
-  .desktop-file-options-menu {
-    background: #ffffff !important;
-    border-color: #dbe3ec !important;
-    box-shadow: 0 14px 35px rgba(15, 23, 42, .16) !important;
-  }
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* =========================================================
-   STARRED — DARK MODE
-========================================================= */
+/* Theme styling for Dropdown Box */
+html[data-theme="dark"] .desktop-file-options-menu,
+html[data-theme="dark"] .mobile-file-options-menu,
+html[data-theme="dark"] .recent-grid-file-options-menu,
+html[data-theme="dark"] .grid-file-menu-dropdown {
+  background: #17202d !important;
+  border: 1px solid #303d50 !important;
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.5) !important;
+}
 
-@media (min-width: 701px) {
-  html[data-theme="dark"]
-  .starred-desktop-file-options[open]
-  .desktop-file-options-menu {
-    background: #111827 !important;
-    border-color: #334155 !important;
-    box-shadow: 0 14px 35px rgba(0, 0, 0, .35) !important;
-  }
+html[data-theme="light"] .desktop-file-options-menu,
+html[data-theme="light"] .mobile-file-options-menu,
+html[data-theme="light"] .recent-grid-file-options-menu,
+html[data-theme="light"] .grid-file-menu-dropdown {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16) !important;
+}
+
+/* Three-Dot Summary Trigger Button */
+.desktop-file-options > summary,
+.mobile-file-options > summary,
+.recent-desktop-file-options > summary,
+.starred-desktop-file-options > summary,
+.shared-desktop-file-options > summary {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  border-radius: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  list-style: none !important;
+  user-select: none !important;
+  transition: all 0.15s ease !important;
+}
+
+.desktop-file-options > summary::-webkit-details-marker,
+.mobile-file-options > summary::-webkit-details-marker,
+.recent-desktop-file-options > summary::-webkit-details-marker,
+.starred-desktop-file-options > summary::-webkit-details-marker,
+.shared-desktop-file-options > summary::-webkit-details-marker {
+  display: none !important;
+}
+
+html[data-theme="dark"] .desktop-file-options > summary,
+html[data-theme="dark"] .mobile-file-options > summary,
+html[data-theme="dark"] .recent-desktop-file-options > summary,
+html[data-theme="dark"] .starred-desktop-file-options > summary,
+html[data-theme="dark"] .shared-desktop-file-options > summary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid #2d3848;
+  color: #cbd5e1;
+}
+
+html[data-theme="dark"] .desktop-file-options > summary:hover,
+html[data-theme="dark"] .mobile-file-options > summary:hover,
+html[data-theme="dark"] .starred-desktop-file-options[open] > summary {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+html[data-theme="light"] .desktop-file-options > summary,
+html[data-theme="light"] .mobile-file-options > summary,
+html[data-theme="light"] .starred-desktop-file-options > summary {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+}
+
+html[data-theme="light"] .desktop-file-options > summary:hover,
+html[data-theme="light"] .mobile-file-options > summary:hover,
+html[data-theme="light"] .starred-desktop-file-options[open] > summary {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+/* Menu Items inside Dropdown */
+.desktop-file-options-menu button,
+.mobile-file-options-menu button,
+.recent-grid-file-options-menu button,
+.grid-file-menu-dropdown button {
+  width: 100% !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 10px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 10px !important;
+  border: 0 !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: all 0.15s ease !important;
+  box-sizing: border-box !important;
+}
+
+.desktop-file-options-menu button span,
+.mobile-file-options-menu button span {
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+html[data-theme="dark"] .desktop-file-options-menu button,
+html[data-theme="dark"] .mobile-file-options-menu button,
+html[data-theme="dark"] .recent-grid-file-options-menu button {
+  color: #cbd5e1 !important;
+}
+
+html[data-theme="dark"] .desktop-file-options-menu button:hover,
+html[data-theme="dark"] .mobile-file-options-menu button:hover,
+html[data-theme="dark"] .recent-grid-file-options-menu button:hover {
+  background: rgba(37, 99, 235, 0.2) !important;
+  color: #60a5fa !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu button,
+html[data-theme="light"] .mobile-file-options-menu button,
+html[data-theme="light"] .recent-grid-file-options-menu button {
+  color: #334155 !important;
+}
+
+html[data-theme="light"] .desktop-file-options-menu button:hover,
+html[data-theme="light"] .mobile-file-options-menu button:hover,
+html[data-theme="light"] .recent-grid-file-options-menu button:hover {
+  background: rgba(37, 99, 235, 0.1) !important;
+  color: #2563eb !important;
+}
+
+.desktop-file-options-menu button.desktop-file-delete:hover,
+.mobile-file-options-menu button.mobile-file-delete:hover {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #f87171 !important;
 }
 
 /* =========================================================
@@ -7875,4 +7981,747 @@ html[data-theme="dark"] .login-switch button {
 
 html[data-theme="dark"] .login-switch button:hover {
   color: #93c5fd;
+}
+
+/* =========================================================
+   LANDING PAGE — STYLES & THEMING
+   Ultra-modern, high-converting landing page layout
+========================================================= */
+
+html:has(.landing-container),
+body:has(.landing-container) {
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.landing-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  z-index: 99999 !important;
+  background: #0f172a;
+  color: #f8fafc;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+html[data-theme="light"] .landing-container {
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+/* Landing Navbar */
+.landing-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 10000;
+  width: 100%;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 40px;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme="light"] .landing-navbar {
+  background: rgba(255, 255, 255, 0.88);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+}
+
+.landing-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.landing-brand-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+}
+
+.landing-brand-title {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+html[data-theme="light"] .landing-brand-title {
+  background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-nav-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 auto;
+}
+
+.landing-nav-links a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.landing-nav-links a:hover {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.08);
+}
+
+html[data-theme="light"] .landing-nav-links a {
+  color: #64748b;
+}
+
+html[data-theme="light"] .landing-nav-links a:hover {
+  color: #2563eb;
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.landing-navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.landing-theme-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f1f5f9;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+html[data-theme="light"] .landing-theme-btn {
+  border-color: #cbd5e1;
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.landing-theme-btn:hover {
+  border-color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.landing-nav-btn {
+  height: 40px;
+  padding: 0 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.landing-nav-btn.login-btn {
+  border: 1px solid #334155;
+  background: rgba(255, 255, 255, 0.04);
+  color: #f8fafc;
+}
+
+html[data-theme="light"] .landing-nav-btn.login-btn {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+}
+
+.landing-nav-btn.login-btn:hover {
+  background: rgba(59, 130, 246, 0.12);
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.landing-nav-btn.register-btn {
+  border: 0;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.4);
+}
+
+.landing-nav-btn.register-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 22px rgba(37, 99, 235, 0.55);
+  filter: brightness(1.06);
+}
+
+/* Landing Hero */
+.landing-hero {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px 60px;
+  text-align: center;
+}
+
+.landing-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+  color: #60a5fa;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+html[data-theme="light"] .landing-badge {
+  background: rgba(37, 99, 235, 0.08);
+  color: #2563eb;
+}
+
+.badge-pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #3b82f6;
+  box-shadow: 0 0 10px #3b82f6;
+}
+
+.landing-title {
+  font-size: 52px;
+  line-height: 1.15;
+  font-weight: 900;
+  letter-spacing: -1.2px;
+  margin-bottom: 20px;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.landing-subtitle {
+  max-width: 720px;
+  margin: 0 auto 36px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #94a3b8;
+}
+
+html[data-theme="light"] .landing-subtitle {
+  color: #475569;
+}
+
+.landing-hero-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 60px;
+}
+
+.landing-primary-btn {
+  padding: 14px 32px;
+  border-radius: 10px;
+  border: 0;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.4);
+  transition: all 0.2s ease;
+}
+
+.landing-primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.5);
+}
+
+.landing-secondary-btn {
+  padding: 14px 28px;
+  border-radius: 10px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f8fafc;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+html[data-theme="light"] .landing-secondary-btn {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  color: #0f172a;
+}
+
+.landing-secondary-btn:hover {
+  background: #334155;
+}
+
+html[data-theme="light"] .landing-secondary-btn:hover {
+  background: #f1f5f9;
+}
+
+/* Hero Preview Window */
+.landing-hero-preview {
+  max-width: 960px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid #334155;
+  background: #1e293b;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.6);
+  text-align: left;
+}
+
+html[data-theme="light"] .landing-hero-preview {
+  border-color: #cbd5e1;
+  background: #ffffff;
+  box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.15);
+}
+
+.preview-top-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 18px;
+  background: #0f172a;
+  border-bottom: 1px solid #334155;
+}
+
+html[data-theme="light"] .preview-top-bar {
+  background: #f1f5f9;
+  border-bottom: 1px solid #cbd5e1;
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.dot.red { background: #ef4444; }
+.dot.yellow { background: #f59e0b; }
+.dot.green { background: #10b981; }
+
+.preview-url-bar {
+  flex: 1;
+  padding: 4px 14px;
+  border-radius: 6px;
+  background: #1e293b;
+  color: #94a3b8;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+html[data-theme="light"] .preview-url-bar {
+  background: #ffffff;
+  color: #64748b;
+}
+
+.preview-content {
+  display: flex;
+  min-height: 240px;
+}
+
+.preview-sidebar {
+  width: 200px;
+  padding: 16px 12px;
+  background: #172033;
+  border-right: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+html[data-theme="light"] .preview-sidebar {
+  background: #f8fafc;
+  border-right: 1px solid #e2e8f0;
+}
+
+.preview-sidebar-item {
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #94a3b8;
+}
+
+html[data-theme="light"] .preview-sidebar-item {
+  color: #475569;
+}
+
+.preview-sidebar-item.active {
+  background: #2563eb;
+  color: #ffffff !important;
+  font-weight: 600;
+}
+
+.preview-main {
+  flex: 1;
+  padding: 24px;
+}
+
+.preview-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.preview-header-row h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.preview-badge {
+  padding: 4px 12px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.preview-cards-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #0f172a;
+  border: 1px solid #334155;
+}
+
+html[data-theme="light"] .mini-card {
+  background: #f8fafc;
+  border-color: #e2e8f0;
+}
+
+.card-icon {
+  font-size: 24px;
+}
+
+.mini-card strong {
+  display: block;
+  font-size: 13px;
+}
+
+.mini-card small {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* Feature Grid Section */
+.landing-features-section {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 80px 24px;
+}
+
+.section-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 50px;
+}
+
+.section-header h2 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  margin-bottom: 12px;
+}
+
+.section-header p {
+  color: #94a3b8;
+  font-size: 16px;
+  margin: 0;
+}
+
+html[data-theme="light"] .section-header p {
+  color: #64748b;
+}
+
+.landing-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+}
+
+.landing-feature-card {
+  padding: 32px;
+  border-radius: 16px;
+  background: #1e293b;
+  border: 1px solid #334155;
+  transition: all 0.3s ease;
+}
+
+html[data-theme="light"] .landing-feature-card {
+  background: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.landing-feature-card:hover {
+  transform: translateY(-4px);
+  border-color: #3b82f6;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+}
+
+.feature-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.feature-icon-wrapper.blue { background: rgba(37, 99, 235, 0.15); }
+.feature-icon-wrapper.purple { background: rgba(139, 92, 246, 0.15); }
+.feature-icon-wrapper.green { background: rgba(16, 185, 129, 0.15); }
+.feature-icon-wrapper.orange { background: rgba(245, 158, 11, 0.15); }
+.feature-icon-wrapper.red { background: rgba(239, 68, 68, 0.15); }
+.feature-icon-wrapper.cyan { background: rgba(6, 182, 212, 0.15); }
+
+.landing-feature-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.landing-feature-card p {
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+html[data-theme="light"] .landing-feature-card p {
+  color: #64748b;
+}
+
+/* Stats Section */
+.landing-stats-section {
+  background: #172033;
+  border-top: 1px solid #334155;
+  border-bottom: 1px solid #334155;
+  padding: 50px 24px;
+}
+
+html[data-theme="light"] .landing-stats-section {
+  background: #f1f5f9;
+  border-color: #e2e8f0;
+}
+
+.landing-stats-grid {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 30px;
+  text-align: center;
+}
+
+.stat-box h4 {
+  font-size: 42px;
+  font-weight: 900;
+  margin: 0 0 6px;
+  background: linear-gradient(135deg, #3b82f6, #60a5fa);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-box p {
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+}
+
+html[data-theme="light"] .stat-box p {
+  color: #475569;
+}
+
+/* CTA Banner */
+.landing-cta-banner {
+  max-width: 1000px;
+  margin: 80px auto;
+  padding: 60px 32px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, #1e3a8a 0%, #1e1b4b 100%);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(30, 58, 138, 0.3);
+}
+
+.landing-cta-banner h2 {
+  font-size: 38px;
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: #ffffff;
+}
+
+.landing-cta-banner p {
+  font-size: 16px;
+  color: #93c5fd;
+  margin-bottom: 30px;
+}
+
+.cta-banner-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+/* Footer */
+.landing-footer {
+  border-top: 1px solid #334155;
+  padding: 40px 24px;
+  background: #0f172a;
+}
+
+html[data-theme="light"] .landing-footer {
+  border-top-color: #e2e8f0;
+  background: #ffffff;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.footer-content p {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0;
+}
+
+.back-to-landing-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  margin-bottom: 16px;
+  border-radius: 6px;
+  border: 1px solid #334155;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+html[data-theme="light"] .back-to-landing-btn {
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+.back-to-landing-btn:hover {
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+/* Responsive adjustments for Landing Page */
+@media (max-width: 768px) {
+  .landing-navbar {
+    padding: 12px 16px;
+  }
+
+  .landing-nav-links {
+    display: none;
+  }
+
+  .landing-title {
+    font-size: 34px;
+  }
+
+  .landing-subtitle {
+    font-size: 15px;
+  }
+
+  .landing-hero-cta {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .landing-primary-btn,
+  .landing-secondary-btn {
+    width: 100%;
+  }
+
+  .preview-sidebar {
+    display: none;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
 }
