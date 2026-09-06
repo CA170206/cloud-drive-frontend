@@ -1047,35 +1047,41 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!summary || !menu || !isOpen) return;
 
       const summaryRect = summary.getBoundingClientRect();
-      const menuRect = menu.getBoundingClientRect();
-      const gap = 8;
-      const viewportWidth = document.documentElement.clientWidth || window.innerWidth;
+      const menuHeight = menu.offsetHeight || 250;
       const viewportHeight = window.innerHeight;
 
-      let top;
       const spaceBelow = viewportHeight - summaryRect.bottom;
       const spaceAbove = summaryRect.top;
 
-      if (spaceBelow >= menuRect.height + gap || spaceBelow >= spaceAbove) {
-        top = summaryRect.bottom + gap;
+      // If there is not enough room below for the menu (250px + margin) and more room above, open upward!
+      const shouldOpenUp = spaceBelow < (menuHeight + 16) && spaceAbove > spaceBelow;
+
+      if (shouldOpenUp) {
+        details.setAttribute("data-menu-direction", "up");
+        details.classList.add("open-upward");
+        menu.classList.add("open-upward");
+        menu.setAttribute("data-menu-direction", "up");
       } else {
-        top = summaryRect.top - menuRect.height - gap;
+        details.setAttribute("data-menu-direction", "down");
+        details.classList.remove("open-upward");
+        menu.classList.remove("open-upward");
+        menu.setAttribute("data-menu-direction", "down");
       }
-
-      top = Math.max(8, Math.min(top, viewportHeight - menuRect.height - 8));
-
-      const right = Math.max(8, viewportWidth - summaryRect.right);
-
-      menu.style.setProperty("--cd-menu-top", `${Math.round(top)}px`);
-      menu.style.setProperty("--cd-menu-right", `${Math.round(right)}px`);
-      menu.style.setProperty("--cd-menu-ready", "1");
     };
 
     const closeOnOutsidePointer = (event) => {
       const target = event.target;
       if (!(target instanceof Element)) return;
 
+      const clickedSummary = target.closest("summary, button[aria-label='File options']");
       const clickedDropdown = target.closest(dropdownSelector);
+
+      if (clickedSummary) {
+        const parentDropdown = clickedSummary.closest(dropdownSelector);
+        if (parentDropdown) {
+          positionOpenDropdown(parentDropdown);
+        }
+      }
 
       if (clickedDropdown) {
         if (clickedDropdown.classList.contains("recent-grid-file-options-control")) {
@@ -1102,6 +1108,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
       if (details.open) {
         closeOtherDropdowns(details);
+        positionOpenDropdown(details);
         requestAnimationFrame(() => positionOpenDropdown(details));
       }
     };
@@ -1168,37 +1175,24 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         if (button && menu) {
           const buttonRect = button.getBoundingClientRect();
-          const menuRect = menu.getBoundingClientRect();
-          const gap = 8;
-          const viewportWidth =
-            document.documentElement.clientWidth || window.innerWidth;
+          const menuHeight = menu.offsetHeight || 250;
           const viewportHeight = window.innerHeight;
 
           const spaceBelow = viewportHeight - buttonRect.bottom;
           const spaceAbove = buttonRect.top;
-          let top =
-            spaceBelow >= menuRect.height + gap || spaceBelow >= spaceAbove
-              ? buttonRect.bottom + gap
-              : buttonRect.top - menuRect.height - gap;
 
-          top = Math.max(8, Math.min(
-            top,
-            viewportHeight - menuRect.height - 8
-          ));
-
-          const right = Math.max(
-            8,
-            viewportWidth - buttonRect.right
-          );
-
-          menu.style.setProperty(
-            "--cd-menu-top",
-            `${Math.round(top)}px`
-          );
-          menu.style.setProperty(
-            "--cd-menu-right",
-            `${Math.round(right)}px`
-          );
+          const shouldOpenUp = spaceBelow < (menuHeight + 16) && spaceAbove > spaceBelow;
+          if (shouldOpenUp) {
+            control.classList.add("open-upward");
+            control.setAttribute("data-menu-direction", "up");
+            menu.classList.add("open-upward");
+            menu.setAttribute("data-menu-direction", "up");
+          } else {
+            control.classList.remove("open-upward");
+            control.setAttribute("data-menu-direction", "down");
+            menu.classList.remove("open-upward");
+            menu.setAttribute("data-menu-direction", "down");
+          }
         }
       }
     });

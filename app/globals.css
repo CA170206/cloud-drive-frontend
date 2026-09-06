@@ -8420,7 +8420,17 @@ html[data-theme="light"] .cloud-file-icon {
   overflow: visible !important;
 }
 
-/* Dropdown Menu Popup Box */
+/* Dropdown Menu Popup Box - Default: opens downward below the 3 dots */
+.desktop-file-options,
+.mobile-file-options,
+.recent-desktop-file-options,
+.starred-desktop-file-options,
+.shared-desktop-file-options,
+.grid-file-options,
+.recent-grid-file-options-control {
+  position: relative !important;
+}
+
 .desktop-file-options-menu,
 .mobile-file-options-menu,
 .recent-desktop-file-options .desktop-file-options-menu,
@@ -8430,9 +8440,9 @@ html[data-theme="light"] .cloud-file-icon {
 .recent-grid-file-options-menu {
   position: absolute !important;
   top: calc(100% + 6px) !important;
+  bottom: auto !important;
   right: 0 !important;
   left: auto !important;
-  bottom: auto !important;
   width: 175px !important;
   min-width: 175px !important;
   z-index: 10000 !important;
@@ -8446,8 +8456,42 @@ html[data-theme="light"] .cloud-file-icon {
   animation: dropdownFadeIn 0.15s ease-out !important;
 }
 
+/* Opening upward when near bottom of page/viewport without overlapping 3 dots */
+.desktop-file-options.open-upward > .desktop-file-options-menu,
+.mobile-file-options.open-upward > .mobile-file-options-menu,
+.recent-desktop-file-options.open-upward > .desktop-file-options-menu,
+.starred-desktop-file-options.open-upward > .desktop-file-options-menu,
+.shared-desktop-file-options.open-upward > .desktop-file-options-menu,
+.grid-file-options.open-upward > .grid-file-menu-dropdown,
+.recent-grid-file-options-control.open-upward .recent-grid-file-options-menu,
+details[data-menu-direction="up"] > .desktop-file-options-menu,
+details[data-menu-direction="up"] > .mobile-file-options-menu,
+details[data-menu-direction="up"] > .grid-file-menu-dropdown,
+details.open-upward > .desktop-file-options-menu,
+details.open-upward > .mobile-file-options-menu,
+details.open-upward > .grid-file-menu-dropdown,
+.desktop-file-options-menu.open-upward,
+.mobile-file-options-menu.open-upward,
+.grid-file-menu-dropdown.open-upward,
+.recent-grid-file-options-menu.open-upward,
+.file-row:last-child .desktop-file-options:not([data-menu-direction="down"]) > .desktop-file-options-menu,
+.file-row:nth-last-child(2) .desktop-file-options:not([data-menu-direction="down"]) > .desktop-file-options-menu,
+.dashboard-file-row:last-child .desktop-file-options:not([data-menu-direction="down"]) > .desktop-file-options-menu,
+.dashboard-file-row:nth-last-child(2) .desktop-file-options:not([data-menu-direction="down"]) > .desktop-file-options-menu,
+.shared-resource-row:last-child .shared-desktop-file-options:not([data-menu-direction="down"]) > .desktop-file-options-menu,
+.shared-resource-row:nth-last-child(2) .shared-desktop-file-options:not([data-menu-direction="down"]) > .desktop-file-options-menu {
+  top: auto !important;
+  bottom: calc(100% + 6px) !important;
+  animation: dropdownFadeInUp 0.15s ease-out !important;
+}
+
 @keyframes dropdownFadeIn {
   from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes dropdownFadeInUp {
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
