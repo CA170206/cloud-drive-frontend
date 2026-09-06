@@ -328,12 +328,47 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
     },
   ];
 
+  const [activeSection, setActiveSection] = useState("overview");
+
   useEffect(() => {
     const timer = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % steps.length);
     }, 4500);
     return () => clearInterval(timer);
   }, [steps.length]);
+
+  useEffect(() => {
+    const sections = ["overview", "features", "how-it-works", "stats"];
+
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY + 180;
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const sectionEl = document.getElementById(sections[i]);
+        if (sectionEl) {
+          const top = sectionEl.offsetTop;
+          if (scrollPosition >= top) {
+            setActiveSection(sections[i]);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToSection = (id) => (e) => {
+    e.preventDefault();
+    const el = document.getElementById(id);
+    if (el) {
+      const top = el.offsetTop - 100;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
+  };
 
   const currentStep = steps[activeStep];
 
@@ -342,7 +377,7 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
       {/* Floating Pill Navbar */}
       <div className="landing-pill-nav-container">
         <header className="landing-navbar-pill">
-          <a href="#overview" className="landing-brand-logo">
+          <a href="#overview" onClick={scrollToSection("overview")} className="landing-brand-logo">
             <div className="landing-logo-icon">
               <CloudIcon size={20} />
             </div>
@@ -350,10 +385,34 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
           </a>
 
           <div className="landing-nav-pill-links">
-            <a href="#overview" className="landing-nav-pill-item active">Home</a>
-            <a href="#features" className="landing-nav-pill-item">Features</a>
-            <a href="#how-it-works" className="landing-nav-pill-item">How It Works</a>
-            <a href="#stats" className="landing-nav-pill-item">Stats</a>
+            <a
+              href="#overview"
+              onClick={scrollToSection("overview")}
+              className={`landing-nav-pill-item ${activeSection === "overview" ? "active" : ""}`}
+            >
+              Home
+            </a>
+            <a
+              href="#features"
+              onClick={scrollToSection("features")}
+              className={`landing-nav-pill-item ${activeSection === "features" ? "active" : ""}`}
+            >
+              Features
+            </a>
+            <a
+              href="#how-it-works"
+              onClick={scrollToSection("how-it-works")}
+              className={`landing-nav-pill-item ${activeSection === "how-it-works" ? "active" : ""}`}
+            >
+              How It Works
+            </a>
+            <a
+              href="#stats"
+              onClick={scrollToSection("stats")}
+              className={`landing-nav-pill-item ${activeSection === "stats" ? "active" : ""}`}
+            >
+              Stats
+            </a>
           </div>
 
           <div className="landing-nav-actions">
