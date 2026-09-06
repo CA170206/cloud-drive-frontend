@@ -1919,11 +1919,13 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       let uploadSuccess = false;
 
       try {
+        const token = typeof window !== "undefined" ? localStorage.getItem("cloud-drive-token") : null;
         const pathname = `users/${user.id}/files/${file.name}`;
 
         const blob = await upload(pathname, file, {
           access: "private",
           handleUploadUrl: `${API_URL}/api/files/blob-upload`,
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
           clientPayload: JSON.stringify({
             purpose: "file",
             userId: user.id,
@@ -1937,11 +1939,34 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           },
         });
 
-        if (blob?.url) {
+        if (blob?.url || blob?.pathname) {
           uploadSuccess = true;
+          // Immediately confirm blob to make sure it is recorded in database right away
+          try {
+            await authenticatedFetch(`${API_URL}/api/files/confirm-blob`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                pathname: blob.pathname,
+                fileName: file.name,
+                contentType: file.type || "application/octet-stream",
+                folderId: currentFolder?.id || null,
+              }),
+            });
+          } catch (confirmErr) {
+            console.warn("Direct blob confirmation note:", confirmErr);
+          }
         }
       } catch (blobErr) {
-        console.warn("Vercel Blob client upload unavailable, falling back to direct upload:", blobErr);
+        console.warn("Vercel Blob client upload error:", blobErr);
+        // Direct serverless upload has a strict 4.5MB request limit on Vercel
+        if (file.size > 4.5 * 1024 * 1024) {
+          throw new Error(
+            blobErr?.message
+              ? `Video upload failed: ${blobErr.message}`
+              : `Unable to upload file (${(file.size / (1024 * 1024)).toFixed(1)}MB). Cloud storage encountered an error and direct upload exceeds the 4.5MB server limit.`
+          );
+        }
       }
 
       if (!uploadSuccess) {
@@ -1964,6 +1989,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       }
 
       setUploadProgress(100);
+
+      // Brief tick for webhook/db consistency
+      await new Promise((r) => setTimeout(r, 400));
 
       await Promise.all([
         loadContents(currentFolder?.id || null),
@@ -2730,11 +2758,13 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         let versionSuccess = false;
 
         try {
+          const token = typeof window !== "undefined" ? localStorage.getItem("cloud-drive-token") : null;
           const pathname = `users/${user.id}/versions/${versionTarget.id}/${selectedFile.name}`;
 
           const blob = await upload(pathname, selectedFile, {
             access: "private",
             handleUploadUrl: `${API_URL}/api/files/blob-upload`,
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
             clientPayload: JSON.stringify({
               purpose: "version",
               userId: user.id,
@@ -2745,11 +2775,31 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             multipart: true,
           });
 
-          if (blob?.url) {
+          if (blob?.url || blob?.pathname) {
             versionSuccess = true;
+            try {
+              await authenticatedFetch(`${API_URL}/api/files/${versionTarget.id}/versions/confirm-blob`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  pathname: blob.pathname,
+                  fileName: selectedFile.name,
+                  contentType: selectedFile.type || "application/octet-stream",
+                }),
+              });
+            } catch (confirmErr) {
+              console.warn("Direct version blob confirmation note:", confirmErr);
+            }
           }
         } catch (blobErr) {
-          console.warn("Vercel Blob version upload unavailable, falling back to direct upload:", blobErr);
+          console.warn("Vercel Blob version upload error:", blobErr);
+          if (selectedFile.size > 4.5 * 1024 * 1024) {
+            throw new Error(
+              blobErr?.message
+                ? `Version upload failed: ${blobErr.message}`
+                : `Unable to upload large version (${(selectedFile.size / (1024 * 1024)).toFixed(1)}MB). Direct upload exceeds 4.5MB server limit.`
+            );
+          }
         }
 
         if (!versionSuccess) {
