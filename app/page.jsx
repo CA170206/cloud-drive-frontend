@@ -1677,7 +1677,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       return true;
     } catch (error) {
       console.error("Upload failed:", error);
-      alert(error?.message || "Unable to upload file");
+      const userMsg =
+        error?.message === "Failed to fetch"
+          ? "Failed to fetch: Unable to reach the backend server. Please ensure backend is deployed and API URL is configured."
+          : error?.message || "Unable to upload file";
+      alert(userMsg);
       return false;
     } finally {
       setUploading(false);
