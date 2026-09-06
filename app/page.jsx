@@ -6,8 +6,9 @@ import { useEffect, useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 
 const API_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://cloud-drive-internship.vercel.app";
+  process.env.NEXT_PUBLIC_API_URL && process.env.NEXT_PUBLIC_API_URL.trim() !== ""
+    ? process.env.NEXT_PUBLIC_API_URL.trim()
+    : "";
 
 const authenticatedFetch = (url, options = {}) => {
   const token = typeof window !== "undefined" ? localStorage.getItem("cloud-drive-token") : null;
