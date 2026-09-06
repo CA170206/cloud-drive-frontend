@@ -367,12 +367,11 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
     setMessage("");
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const response = await authenticatedFetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
           password,
@@ -425,12 +424,11 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const response = await authenticatedFetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include",
         body: JSON.stringify({
           name: trimmedName,
           email: normalizedEmail,
