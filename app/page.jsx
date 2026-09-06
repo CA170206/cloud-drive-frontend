@@ -143,6 +143,161 @@ export default function Home() {
   );
 }
 
+const dashboardNavTabs = [
+  { id: "files", label: "My Files", icon: "📁", badge: "15 GB Free Storage" },
+  { id: "shared", label: "Shared with me", icon: "👥", badge: "Public & Direct Share Links" },
+  { id: "recent", label: "Recent", icon: "🕒", badge: "Accessed Last 24 Hours" },
+  { id: "starred", label: "Starred", icon: "⭐", badge: "Starred Favorites" },
+  { id: "activity", label: "Activity", icon: "⚡", badge: "Real-time Event Logs" },
+  { id: "trash", label: "Trash", icon: "🗑️", badge: "30 Days Retention Window" },
+];
+
+const dashboardMockupData = {
+  files: {
+    title: "My Storage Workspace",
+    badge: "15 GB Storage Available",
+    items: [
+      { icon: "📁", name: "Projects & Assets", meta: "18 items • 1.4 GB", tag: "Folder" },
+      { icon: "📄", name: "Annual_Report.pdf", meta: "Uploaded 5m ago • Shared", tag: "PDF Document" },
+      { icon: "🖼️", name: "Banner_Design.png", meta: "4.2 MB • Version 2", tag: "PNG Image" },
+    ],
+  },
+  shared: {
+    title: "Shared With Me",
+    badge: "Public & Team Share Links",
+    items: [
+      { icon: "📦", name: "Marketing_Campaign.zip", meta: "Shared by Sarah • Public Link", tag: "Shared Link" },
+      { icon: "📄", name: "Client_Contract_v3.pdf", meta: "Shared by Alex • Password Protected", tag: "Restricted" },
+      { icon: "📊", name: "Q3_Financials.xlsx", meta: "Shared by Finance Team", tag: "Collaborative" },
+    ],
+  },
+  recent: {
+    title: "Recently Accessed Files",
+    badge: "Quick Access Workspace",
+    items: [
+      { icon: "📄", name: "Annual_Report.pdf", meta: "Opened 2 mins ago", tag: "Just Now" },
+      { icon: "🎨", name: "Design_System_v4.fig", meta: "Opened 15 mins ago", tag: "Figma File" },
+      { icon: "🗄️", name: "Database_Backup.sql", meta: "Uploaded 1 hour ago", tag: "SQL Export" },
+    ],
+  },
+  starred: {
+    title: "Starred Favorites",
+    badge: "3 Starred Workspace Items",
+    items: [
+      { icon: "⭐", name: "Q4_Strategy_Deck.pptx", meta: "High Priority Deck", tag: "Starred" },
+      { icon: "⭐", name: "Design_System_v4.fig", meta: "Core UI Components", tag: "Starred" },
+      { icon: "⭐", name: "Production_Secrets.env", meta: "Encrypted API Keys", tag: "Starred" },
+    ],
+  },
+  activity: {
+    title: "Live Activity Stream",
+    badge: "Real-Time Cloud Audit Stream",
+    items: [
+      { icon: "⚡", name: "Uploaded Annual_Report.pdf", meta: "Direct client streaming via Vercel Blob", tag: "Edge Upload" },
+      { icon: "🔗", name: "Created Public Share Link", meta: "Generated link with expiration date", tag: "Shared Link" },
+      { icon: "🔄", name: "Restored Version 2 of Q4_Strategy", meta: "Restored earlier revision from history", tag: "Version Restore" },
+    ],
+  },
+  trash: {
+    title: "Trash & Version Recovery",
+    badge: "30 Days Retention Window",
+    items: [
+      { icon: "🗑️", name: "Old_Draft_Notes.txt", meta: "Deleted 3 days ago", tag: "Restore File" },
+      { icon: "🗑️", name: "Legacy_Export_v1.zip", meta: "Deleted 5 days ago", tag: "Restore File" },
+      { icon: "🗑️", name: "Unused_Banner_Design.png", meta: "Deleted 1 week ago", tag: "Restore File" },
+    ],
+  },
+};
+
+function AnimatedDashboardMockup() {
+  const [activeTabId, setActiveTabId] = useState("files");
+  const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (isHovered) return;
+    const interval = setInterval(() => {
+      setActiveTabId((prev) => {
+        const ids = dashboardNavTabs.map((t) => t.id);
+        const currentIndex = ids.indexOf(prev);
+        const nextIndex = (currentIndex + 1) % ids.length;
+        return ids[nextIndex];
+      });
+    }, 3200);
+    return () => clearInterval(interval);
+  }, [isHovered]);
+
+  const currentContent = dashboardMockupData[activeTabId] || dashboardMockupData.files;
+
+  return (
+    <div
+      className="hero-browser-mockup"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="browser-top-bar">
+        <div className="browser-dots">
+          <span className="dot red" />
+          <span className="dot yellow" />
+          <span className="dot green" />
+        </div>
+        <div className="browser-url-input">
+          <span className="lock-icon">🔒</span> https://cloud-drive.app/dashboard
+        </div>
+        <div className="browser-right-badge">
+          <span className="live-dot" /> 15 GB Storage Available
+        </div>
+      </div>
+
+      <div className="mockup-app-shell">
+        <aside className="mockup-sidebar">
+          <div className="mockup-sidebar-header">
+            <CloudIcon size={16} />
+            <span>Cloud Drive</span>
+          </div>
+          <nav className="mockup-sidebar-menu">
+            {dashboardNavTabs.map((tab) => {
+              const isActive = tab.id === activeTabId;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTabId(tab.id)}
+                  className={`mockup-sidebar-item ${isActive ? "active" : ""}`}
+                >
+                  <span className="sidebar-item-icon">{tab.icon}</span>
+                  <span className="sidebar-item-label">{tab.label}</span>
+                </button>
+              );
+            })}
+          </nav>
+        </aside>
+
+        <main className="mockup-main-panel">
+          <div className="mockup-panel-header">
+            <h3>{currentContent.title}</h3>
+            <span className="mockup-panel-badge">{currentContent.badge}</span>
+          </div>
+
+          <div className="mockup-items-grid" key={activeTabId}>
+            {currentContent.items.map((item, idx) => (
+              <div key={idx} className="mockup-item-card">
+                <div className="item-icon-box">{item.icon}</div>
+                <div className="item-details">
+                  <strong>{item.name}</strong>
+                  <small>{item.meta}</small>
+                </div>
+                <span className={`item-action-pill ${item.tag.toLowerCase().includes("restore") ? "restore" : ""}`}>
+                  {item.tag}
+                </span>
+              </div>
+            ))}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
 function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
   const [activeStep, setActiveStep] = useState(0);
 
@@ -286,80 +441,8 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
           <span>✓ Instant Public Sharing</span>
         </div>
 
-        {/* Hero Interactive App Mockup */}
-        <div className="landing-mockup-card">
-          <div className="mockup-header-bar">
-            <div className="mockup-brand-title">
-              <CloudIcon size={18} />
-              <strong>Cloud Drive</strong>
-              <small>Store. Version. Share.</small>
-            </div>
-            <div className="mockup-tabs">
-              {steps.map((s, idx) => (
-                <button
-                  key={s.tabName}
-                  type="button"
-                  onClick={() => setActiveStep(idx)}
-                  className={`mockup-tab-pill ${activeStep === idx ? "active" : ""}`}
-                >
-                  {s.tabName}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mockup-body">
-            <div className="mockup-storage-banner">
-              <div className="banner-info">
-                <span className="banner-title">READY TO STORE FILES</span>
-                <h3>15 GB Free Storage Workspace</h3>
-              </div>
-              <div className="banner-stats-pills">
-                <div className="pill-stat">
-                  <strong>15 GB</strong>
-                  <small>Capacity</small>
-                </div>
-                <div className="pill-stat">
-                  <strong>0.01s</strong>
-                  <small>Latency</small>
-                </div>
-                <div className="pill-stat">
-                  <strong>Unlimited</strong>
-                  <small>Revisions</small>
-                </div>
-              </div>
-            </div>
-
-            <div className="mockup-file-grid">
-              <div className="mockup-file-item">
-                <div className="file-icon-box blue">📂</div>
-                <div className="file-meta">
-                  <strong>Project_Assets/</strong>
-                  <span>14 items • 240 MB</span>
-                </div>
-                <span className="file-tag-pill">Folder</span>
-              </div>
-
-              <div className="mockup-file-item">
-                <div className="file-icon-box purple">📄</div>
-                <div className="file-meta">
-                  <strong>Annual_Report_2026.pdf</strong>
-                  <span>3.4 MB • Version 2</span>
-                </div>
-                <span className="file-tag-pill green">Restorable</span>
-              </div>
-
-              <div className="mockup-file-item">
-                <div className="file-icon-box orange">🖼️</div>
-                <div className="file-meta">
-                  <strong>Product_Design_v3.png</strong>
-                  <span>8.1 MB • Shared Link</span>
-                </div>
-                <span className="file-tag-pill blue">Public Link</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Hero Animated Dashboard App Mockup */}
+        <AnimatedDashboardMockup />
       </section>
 
       {/* Everything You Need / Features Section */}
