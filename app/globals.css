@@ -25,7 +25,7 @@ body {
 }
 
 html[data-theme="light"] body {
-  background: #f6f3eb;
+  background: #faf8f5;
   color: #121212;
 }
 
@@ -8234,7 +8234,7 @@ html[data-theme="light"] .mini-card {
 }
 
 html[data-theme="light"] .landing-container {
-  background: #f6f3eb !important;
+  background: #faf8f5 !important;
   color: #121212 !important;
 }
 
@@ -9427,8 +9427,8 @@ html[data-theme="light"] .landing-footer {
 
 html[data-theme="light"] .hero-browser-mockup {
   background: #ffffff;
-  border-color: #e5dfd3;
-  box-shadow: 0 25px 60px -15px rgba(18, 18, 18, 0.12), 0 0 30px rgba(0, 0, 0, 0.03);
+  border-color: #eee9e0;
+  box-shadow: 0 25px 60px -15px rgba(18, 18, 18, 0.08), 0 0 30px rgba(0, 0, 0, 0.02);
 }
 
 .hero-browser-mockup:hover {
@@ -9447,8 +9447,8 @@ html[data-theme="light"] .hero-browser-mockup {
 }
 
 html[data-theme="light"] .browser-top-bar {
-  background: #f7f4ec;
-  border-bottom-color: #e5dfd3;
+  background: #faf8f5;
+  border-bottom-color: #eee9e0;
 }
 
 .browser-dots {
@@ -9487,7 +9487,7 @@ html[data-theme="light"] .browser-top-bar {
 
 html[data-theme="light"] .browser-url-input {
   background: #ffffff;
-  border-color: #e5dfd3;
+  border-color: #eee9e0;
   color: #555b68;
 }
 
@@ -9530,8 +9530,8 @@ html[data-theme="light"] .browser-url-input {
 }
 
 html[data-theme="light"] .mockup-sidebar {
-  background: #fdfbf7;
-  border-right-color: #e5dfd3;
+  background: #f7f5f0;
+  border-right-color: #eee9e0;
 }
 
 .mockup-sidebar-header {
@@ -9547,7 +9547,7 @@ html[data-theme="light"] .mockup-sidebar {
 
 html[data-theme="light"] .mockup-sidebar-header {
   color: #121212;
-  border-bottom-color: #e5dfd3;
+  border-bottom-color: #eee9e0;
 }
 
 .mockup-sidebar-menu {
@@ -9574,7 +9574,7 @@ html[data-theme="light"] .mockup-sidebar-header {
 }
 
 html[data-theme="light"] .mockup-sidebar-item {
-  color: #4b5563;
+  color: #55524c;
 }
 
 .mockup-sidebar-item:hover {
@@ -9596,8 +9596,8 @@ html[data-theme="light"] .mockup-sidebar-item:hover {
 
 html[data-theme="light"] .mockup-sidebar-item.active {
   background: #121212 !important;
-  color: #f6f3eb !important;
-  box-shadow: 0 4px 14px rgba(18, 18, 18, 0.25) !important;
+  color: #faf8f5 !important;
+  box-shadow: 0 4px 14px rgba(18, 18, 18, 0.2) !important;
 }
 
 .sidebar-item-icon {
@@ -9634,7 +9634,7 @@ html[data-theme="light"] .mockup-main-panel {
 }
 
 html[data-theme="light"] .mockup-panel-header {
-  border-bottom-color: #e5dfd3;
+  border-bottom-color: #eee9e0;
 }
 
 .mockup-panel-header h3 {
@@ -9660,8 +9660,8 @@ html[data-theme="light"] .mockup-panel-header h3 {
 }
 
 html[data-theme="light"] .mockup-panel-badge {
-  background: rgba(18, 18, 18, 0.05);
-  border-color: #e5dfd3;
+  background: rgba(18, 18, 18, 0.04);
+  border-color: #eee9e0;
   color: #121212;
 }
 
@@ -9689,8 +9689,8 @@ html[data-theme="light"] .mockup-panel-badge {
 }
 
 html[data-theme="light"] .mockup-item-card {
-  background: #fdfbf7;
-  border-color: #e5dfd3;
+  background: #faf8f5;
+  border-color: #eee9e0;
 }
 
 .mockup-item-card:hover {
