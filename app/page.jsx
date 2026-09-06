@@ -9,6 +9,19 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
   "https://cloud-drive-internship.vercel.app";
 
+const authenticatedFetch = (url, options = {}) => {
+  const token = typeof window !== "undefined" ? localStorage.getItem("cloud-drive-token") : null;
+  const headers = {
+    ...(options.headers || {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+  return fetch(url, {
+    ...options,
+    credentials: "include",
+    headers,
+  });
+};
+
 const recentGridMenuButtonStyle = {
   width: "100%",
   height: "30px",
@@ -53,13 +66,13 @@ export default function Home() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/auth/me`, {
-        credentials: "include",
-      });
+      const response = await authenticatedFetch(`${API_URL}/api/auth/me`);
 
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
+      } else {
+        try { localStorage.removeItem("cloud-drive-token"); } catch (e) {}
       }
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -373,6 +386,10 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
         return;
       }
 
+      if (data.token) {
+        try { localStorage.setItem("cloud-drive-token", data.token); } catch (e) {}
+      }
+
       onLogin(data.user);
     } catch (error) {
       console.error("Login failed:", error);
@@ -426,6 +443,10 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
       if (!response.ok) {
         setMessage(data.error?.message || "Registration failed");
         return;
+      }
+
+      if (data.token) {
+        try { localStorage.setItem("cloud-drive-token", data.token); } catch (e) {}
       }
 
       if (data.user) {
@@ -912,7 +933,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setActivitiesLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/activities`, {
+      const response = await authenticatedFetch(`${API_URL}/api/activities`, {
         credentials: "include",
       });
 
@@ -929,7 +950,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const loadStorageStats = async () => {
     try {
-      const response = await fetch(`${API_URL}/api/files/stats`, {
+      const response = await authenticatedFetch(`${API_URL}/api/files/stats`, {
         credentials: "include",
       });
 
@@ -953,7 +974,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setSharedLoading(true);
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/shares/shared-with-me`,
         {
           credentials: "include",
@@ -975,7 +996,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setRecentLoading(true);
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/recent`,
         {
           credentials: "include",
@@ -997,7 +1018,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setTrashLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/files/trash`, {
+      const response = await authenticatedFetch(`${API_URL}/api/files/trash`, {
         credentials: "include",
       });
 
@@ -1032,7 +1053,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const restoreTrashFile = async (file) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/trash/${file.id}/restore`,
         {
           method: "PATCH",
@@ -1058,7 +1079,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const restoreTrashFolder = async (folder) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/trash/folder/${folder.id}/restore`,
         {
           method: "PATCH",
@@ -1117,7 +1138,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setStarredLoading(true);
 
     try {
-      const response = await fetch(`${API_URL}/api/stars`, {
+      const response = await authenticatedFetch(`${API_URL}/api/stars`, {
         credentials: "include",
       });
 
@@ -1156,7 +1177,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     );
 
     try {
-      const response = await fetch(`${API_URL}/api/stars`, {
+      const response = await authenticatedFetch(`${API_URL}/api/stars`, {
         method: currentlyStarred ? "DELETE" : "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1255,8 +1276,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         : `${API_URL}/api/files`;
 
       const [foldersResponse, filesResponse] = await Promise.all([
-        fetch(folderUrl, { credentials: "include" }),
-        fetch(fileUrl, { credentials: "include" }),
+        authenticatedFetch(folderUrl),
+        authenticatedFetch(fileUrl),
       ]);
 
       if (foldersResponse.ok) {
@@ -1350,7 +1371,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setSearchQuery("");
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/shares/shared-with-me/folder/${folderId}`,
         {
           credentials: "include",
@@ -1450,7 +1471,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     if (!newFolderName.trim()) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/folders`, {
+      const response = await authenticatedFetch(`${API_URL}/api/folders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1498,7 +1519,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     if (!renameValue.trim() || !renamingFolder) return;
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/folders/${renamingFolder.id}`,
         {
           method: "PATCH",
@@ -1547,7 +1568,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     if (!renameFileValue.trim() || !renamingFile) return;
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/${renamingFile.id}`,
         {
           method: "PATCH",
@@ -1584,7 +1605,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/folders/${folder.id}`,
         {
           method: "DELETE",
@@ -1652,7 +1673,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           formData.append("folderId", currentFolder.id);
         }
 
-        const res = await fetch(`${API_URL}/api/files/upload`, {
+        const res = await authenticatedFetch(`${API_URL}/api/files/upload`, {
           method: "POST",
           credentials: "include",
           body: formData,
@@ -1776,7 +1797,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
         : `${API_URL}/api/files/${file.id}/download`;
 
-      const response = await fetch(url, {
+      const response = await authenticatedFetch(url, {
         credentials: "include",
       });
 
@@ -1830,7 +1851,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const downloadFile = async (file) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/${file.id}/download`,
         {
           credentials: "include",
@@ -1865,7 +1886,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const downloadSharedFile = async (file) => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/shares/shared-with-me/${file.id}/download`,
         {
           credentials: "include",
@@ -1939,7 +1960,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
     for (const id of selectedFileIds) {
       try {
-        await fetch(`${API_URL}/api/files/${id}`, {
+        await authenticatedFetch(`${API_URL}/api/files/${id}`, {
           method: "DELETE",
           credentials: "include",
         });
@@ -1976,7 +1997,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (isStarred("file", file.id)) continue;
 
       try {
-        await fetch(`${API_URL}/api/stars`, {
+        await authenticatedFetch(`${API_URL}/api/stars`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -2002,7 +2023,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/${file.id}`,
         {
           method: "DELETE",
@@ -2036,7 +2057,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     if (!confirmed) return;
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/shares/shared-with-me/${resource.share_id}`,
         {
           method: "DELETE",
@@ -2109,7 +2130,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setShareMessage("");
 
     try {
-      const response = await fetch(`${API_URL}/api/shares`, {
+      const response = await authenticatedFetch(`${API_URL}/api/shares`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -2160,7 +2181,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setPublicLinkLoading(true);
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/shares/public?resourceType=file&resourceId=${file.id}`,
         {
           credentials: "include",
@@ -2213,7 +2234,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setPublicLinkMessage("");
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/shares/public`,
         {
           method: "POST",
@@ -2290,7 +2311,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setPublicLinkMessage("");
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/shares/public/${linkId}`,
         {
           method: "DELETE",
@@ -2354,7 +2375,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setVersionLoading(true);
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/${file.id}/versions`,
         {
           credentials: "include",
@@ -2435,7 +2456,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
           const formData = new FormData();
           formData.append("file", selectedFile);
 
-          const res = await fetch(`${API_URL}/api/files/${versionTarget.id}/versions`, {
+          const res = await authenticatedFetch(`${API_URL}/api/files/${versionTarget.id}/versions`, {
             method: "POST",
             credentials: "include",
             body: formData,
@@ -2454,7 +2475,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         );
         await loadStorageStats();
 
-        const versionsResponse = await fetch(
+        const versionsResponse = await authenticatedFetch(
           `${API_URL}/api/files/${versionTarget.id}/versions`,
           {
             credentials: "include",
@@ -2484,7 +2505,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     if (!versionTarget) return;
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/download`,
         {
           credentials: "include",
@@ -2536,7 +2557,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setVersionMessage("");
 
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/restore`,
         {
           method: "POST",
@@ -2564,7 +2585,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       );
       await loadStorageStats();
 
-      const versionsResponse = await fetch(
+      const versionsResponse = await authenticatedFetch(
         `${API_URL}/api/files/${versionTarget.id}/versions`,
         {
           credentials: "include",
@@ -2598,15 +2619,16 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   const logout = async () => {
     try {
-      await fetch(
+      await authenticatedFetch(
         `${API_URL}/api/auth/logout`,
         {
           method: "POST",
-          credentials: "include",
         }
       );
     } catch (error) {
       console.error("Logout failed:", error);
+    } finally {
+      try { localStorage.removeItem("cloud-drive-token"); } catch (e) {}
     }
 
     onLogout();
