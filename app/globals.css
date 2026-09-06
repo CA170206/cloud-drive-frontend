@@ -4578,11 +4578,16 @@ summary {
 /* ---------- DESKTOP APP SHELL ---------- */
 
 @media (min-width: 801px) {
-  html,
-  body,
-  #root {
+  html:has(.dashboard),
+  body:has(.dashboard) {
     height: 100%;
     overflow: hidden !important;
+  }
+  
+  html,
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 
   .dashboard {
@@ -5613,11 +5618,16 @@ button {
 /* ---------- DESKTOP SHELL ---------- */
 
 @media (min-width: 801px) {
-  html,
-  body,
-  #root {
+  html:has(.dashboard),
+  body:has(.dashboard) {
     height: 100%;
     overflow: hidden !important;
+  }
+
+  html,
+  body {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
   }
 
   .dashboard {
