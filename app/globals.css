@@ -884,37 +884,229 @@ html[data-theme="light"] .search-bar {
   color: #eef2f7;
 }
 
-/* LOGIN */
+/* LOGIN & REGISTER - ALMONDISH MONOCHROME THEME */
 .login-container {
   min-height: 100vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 20px;
-  background: #11161d;
+  padding: 24px;
+  background: #08090c;
+  color: #f5f2eb;
+}
+
+html[data-theme="light"] .login-container {
+  background: #faf8f5;
+  color: #121212;
 }
 
 .login-card {
-  width: 100%;
-  max-width: 410px;
-  padding: 30px;
-  border: 1px solid #2c3541;
-  border-radius: 16px;
-  background: #1a212a;
-  box-shadow: 0 25px 70px rgba(0,0,0,.35);
+  position: relative;
+  width: min(440px, 100%);
+  padding: 36px 32px;
+  border-radius: 24px;
+  background: #111319;
+  border: 1px solid rgba(245, 240, 230, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+html[data-theme="light"] .login-card {
+  background: #ffffff;
+  border-color: #e5dfd3;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06);
+}
+
+.back-to-landing-btn {
+  align-self: flex-start;
+  margin-bottom: 20px;
+  padding: 6px 16px;
+  border-radius: 9999px;
+  border: 1px solid rgba(245, 240, 230, 0.15);
+  background: rgba(245, 240, 230, 0.06);
+  color: #f5f0e6;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+html[data-theme="light"] .back-to-landing-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: #e5dfd3;
+  color: #121212;
+}
+
+.back-to-landing-btn:hover {
+  background: #f5f0e6;
+  color: #08090c;
+}
+
+html[data-theme="light"] .back-to-landing-btn:hover {
+  background: #121212;
+  color: #f6f3eb;
 }
 
 .login-card h1 {
-  margin: 0 0 7px;
-  color: #f1f5f9;
-  text-align: center;
+  margin: 0 0 6px;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #f5f0e6;
 }
 
-.subtitle {
+html[data-theme="light"] .login-card h1 {
+  color: #121212;
+}
+
+.login-card .subtitle {
+  margin: 0 0 24px;
+  font-size: 13px;
+  color: #a6a095;
+}
+
+html[data-theme="light"] .login-card .subtitle {
+  color: #666055;
+}
+
+.login-theme-toggle {
   margin-bottom: 24px;
-  color: #778396;
-  text-align: center;
+  padding: 6px 14px;
+  border-radius: 9999px;
+  border: 1px solid rgba(245, 240, 230, 0.15);
+  background: rgba(245, 240, 230, 0.06);
+  color: #f5f2eb;
   font-size: 12px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+html[data-theme="light"] .login-theme-toggle {
+  border-color: #e5dfd3;
+  background: rgba(0, 0, 0, 0.04);
+  color: #121212;
+}
+
+.login-card form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-card form label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ece5d8;
+  margin-bottom: -10px;
+}
+
+html[data-theme="light"] .login-card form label {
+  color: #333333;
+}
+
+.login-card form input {
+  width: 100%;
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+  border: 1px solid #252836;
+  background: #181b24;
+  color: #f5f2eb;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+html[data-theme="light"] .login-card form input {
+  background: #faf8f5;
+  border-color: #e5dfd3;
+  color: #121212;
+}
+
+.login-card form input:focus {
+  outline: none;
+  border-color: #f5f0e6;
+  box-shadow: 0 0 0 3px rgba(245, 240, 230, 0.15);
+}
+
+html[data-theme="light"] .login-card form input:focus {
+  border-color: #121212;
+  box-shadow: 0 0 0 3px rgba(18, 18, 18, 0.1);
+}
+
+.login-card form button[type="submit"] {
+  margin-top: 8px;
+  height: 46px;
+  border-radius: 9999px;
+  border: none;
+  background: #f5f0e6;
+  color: #08090c;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(245, 240, 230, 0.2);
+  transition: all 0.2s ease;
+}
+
+html[data-theme="light"] .login-card form button[type="submit"] {
+  background: #121212;
+  color: #f6f3eb;
+  box-shadow: 0 4px 14px rgba(18, 18, 18, 0.2);
+}
+
+.login-card form button[type="submit"]:hover {
+  background: #ece5d8;
+  transform: translateY(-1px);
+}
+
+html[data-theme="light"] .login-card form button[type="submit"]:hover {
+  background: #2a2825;
+}
+
+.login-switch {
+  margin-top: 24px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #a6a095;
+}
+
+html[data-theme="light"] .login-switch {
+  color: #666055;
+}
+
+.login-switch button {
+  border: none;
+  background: transparent;
+  color: #f5f0e6;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+html[data-theme="light"] .login-switch button {
+  color: #121212;
+}
+
+.message.error {
+  margin-top: 16px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+  font-size: 13px;
+  text-align: center;
+  width: 100%;
 }
 
 /* GENERAL FORM CONTROLS */
@@ -4541,13 +4733,25 @@ html[data-theme="light"] .shortcut-grid span{color:#64748b}
   --cd-sidebar-width: 245px;
   --cd-content-max: 1440px;
   --cd-gap: 18px;
-  --cd-border: #2a333f;
-  --cd-panel: #1a212a;
-  --cd-panel-2: #181f28;
-  --cd-bg: #11161d;
-  --cd-text: #e7edf5;
-  --cd-muted: #7f8b9b;
-  --cd-blue: #2563eb;
+  --cd-border: #222530;
+  --cd-panel: #111319;
+  --cd-panel-2: #181b24;
+  --cd-bg: #08090c;
+  --cd-text: #f5f2eb;
+  --cd-muted: #8c867b;
+  --cd-blue: #f5f0e6;
+  --cd-accent: #f5f0e6;
+}
+
+html[data-theme="light"] {
+  --cd-border: #e5dfd3;
+  --cd-panel: #ffffff;
+  --cd-panel-2: #fbf9f5;
+  --cd-bg: #faf8f5;
+  --cd-text: #121212;
+  --cd-muted: #666055;
+  --cd-blue: #121212;
+  --cd-accent: #121212;
 }
 
 html,
@@ -4817,11 +5021,11 @@ summary {
     flex-direction: column !important;
     gap: 2px !important;
     margin: 0 !important;
-    padding: 5px !important;
-    border: 1px solid #334155 !important;
-    border-radius: 9px !important;
-    background: #111827 !important;
-    box-shadow: 0 14px 35px rgba(0, 0, 0, .38) !important;
+    padding: 6px !important;
+    border: 1px solid rgba(245, 240, 230, 0.15) !important;
+    border-radius: 12px !important;
+    background: #111319 !important;
+    box-shadow: 0 14px 35px rgba(0, 0, 0, .55) !important;
   }
 
   .desktop-file-options-menu button,
@@ -4842,8 +5046,8 @@ summary {
     border: 0 !important;
     border-radius: 6px !important;
     background: transparent !important;
-    color: #cbd5e1 !important;
-    font-size: 10px !important;
+    color: #f5f2eb !important;
+    font-size: 11px !important;
     font-weight: 500 !important;
     text-align: left !important;
     white-space: nowrap !important;
@@ -4855,8 +5059,8 @@ summary {
   .starred-desktop-file-options .desktop-file-options-menu button:hover,
   .shared-desktop-file-options .desktop-file-options-menu button:hover,
   .grid-file-options .grid-file-menu-dropdown button:hover {
-    background: #1e293b !important;
-    color: #fff !important;
+    background: rgba(245, 240, 230, 0.08) !important;
+    color: #f5f0e6 !important;
   }
 
   .desktop-file-options-menu button svg,
@@ -4871,7 +5075,7 @@ summary {
   .starred-desktop-file-options .desktop-file-options-menu .desktop-file-delete,
   .shared-desktop-file-options .desktop-file-options-menu .desktop-file-delete,
   .grid-file-options .grid-file-menu-dropdown .grid-file-delete {
-    color: #f87171 !important;
+    color: #fca5a5 !important;
   }
 
   .file-row:has(.desktop-file-options[open]),
@@ -4917,15 +5121,27 @@ summary {
     align-items: flex-start !important;
     overflow: visible !important;
     padding: 13px !important;
-    border: 1px solid #2a333f !important;
-    border-radius: 11px !important;
-    background: #181f28 !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,.10) !important;
+    border: 1px solid rgba(245, 240, 230, 0.12) !important;
+    border-radius: 14px !important;
+    background: #111319 !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,.25) !important;
+    transition: all 0.2s ease !important;
+  }
+
+  html[data-theme="light"] .items-list.grid-view .grid-view-item {
+    border-color: #e5dfd3 !important;
+    background: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,.04) !important;
   }
 
   .items-list.grid-view .grid-view-item:hover {
-    border-color: #3a4655 !important;
-    background: #1d252f !important;
+    border-color: rgba(245, 240, 230, 0.25) !important;
+    background: #181b24 !important;
+  }
+
+  html[data-theme="light"] .items-list.grid-view .grid-view-item:hover {
+    border-color: #d0c8b8 !important;
+    background: #fbf9f5 !important;
   }
 
   .items-list.grid-view .grid-view-item > .file-action {
