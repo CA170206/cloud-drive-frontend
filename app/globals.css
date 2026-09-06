@@ -9825,260 +9825,6 @@ html[data-theme="light"] .landing-footer {
 }
 
 /* =========================================================
-   COMPREHENSIVE MOBILE RESPONSIVENESS (< 768px)
-========================================================= */
-@media (max-width: 768px) {
-  /* Floating Navbar on Mobile */
-  .landing-pill-nav-container {
-    position: fixed !important;
-    top: 8px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    z-index: 9999 !important;
-    width: 96% !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .landing-navbar-pill {
-    padding: 8px 14px !important;
-    gap: 8px !important;
-  }
-
-  .landing-brand-logo {
-    gap: 8px !important;
-  }
-
-  .landing-brand-title {
-    font-size: 15px !important;
-  }
-
-  .landing-logo-icon {
-    width: 30px !important;
-    height: 30px !important;
-  }
-
-  .landing-nav-pill-links {
-    display: none !important; /* Hide links on mobile to prevent squishing */
-  }
-
-  .landing-nav-actions {
-    gap: 6px !important;
-  }
-
-  .landing-theme-toggle-pill {
-    padding: 5px 10px !important;
-    font-size: 11px !important;
-  }
-
-  .landing-nav-action-pill {
-    padding: 6px 14px !important;
-    font-size: 12px !important;
-  }
-
-  /* Hero Section Mobile */
-  .landing-hero {
-    padding: 80px 16px 50px !important;
-  }
-
-  .landing-badge-pill {
-    padding: 5px 14px !important;
-    font-size: 11px !important;
-    margin-bottom: 16px !important;
-    max-width: 100% !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-  }
-
-  .landing-hero-title {
-    font-size: 28px !important;
-    letter-spacing: -0.6px !important;
-    line-height: 1.2 !important;
-    margin-bottom: 12px !important;
-  }
-
-  .landing-step-indicator {
-    gap: 8px !important;
-    margin-bottom: 18px !important;
-  }
-
-  .step-num-pill {
-    padding: 4px 10px !important;
-    font-size: 10px !important;
-  }
-
-  .landing-hero-subtitle {
-    font-size: 14px !important;
-    line-height: 1.5 !important;
-    margin-bottom: 24px !important;
-  }
-
-  .landing-hero-cta {
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 10px !important;
-    margin-top: 24px !important;
-    margin-bottom: 18px !important;
-  }
-
-  .landing-primary-btn,
-  .landing-secondary-btn {
-    width: 100% !important;
-    padding: 12px 20px !important;
-    font-size: 14px !important;
-  }
-
-  .landing-trust-checks {
-    flex-direction: column !important;
-    gap: 6px !important;
-    font-size: 12px !important;
-    margin-bottom: 30px !important;
-  }
-
-  /* Hero Mockup Card Mobile */
-  .landing-mockup-card {
-    border-radius: 16px !important;
-  }
-
-  .mockup-header-bar {
-    padding: 12px 14px !important;
-  }
-
-  .mockup-brand-title small {
-    display: none !important;
-  }
-
-  .mockup-tabs {
-    gap: 2px !important;
-    padding: 2px !important;
-  }
-
-  .mockup-tab-pill {
-    padding: 4px 10px !important;
-    font-size: 10px !important;
-  }
-
-  .mockup-body {
-    padding: 14px !important;
-  }
-
-  .mockup-storage-banner {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    gap: 12px !important;
-    padding: 14px !important;
-  }
-
-  .banner-stats-pills {
-    width: 100% !important;
-    display: grid !important;
-    grid-template-columns: repeat(3, 1fr) !important;
-    gap: 6px !important;
-  }
-
-  .pill-stat {
-    padding: 6px 4px !important;
-    width: 100% !important;
-  }
-
-  .pill-stat strong {
-    font-size: 12px !important;
-  }
-
-  .pill-stat small {
-    font-size: 9px !important;
-  }
-
-  .mockup-file-grid {
-    grid-template-columns: 1fr !important;
-    gap: 10px !important;
-  }
-
-  .mockup-file-item {
-    padding: 12px !important;
-  }
-
-  /* Section Grids Mobile */
-  .landing-features-section {
-    padding: 40px 16px !important;
-  }
-
-  .section-header {
-    margin-bottom: 24px !important;
-  }
-
-  .section-header h2 {
-    font-size: 26px !important;
-  }
-
-  .section-header p {
-    font-size: 14px !important;
-  }
-
-  .landing-features-grid-3,
-  .how-it-works-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-
-  .feature-card-pill,
-  .step-card {
-    padding: 20px !important;
-    border-radius: 16px !important;
-  }
-
-  .stats-pill-container {
-    border-radius: 20px !important;
-    grid-template-columns: 1fr !important;
-    gap: 18px !important;
-    padding: 24px 20px !important;
-  }
-
-  .landing-cta-banner {
-    margin: 40px 16px !important;
-    padding: 36px 20px !important;
-    border-radius: 20px !important;
-  }
-
-  .landing-cta-banner h2 {
-    font-size: 26px !important;
-  }
-
-  .cta-banner-buttons {
-    flex-direction: column !important;
-    width: 100% !important;
-  }
-
-  /* App Shell & Dashboard Responsiveness on Mobile */
-  .dashboard {
-    flex-direction: column !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow: auto !important;
-  }
-
-  .sidebar {
-    width: 100% !important;
-    height: auto !important;
-    border-right: 0 !important;
-    border-bottom: 1px solid #27272a !important;
-    padding: 12px !important;
-  }
-
-  .content {
-    padding: 16px !important;
-    height: auto !important;
-  }
-
-  .footer-content {
-    flex-direction: column !important;
-    gap: 16px !important;
-    text-align: center !important;
-  }
-}
-
-/* =========================================================
    HERO BROWSER DASHBOARD ANIMATED MOCKUP
    Enlarged High-Impact Scale (3-Column Layout Matching Pic 2)
    Pure Black & White Monochrome Palette
@@ -10560,53 +10306,7 @@ html[data-theme="dark"] .item-action-pill.restore,
 /* =========================================================
    MOCKUP RESPONSIVE LAYOUT (< 768px)
 ========================================================= */
-@media (max-width: 768px) {
-  .hero-browser-mockup {
-    margin-top: 10px !important;
-  }
-
-  .mockup-app-shell {
-    flex-direction: column !important;
-  }
-
-  .mockup-sidebar {
-    width: 100% !important;
-    border-right: 0 !important;
-    border-bottom: 1px solid #27272a !important;
-    padding: 8px 10px !important;
-  }
-
-  html[data-theme="dark"] .mockup-sidebar {
-    border-bottom-color: #e5e7eb !important;
-  }
-
-  .mockup-sidebar-menu {
-    flex-direction: row !important;
-    overflow-x: auto !important;
-    gap: 6px !important;
-    padding-bottom: 2px !important;
-  }
-
-  .mockup-sidebar-item {
-    width: auto !important;
-    white-space: nowrap !important;
-    padding: 4px 10px !important;
-    font-size: 11px !important;
-  }
-
-  .mockup-items-grid {
-    grid-template-columns: 1fr !important;
-  }
-
-  .browser-url-input {
-    max-width: 180px !important;
-    font-size: 10px !important;
-  }
-
-  .browser-right-badge {
-    display: none !important;
-  }
-}
+/* Mockup responsive rules consolidated below */
 
 html[data-theme="dark"] .spreadsheet-search input {
   background: #111113 !important;
@@ -10788,4 +10488,535 @@ html[data-theme="dark"] .pdf-explorer-btn {
 
 html[data-theme="dark"] .pdf-explorer-btn:hover {
   background: #111113 !important;
+}
+/* =========================================================
+   COMPREHENSIVE MULTI-DEVICE RESPONSIVE SYSTEM
+   Breakpoints: 
+   - Tablet / Small Laptop: <= 1024px
+   - Mobile Landscape & Tablet: <= 768px
+   - Mobile Portrait: <= 480px
+   - Small Mobile: <= 360px
+========================================================= */
+
+/* ---------------- TABLETS & SMALL LAPTOPS (<= 1024px) ---------------- */
+@media (max-width: 1024px) {
+  .landing-pill-nav-container {
+    width: 95% !important;
+    top: 12px !important;
+  }
+
+  .landing-navbar-pill {
+    padding: 8px 18px !important;
+  }
+
+  .landing-nav-pill-item {
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .landing-nav-action-pill {
+    padding: 7px 16px !important;
+    font-size: 12.5px !important;
+  }
+
+  .landing-hero {
+    padding: 92px 20px 24px !important;
+    min-height: auto !important;
+  }
+
+  .hero-browser-mockup {
+    max-width: 100% !important;
+    width: 95vw !important;
+  }
+
+  .mockup-sidebar {
+    width: 190px !important;
+    padding: 12px 10px !important;
+  }
+
+  .mockup-sidebar-item {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .mockup-items-grid {
+    gap: 8px !important;
+  }
+
+  .mockup-item-card {
+    padding: 9px 10px !important;
+    gap: 8px !important;
+  }
+
+  .item-icon-box {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 14px !important;
+  }
+
+  .item-details strong {
+    font-size: 11px !important;
+  }
+
+  .item-details small {
+    font-size: 9.5px !important;
+  }
+
+  .item-action-pill {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+  }
+
+  .landing-features-grid-3,
+  .how-it-works-grid {
+    gap: 16px !important;
+  }
+
+  .feature-card-pill {
+    padding: 24px 20px !important;
+    border-radius: 20px !important;
+  }
+
+  .step-card {
+    padding: 24px 20px !important;
+    border-radius: 20px !important;
+  }
+
+  .stats-pill-container {
+    padding: 24px 30px !important;
+  }
+}
+
+/* ---------------- MOBILE LANDSCAPE & TABLETS (<= 768px) ---------------- */
+@media (max-width: 768px) {
+  /* Floating Navbar */
+  .landing-pill-nav-container {
+    position: fixed !important;
+    top: 8px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 9999 !important;
+    width: calc(100% - 20px) !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .landing-navbar-pill {
+    padding: 7px 12px !important;
+    gap: 8px !important;
+  }
+
+  .landing-brand-logo {
+    gap: 8px !important;
+  }
+
+  .landing-brand-title {
+    font-size: 14.5px !important;
+  }
+
+  .landing-logo-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 7px !important;
+  }
+
+  .landing-nav-pill-links {
+    display: none !important; /* Hide links on mobile to keep navbar clean */
+  }
+
+  .landing-nav-actions {
+    gap: 6px !important;
+  }
+
+  .landing-theme-toggle-pill {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+  }
+
+  .landing-nav-action-pill.secondary {
+    display: none !important; /* Hide secondary sign in in header; CTA below handles it */
+  }
+
+  .landing-nav-action-pill.primary {
+    padding: 6px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* Hero Section */
+  .landing-hero {
+    padding: 74px 14px 24px !important;
+    min-height: auto !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .landing-badge-pill {
+    padding: 4px 14px !important;
+    font-size: 11px !important;
+    margin-bottom: 8px !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
+  .landing-hero-title {
+    font-size: clamp(22px, 6.2vw, 29px) !important;
+    letter-spacing: -0.5px !important;
+    line-height: 1.2 !important;
+    margin: 0 0 6px !important;
+  }
+
+  .landing-step-indicator {
+    gap: 8px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .step-num-pill {
+    padding: 3px 8px !important;
+    font-size: 9.5px !important;
+  }
+
+  .landing-hero-subtitle {
+    font-size: 13px !important;
+    line-height: 1.45 !important;
+    max-width: 100% !important;
+    margin: 0 auto 10px !important;
+    padding: 0 6px !important;
+  }
+
+  /* Animated Mockup on Mobile */
+  .hero-browser-mockup {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 8px 0 0 !important;
+    border-radius: 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .browser-top-bar {
+    padding: 8px 12px !important;
+  }
+
+  .browser-dots {
+    width: 48px !important;
+    gap: 5px !important;
+  }
+
+  .dot {
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  .browser-url-input {
+    max-width: 170px !important;
+    font-size: 10px !important;
+    padding: 3px 10px !important;
+  }
+
+  .browser-right-badge {
+    display: none !important;
+  }
+
+  .mockup-app-shell {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  .mockup-sidebar {
+    width: 100% !important;
+    border-right: 0 !important;
+    border-bottom: 1px solid #27272a !important;
+    padding: 6px 8px !important;
+  }
+
+  html[data-theme="dark"] .mockup-sidebar {
+    border-bottom-color: #e5e7eb !important;
+  }
+
+  .mockup-sidebar-header {
+    display: none !important; /* Save vertical space on mobile */
+  }
+
+  .mockup-sidebar-menu {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    gap: 5px !important;
+    padding-bottom: 2px !important;
+    scrollbar-width: none !important;
+  }
+
+  .mockup-sidebar-menu::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .mockup-sidebar-item {
+    width: auto !important;
+    flex-shrink: 0 !important;
+    white-space: nowrap !important;
+    padding: 4px 9px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+  }
+
+  .mockup-main-panel {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .mockup-panel-header {
+    padding-bottom: 6px !important;
+  }
+
+  .mockup-panel-header h3 {
+    font-size: 12.5px !important;
+  }
+
+  .mockup-panel-badge {
+    font-size: 9.5px !important;
+    padding: 2px 7px !important;
+  }
+
+  /* Single Column Stack on Mobile for readability */
+  .mockup-items-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    width: 100% !important;
+  }
+
+  .mockup-item-card {
+    display: flex !important;
+    align-items: center !important;
+    padding: 8px 10px !important;
+    gap: 8px !important;
+    border-radius: 7px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .item-icon-box {
+    width: 28px !important;
+    height: 28px !important;
+    font-size: 13px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .item-details {
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .item-details strong {
+    font-size: 11px !important;
+    max-width: 140px !important;
+  }
+
+  .item-details small {
+    font-size: 9.5px !important;
+    max-width: 140px !important;
+  }
+
+  .item-action-pill {
+    font-size: 8.5px !important;
+    padding: 2px 6px !important;
+    margin-left: auto !important;
+  }
+
+  /* CTA Buttons Below Hero */
+  .landing-hero-cta-scroll {
+    padding: 30px 16px 20px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .landing-hero-cta-scroll .landing-hero-cta {
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 290px !important;
+    gap: 10px !important;
+    margin: 0 0 16px !important;
+  }
+
+  .landing-primary-btn,
+  .landing-secondary-btn {
+    width: 100% !important;
+    padding: 12px 20px !important;
+    font-size: 14px !important;
+    box-sizing: border-box !important;
+    text-align: center !important;
+  }
+
+  .landing-hero-cta-scroll .landing-trust-checks {
+    flex-direction: column !important;
+    gap: 6px !important;
+    font-size: 12px !important;
+    margin: 0 !important;
+  }
+
+  /* Features Section */
+  .landing-features-section {
+    padding: 36px 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .section-header {
+    margin-bottom: 22px !important;
+  }
+
+  .section-header h2 {
+    font-size: 24px !important;
+    letter-spacing: -0.4px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .section-header p {
+    font-size: 13.5px !important;
+  }
+
+  .landing-features-grid-3 {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    width: 100% !important;
+  }
+
+  .feature-card-pill {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .feature-emoji-box {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 20px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .feature-card-pill h3 {
+    font-size: 17px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .feature-card-pill p {
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+  }
+
+  /* How It Works Section */
+  .how-it-works-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    width: 100% !important;
+  }
+
+  .step-card {
+    padding: 20px 16px !important;
+    border-radius: 16px !important;
+  }
+
+  .step-num {
+    font-size: 26px !important;
+    top: 14px !important;
+    right: 16px !important;
+  }
+
+  .step-card h3 {
+    font-size: 16px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .step-card p {
+    font-size: 13px !important;
+  }
+
+  /* Stats Section */
+  .stats-pill-container {
+    grid-template-columns: 1fr !important;
+    border-radius: 20px !important;
+    padding: 20px 16px !important;
+    gap: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .stat-box h4 {
+    font-size: 28px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .stat-box p {
+    font-size: 12px !important;
+  }
+
+  /* CTA Banner */
+  .landing-cta-banner {
+    margin: 32px 14px !important;
+    padding: 30px 16px !important;
+    border-radius: 18px !important;
+  }
+
+  .landing-cta-banner h2 {
+    font-size: 22px !important;
+    line-height: 1.25 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .landing-cta-banner p {
+    font-size: 13px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .cta-banner-buttons {
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+  }
+
+  .cta-banner-buttons button {
+    width: 100% !important;
+    max-width: 270px !important;
+  }
+
+  /* Footer */
+  .landing-footer {
+    padding: 28px 16px !important;
+  }
+
+  .footer-content {
+    flex-direction: column !important;
+    gap: 12px !important;
+    text-align: center !important;
+  }
+}
+
+/* ---------------- SMALL PHONES (<= 400px) ---------------- */
+@media (max-width: 400px) {
+  .landing-brand-title {
+    font-size: 13.5px !important;
+  }
+
+  .landing-hero-title {
+    font-size: 22px !important;
+  }
+
+  .browser-url-input {
+    max-width: 130px !important;
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+  }
+
+  .landing-theme-toggle-pill {
+    padding: 4px 7px !important;
+    font-size: 10px !important;
+  }
+
+  .landing-nav-action-pill.primary {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+  }
 }
