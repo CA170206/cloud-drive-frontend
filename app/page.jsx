@@ -927,6 +927,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [previewArrayBuffer, setPreviewArrayBuffer] = useState(null);
   const [imageZoom, setImageZoom] = useState(1);
   const [imageRotation, setImageRotation] = useState(0);
+  const [mediaError, setMediaError] = useState(false);
 
   const [detailsTarget, setDetailsTarget] = useState(null);
 
@@ -2113,6 +2114,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setPreviewArrayBuffer(null);
     setImageZoom(1);
     setImageRotation(0);
+    setMediaError(false);
 
     const token =
       typeof window !== "undefined"
@@ -2134,14 +2136,33 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setPreviewUrl("");
 
     try {
+      if (previewType === "pdf") {
+        // Fetch as blob for 100% same-origin iframe rendering (never blocked by X-Frame-Options)
+        try {
+          const response = await authenticatedFetch(baseDownloadUrl);
+          if (response.ok) {
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(
+              new Blob([blob], { type: "application/pdf" })
+            );
+            setPreviewUrl(blobUrl);
+            setPreviewLoading(false);
+            return;
+          }
+        } catch (pdfErr) {
+          console.warn("PDF blob preview error, falling back to direct URL:", pdfErr);
+        }
+        setPreviewUrl(inlineUrl);
+        setPreviewLoading(false);
+        return;
+      }
+
       if (
         previewType === "video" ||
         previewType === "audio" ||
-        previewType === "pdf" ||
         previewType === "image"
       ) {
-        // Direct media streaming / viewing URL!
-        // No need to buffer entire video or PDF into browser RAM!
+        // Direct media streaming / viewing URL with Range request support!
         setPreviewUrl(inlineUrl);
         setPreviewLoading(false);
         return;
@@ -2197,6 +2218,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setPreviewLoading(false);
     setImageZoom(1);
     setImageRotation(0);
+    setMediaError(false);
   };
 
   const downloadFile = (file) => {
@@ -6137,11 +6159,42 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       {previewText}
                     </pre>
                   ) : getPreviewType(previewFileData.name) === "video" ? (
-                    <video
-                      src={previewUrl}
-                      controls
-                      className="constant-preview-media"
-                    />
+                    <div className="constant-preview-video-container">
+                      {!mediaError ? (
+                        <video
+                          src={previewUrl}
+                          controls
+                          preload="metadata"
+                          playsInline
+                          className="constant-preview-media"
+                          onError={() => setMediaError(true)}
+                        />
+                      ) : (
+                        <div className="constant-preview-placeholder">
+                          <div className="constant-preview-icon">
+                            <FileIcon
+                              fileName={previewFileData.name}
+                              size={64}
+                            />
+                          </div>
+                          <h3>Unable to Play Video in Browser</h3>
+                          <p>
+                            This video format or codec cannot be decoded directly by your web browser. You can download the file to play it on your device (e.g. VLC or Windows Media Player).
+                          </p>
+                          <button
+                            type="button"
+                            className="preview-unpreviewed-download-btn"
+                            onClick={() =>
+                              previewFileData.shared
+                                ? downloadSharedFile(previewFileData)
+                                : downloadFile(previewFileData)
+                            }
+                          >
+                            <DownloadIcon size={16} /> Download {previewFileData.name} ({formatFileSize(previewFileData.size_bytes)})
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   ) : getPreviewType(previewFileData.name) === "audio" ? (
                     <div className="constant-preview-audio">
                       <div className="constant-preview-icon">
