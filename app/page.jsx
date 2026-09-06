@@ -563,8 +563,8 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
                 ? "Creating account..."
                 : "Signing in..."
               : isRegistering
-              ? "Create Account"
-              : "Sign In"}
+                ? "Create Account"
+                : "Sign In"}
           </button>
         </form>
 
@@ -706,11 +706,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     try {
       const saved = localStorage.getItem("cloud-drive-file-tags");
       if (saved) setFileTags(JSON.parse(saved));
-    } catch {}
+    } catch { }
   }, []);
 
   useEffect(() => {
-    try { localStorage.setItem("cloud-drive-file-tags", JSON.stringify(fileTags)); } catch {}
+    try { localStorage.setItem("cloud-drive-file-tags", JSON.stringify(fileTags)); } catch { }
   }, [fileTags]);
 
   useEffect(() => {
@@ -739,8 +739,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       const menu = isRecentGridControl
         ? details.querySelector(".recent-grid-file-options-menu")
         : details.querySelector(
-            ":scope > .desktop-file-options-menu, :scope > .grid-file-menu-dropdown, :scope > .mobile-file-options-menu"
-          );
+          ":scope > .desktop-file-options-menu, :scope > .grid-file-menu-dropdown, :scope > .mobile-file-options-menu"
+        );
 
       const isOpen = isRecentGridControl
         ? !!menu
@@ -1175,7 +1175,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!response.ok) {
         alert(
           data.error?.message ||
-            "Unable to update star"
+          "Unable to update star"
         );
         return;
       }
@@ -1364,7 +1364,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!response.ok) {
         alert(
           data.error?.message ||
-            "Unable to open shared folder"
+          "Unable to open shared folder"
         );
         return;
       }
@@ -1476,7 +1476,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         alert(
           data.error?.message ||
-            "Unable to create folder"
+          "Unable to create folder"
         );
       }
     } catch (error) {
@@ -1525,7 +1525,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         alert(
           data.error?.message ||
-            "Unable to rename folder"
+          "Unable to rename folder"
         );
       }
     } catch (error) {
@@ -1604,7 +1604,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         alert(
           data.error?.message ||
-            "Unable to delete folder"
+          "Unable to delete folder"
         );
       }
     } catch (error) {
@@ -2022,7 +2022,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         alert(
           data.error?.message ||
-            "Unable to delete file"
+          "Unable to delete file"
         );
       }
     } catch (error) {
@@ -2062,7 +2062,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         alert(
           data.error?.message ||
-            "Unable to remove shared resource"
+          "Unable to remove shared resource"
         );
       }
     } catch (error) {
@@ -2130,14 +2130,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!response.ok) {
         setShareMessage(
           data.error?.message ||
-            "Unable to share resource"
+          "Unable to share resource"
         );
         return;
       }
 
       setShareMessage(
         data.message ||
-          "Resource shared successfully"
+        "Resource shared successfully"
       );
 
       setShareEmail("");
@@ -2184,7 +2184,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         setPublicLinks([]);
         setPublicLinkMessage(
           data.error?.message ||
-            "Unable to load public links"
+          "Unable to load public links"
         );
       }
     } catch (error) {
@@ -2232,8 +2232,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             expiresAt:
               publicLinkExpiry
                 ? new Date(
-                    publicLinkExpiry
-                  ).toISOString()
+                  publicLinkExpiry
+                ).toISOString()
                 : undefined,
           }),
         }
@@ -2244,7 +2244,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!response.ok) {
         setPublicLinkMessage(
           data.error?.message ||
-            "Unable to create public link"
+          "Unable to create public link"
         );
         return;
       }
@@ -2305,7 +2305,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!response.ok) {
         setPublicLinkMessage(
           data.error?.message ||
-            "Unable to revoke public link"
+          "Unable to revoke public link"
         );
         return;
       }
@@ -2368,7 +2368,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!response.ok) {
         setVersionMessage(
           data.error?.message ||
-            "Unable to load version history"
+          "Unable to load version history"
         );
         return;
       }
@@ -2500,7 +2500,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         setVersionMessage(
           data.error?.message ||
-            "Unable to download version"
+          "Unable to download version"
         );
         return;
       }
@@ -2551,14 +2551,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       if (!response.ok) {
         setVersionMessage(
           data.error?.message ||
-            "Unable to restore version"
+          "Unable to restore version"
         );
         return;
       }
 
       setVersionMessage(
         data.message ||
-          `Version ${version.version_number} restored successfully`
+        `Version ${version.version_number} restored successfully`
       );
 
       await loadContents(
@@ -2726,11 +2726,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
     ...(currentFolder
       ? [
-          {
-            name: currentFolder.name,
-            folder: currentFolder,
-          },
-        ]
+        {
+          name: currentFolder.name,
+          folder: currentFolder,
+        },
+      ]
       : []),
   ];
 
@@ -2749,11 +2749,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
     ...(sharedFolder
       ? [
-          {
-            name: sharedFolder.name,
-            folder: sharedFolder,
-          },
-        ]
+        {
+          name: sharedFolder.name,
+          folder: sharedFolder,
+        },
+      ]
       : []),
   ];
 
@@ -2830,9 +2830,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </div>
 
         <button
-          className={`sidebar-item ${
-            activeView === "dashboard" ? "active" : ""
-          }`}
+          className={`sidebar-item ${activeView === "dashboard" ? "active" : ""
+            }`}
           onClick={() => { openDashboard(); closeMobileMenu(); }}
         >
           <DashboardIcon size={17} />
@@ -2840,11 +2839,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </button>
 
         <button
-          className={`sidebar-item ${
-            activeView === "my-files"
+          className={`sidebar-item ${activeView === "my-files"
               ? "active"
               : ""
-          }`}
+            }`}
           onClick={() => { openMyFiles(); closeMobileMenu(); }}
         >
           <FolderIcon size={18} />
@@ -2852,11 +2850,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </button>
 
         <button
-          className={`sidebar-item ${
-            activeView === "shared"
+          className={`sidebar-item ${activeView === "shared"
               ? "active"
               : ""
-          }`}
+            }`}
           onClick={() => { openSharedWithMe(); closeMobileMenu(); }}
         >
           <UsersIcon size={18} />
@@ -2864,25 +2861,23 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </button>
 
         <button
-          className={`sidebar-item ${
-            activeView === "recent"
+          className={`sidebar-item ${activeView === "recent"
               ? "active"
               : ""
-          }`}
+            }`}
           onClick={() => { openRecent(); closeMobileMenu(); }}
         >
           <ClockIcon size={18} />
           <span>Recent</span>
         </button>
 
-        
+
 
         <button
-          className={`sidebar-item ${
-            activeView === "starred"
+          className={`sidebar-item ${activeView === "starred"
               ? "active"
               : ""
-          }`}
+            }`}
           onClick={() => { openStarred(); closeMobileMenu(); }}
         >
           <StarIcon size={18} filled />
@@ -2890,11 +2885,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </button>
 
         <button
-          className={`sidebar-item ${
-            activeView === "activity"
+          className={`sidebar-item ${activeView === "activity"
               ? "active"
               : ""
-          }`}
+            }`}
           onClick={() => { openActivity(); closeMobileMenu(); }}
         >
           <ActivityIcon size={18} />
@@ -2902,11 +2896,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
         </button>
 
         <button
-          className={`sidebar-item ${
-            activeView === "trash"
+          className={`sidebar-item ${activeView === "trash"
               ? "active"
               : ""
-          }`}
+            }`}
           onClick={() => { openTrash(); closeMobileMenu(); }}
         >
           <TrashIcon size={18} />
@@ -3105,14 +3098,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
             {activitiesLoading ? (
               <div className="frontend-skeleton-list" aria-label="Loading activity">
-    {Array.from({ length: 6 }).map((_, index) => (
-      <div className="frontend-skeleton-row" key={index}>
-        <span className="skeleton-box skeleton-icon" />
-        <span className="skeleton-box skeleton-line wide" />
-        <span className="skeleton-box skeleton-line short" />
-      </div>
-    ))}
-  </div>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div className="frontend-skeleton-row" key={index}>
+                    <span className="skeleton-box skeleton-icon" />
+                    <span className="skeleton-box skeleton-line wide" />
+                    <span className="skeleton-box skeleton-line short" />
+                  </div>
+                ))}
+              </div>
             ) : activities.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">
@@ -3164,14 +3157,14 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
             {trashLoading ? (
               <div className="frontend-skeleton-list" aria-label="Loading activity">
-    {Array.from({ length: 6 }).map((_, index) => (
-      <div className="frontend-skeleton-row" key={index}>
-        <span className="skeleton-box skeleton-icon" />
-        <span className="skeleton-box skeleton-line wide" />
-        <span className="skeleton-box skeleton-line short" />
-      </div>
-    ))}
-  </div>
+                {Array.from({ length: 6 }).map((_, index) => (
+                  <div className="frontend-skeleton-row" key={index}>
+                    <span className="skeleton-box skeleton-icon" />
+                    <span className="skeleton-box skeleton-line wide" />
+                    <span className="skeleton-box skeleton-line short" />
+                  </div>
+                ))}
+              </div>
             ) : trashFiles.length === 0 && trashFolders.length === 0 ? (
               <div className="empty-state">
                 <div className="empty-icon">
@@ -3302,16 +3295,16 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             </div>
 
             {recentLoading ? (
-  <div className="frontend-skeleton-list recent-skeleton" aria-label="Loading recent files">
-    {Array.from({ length: 5 }).map((_, index) => (
-      <div className="frontend-skeleton-row" key={index}>
-        <span className="skeleton-box skeleton-icon" />
-        <span className="skeleton-box skeleton-line wide" />
-        <span className="skeleton-box skeleton-line short" />
-      </div>
-    ))}
-  </div>
-) : (
+              <div className="frontend-skeleton-list recent-skeleton" aria-label="Loading recent files">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div className="frontend-skeleton-row" key={index}>
+                    <span className="skeleton-box skeleton-icon" />
+                    <span className="skeleton-box skeleton-line wide" />
+                    <span className="skeleton-box skeleton-line short" />
+                  </div>
+                ))}
+              </div>
+            ) : (
               <div className="file-area">
                 {filteredRecentFiles.length === 0 ? (
                   <div className="empty-state">
@@ -3352,13 +3345,13 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                           style={
                             viewMode === "grid"
                               ? {
-                                  position: "relative",
-                                  overflow: "visible",
-                                  zIndex:
-                                    recentGridMenuOpen === file.id
-                                      ? 1000
-                                      : 1,
-                                }
+                                position: "relative",
+                                overflow: "visible",
+                                zIndex:
+                                  recentGridMenuOpen === file.id
+                                    ? 1000
+                                    : 1,
+                              }
                               : undefined
                           }
                         >
@@ -3601,17 +3594,17 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               )}
             </div>
 
-           {starredLoading ? (
-  <div className="frontend-skeleton-list" aria-label="Loading starred items">
-    {Array.from({ length: 5 }).map((_, index) => (
-      <div className="frontend-skeleton-row" key={index}>
-        <span className="skeleton-box skeleton-icon" />
-        <span className="skeleton-box skeleton-line wide" />
-        <span className="skeleton-box skeleton-line short" />
-      </div>
-    ))}
-  </div>
-) : (
+            {starredLoading ? (
+              <div className="frontend-skeleton-list" aria-label="Loading starred items">
+                {Array.from({ length: 5 }).map((_, index) => (
+                  <div className="frontend-skeleton-row" key={index}>
+                    <span className="skeleton-box skeleton-icon" />
+                    <span className="skeleton-box skeleton-line wide" />
+                    <span className="skeleton-box skeleton-line short" />
+                  </div>
+                ))}
+              </div>
+            ) : (
               <div className="file-area">
                 {filteredStarredFolders.length > 0 && (
                   <section>
@@ -3784,12 +3777,12 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               </button>
 
                               <button
-  className="file-action"
-  onClick={() => openPublicLinkModal(file)}
->
-  🔗
-  Public Link
-</button>
+                                className="file-action"
+                                onClick={() => openPublicLinkModal(file)}
+                              >
+                                🔗
+                                Public Link
+                              </button>
 
                               <button
                                 className="file-action"
@@ -3891,15 +3884,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                 </div>
 
                 {sharedLoading ? (
-                   <div className="frontend-skeleton-list" aria-label="Loading shared items">
-    {Array.from({ length: 5 }).map((_, index) => (
-      <div className="frontend-skeleton-row" key={index}>
-        <span className="skeleton-box skeleton-icon" />
-        <span className="skeleton-box skeleton-line wide" />
-        <span className="skeleton-box skeleton-line short" />
-      </div>
-    ))}
-  </div>
+                  <div className="frontend-skeleton-list" aria-label="Loading shared items">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <div className="frontend-skeleton-row" key={index}>
+                        <span className="skeleton-box skeleton-icon" />
+                        <span className="skeleton-box skeleton-line wide" />
+                        <span className="skeleton-box skeleton-line short" />
+                      </div>
+                    ))}
+                  </div>
                 ) : filteredSharedResources.length > 0 ? (
                   <section className="shared-items-section">
                     <h3 className="section-title">
@@ -3915,7 +3908,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                           >
                             <div className="file-icon">
                               {resource.resource_type ===
-                              "folder" ? (
+                                "folder" ? (
                                 <FolderIcon size={30} />
                               ) : (
                                 <FileIcon
@@ -3940,7 +3933,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               style={{
                                 cursor:
                                   resource.resource_type ===
-                                  "folder"
+                                    "folder"
                                     ? "pointer"
                                     : "default",
                               }}
@@ -3951,11 +3944,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
                               <span>
                                 {resource.resource_type ===
-                                "folder"
+                                  "folder"
                                   ? "Folder"
                                   : formatFileSize(
-                                      resource.size_bytes
-                                    )}
+                                    resource.size_bytes
+                                  )}
                               </span>
                             </div>
 
@@ -3991,7 +3984,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                             </details>
 
                             {resource.resource_type ===
-                            "folder" ? (
+                              "folder" ? (
                               <button
                                 className="file-action"
                                 onClick={() =>
@@ -4083,7 +4076,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   </div>
                 </header>
 
-            <div className="breadcrumbs">
+                <div className="breadcrumbs">
                   {sharedBreadcrumbs.map(
                     (breadcrumb, index) => {
                       const isLast =
@@ -4678,9 +4671,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                             <div
                               className="item-card"
                               key={folder.id}
-                             onContextMenu={(e) => openContextMenu(e, folder, "folder")}>
+                              onContextMenu={(e) => openContextMenu(e, folder, "folder")}>
                               {renamingFolder?.id ===
-                              folder.id ? (
+                                folder.id ? (
                                 <form
                                   className="rename-form"
                                   onSubmit={renameFolder}
@@ -4782,11 +4775,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                       {starLoading[starKey]
                                         ? "..."
                                         : isStarred(
-                                            "folder",
-                                            folder.id
-                                          )
-                                        ? "Unstar"
-                                        : "Star"}
+                                          "folder",
+                                          folder.id
+                                        )
+                                          ? "Unstar"
+                                          : "Star"}
                                     </button>
 
                                     <button
@@ -4825,7 +4818,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                             <div
                               className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.id}
-                             onContextMenu={(e) => openContextMenu(e, file, "file")}>
+                              onContextMenu={(e) => openContextMenu(e, file, "file")}>
                               {renamingFile?.id === file.id ? (
                                 <form className="rename-file-form" onSubmit={renameFile}>
                                   <div className="rename-file-label">Rename file</div>
@@ -4844,96 +4837,96 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                   </div>
                                 </form>
                               ) : (
-                              <>
-                              <label className="file-select-checkbox">
-                                <input
-                                  type="checkbox"
-                                  checked={selectedFileIds.includes(file.id)}
-                                  onChange={() =>
-                                    toggleFileSelection(file.id)
-                                  }
-                                  aria-label={`Select ${file.name}`}
-                                />
-                              </label>
+                                <>
+                                  <label className="file-select-checkbox">
+                                    <input
+                                      type="checkbox"
+                                      checked={selectedFileIds.includes(file.id)}
+                                      onChange={() =>
+                                        toggleFileSelection(file.id)
+                                      }
+                                      aria-label={`Select ${file.name}`}
+                                    />
+                                  </label>
 
-                              <div className="file-icon">
-                                <FileIcon
-                                  fileName={file.name}
-                                />
-                              </div>
-
-                              <div className="file-info">
-                                <strong>
-                                  {file.name}
-                                </strong>
-
-                                <span>
-                                  {formatFileSize(
-                                    file.size_bytes
-                                  )}
-                                </span>
-                                {fileTags[file.id]?.length > 0 && (
-                                  <div className="file-tags-inline">
-                                    {fileTags[file.id].slice(0, 3).map((tag) => (
-                                      <span className="file-tag" key={tag}>#{tag}</span>
-                                    ))}
+                                  <div className="file-icon">
+                                    <FileIcon
+                                      fileName={file.name}
+                                    />
                                   </div>
-                                )}
 
-                              </div>
+                                  <div className="file-info">
+                                    <strong>
+                                      {file.name}
+                                    </strong>
 
-                              <details className="mobile-file-options">
-                                <summary aria-label="File options">⋮</summary>
-                                <div className="mobile-file-options-menu">
-                                  <button type="button" onClick={() => startRenameFile(file)}><EditIcon size={14} /> Rename</button>
-                                  <button type="button" onClick={() => openDetails(file)}>ℹ️ Details</button>
-                                  <button type="button" onClick={() => previewFile(file)}><EyeIcon size={14} /> Preview</button>
-                                  <button type="button" onClick={() => downloadFile(file)}><DownloadIcon size={14} /> Download</button>
-                                  <button type="button" onClick={() => openShareModal("file", file)}><UsersIcon size={14} /> Share</button>
-                                  <button type="button" onClick={() => openPublicLinkModal(file)}>🔗 Public Link</button>
-                                  <button type="button" onClick={() => openVersionHistory(file)}>🕘 Versions</button>
-                                  <button type="button" onClick={() => toggleStar("file", file.id)} disabled={starLoading[starKey]}>
-                                    <StarIcon size={14} filled={isStarred("file", file.id)} />
-                                    {starLoading[starKey] ? "..." : isStarred("file", file.id) ? "Unstar" : "Star"}
-                                  </button>
-                                  <button type="button" className="mobile-file-delete" onClick={() => deleteFile(file)}><TrashIcon size={14} /> Delete</button>
-                                </div>
-                              </details>
+                                    <span>
+                                      {formatFileSize(
+                                        file.size_bytes
+                                      )}
+                                    </span>
+                                    {fileTags[file.id]?.length > 0 && (
+                                      <div className="file-tags-inline">
+                                        {fileTags[file.id].slice(0, 3).map((tag) => (
+                                          <span className="file-tag" key={tag}>#{tag}</span>
+                                        ))}
+                                      </div>
+                                    )}
 
-                              <details className="desktop-file-options">
-                                <summary aria-label="File options">⋯</summary>
-                                <div className="desktop-file-options-menu">
-                                  <button type="button" onClick={() => openDetails(file)}>
-                                    ℹ️ <span>Details</span>
-                                  </button>
-                                  <button type="button" onClick={() => startRenameFile(file)}>
-                                    <EditIcon size={14} /> <span>Rename</span>
-                                  </button>
-                                  <button type="button" onClick={() => previewFile(file)}>
-                                    <EyeIcon size={14} /> <span>Preview</span>
-                                  </button>
-                                  <button type="button" onClick={() => downloadFile(file)}>
-                                    <DownloadIcon size={14} /> <span>Download</span>
-                                  </button>
-                                  <button type="button" onClick={() => openShareModal("file", file)}>
-                                    <UsersIcon size={14} /> <span>Share</span>
-                                  </button>
-                                  <button type="button" onClick={() => openPublicLinkModal(file)}>
-                                    🔗 <span>Public Link</span>
-                                  </button>
-                                  <button type="button" onClick={() => openVersionHistory(file)}>
-                                    🕘 <span>Versions</span>
-                                  </button>
-                                  <button type="button" onClick={() => toggleStar("file", file.id)} disabled={starLoading[starKey]}>
-                                    <StarIcon size={14} filled={isStarred("file", file.id)} />
-                                    <span>{starLoading[starKey] ? "..." : isStarred("file", file.id) ? "Unstar" : "Star"}</span>
-                                  </button>
-                                  <button type="button" className="desktop-file-delete" onClick={() => deleteFile(file)}>
-                                    <TrashIcon size={14} /> <span>Delete</span>
-                                  </button>
-                                </div>
-                              </details>
-                              </>
+                                  </div>
+
+                                  <details className="mobile-file-options">
+                                    <summary aria-label="File options">⋮</summary>
+                                    <div className="mobile-file-options-menu">
+                                      <button type="button" onClick={() => startRenameFile(file)}><EditIcon size={14} /> Rename</button>
+                                      <button type="button" onClick={() => openDetails(file)}>ℹ️ Details</button>
+                                      <button type="button" onClick={() => previewFile(file)}><EyeIcon size={14} /> Preview</button>
+                                      <button type="button" onClick={() => downloadFile(file)}><DownloadIcon size={14} /> Download</button>
+                                      <button type="button" onClick={() => openShareModal("file", file)}><UsersIcon size={14} /> Share</button>
+                                      <button type="button" onClick={() => openPublicLinkModal(file)}>🔗 Public Link</button>
+                                      <button type="button" onClick={() => openVersionHistory(file)}>🕘 Versions</button>
+                                      <button type="button" onClick={() => toggleStar("file", file.id)} disabled={starLoading[starKey]}>
+                                        <StarIcon size={14} filled={isStarred("file", file.id)} />
+                                        {starLoading[starKey] ? "..." : isStarred("file", file.id) ? "Unstar" : "Star"}
+                                      </button>
+                                      <button type="button" className="mobile-file-delete" onClick={() => deleteFile(file)}><TrashIcon size={14} /> Delete</button>
+                                    </div>
+                                  </details>
+
+                                  <details className="desktop-file-options">
+                                    <summary aria-label="File options">⋯</summary>
+                                    <div className="desktop-file-options-menu">
+                                      <button type="button" onClick={() => openDetails(file)}>
+                                        ℹ️ <span>Details</span>
+                                      </button>
+                                      <button type="button" onClick={() => startRenameFile(file)}>
+                                        <EditIcon size={14} /> <span>Rename</span>
+                                      </button>
+                                      <button type="button" onClick={() => previewFile(file)}>
+                                        <EyeIcon size={14} /> <span>Preview</span>
+                                      </button>
+                                      <button type="button" onClick={() => downloadFile(file)}>
+                                        <DownloadIcon size={14} /> <span>Download</span>
+                                      </button>
+                                      <button type="button" onClick={() => openShareModal("file", file)}>
+                                        <UsersIcon size={14} /> <span>Share</span>
+                                      </button>
+                                      <button type="button" onClick={() => openPublicLinkModal(file)}>
+                                        🔗 <span>Public Link</span>
+                                      </button>
+                                      <button type="button" onClick={() => openVersionHistory(file)}>
+                                        🕘 <span>Versions</span>
+                                      </button>
+                                      <button type="button" onClick={() => toggleStar("file", file.id)} disabled={starLoading[starKey]}>
+                                        <StarIcon size={14} filled={isStarred("file", file.id)} />
+                                        <span>{starLoading[starKey] ? "..." : isStarred("file", file.id) ? "Unstar" : "Star"}</span>
+                                      </button>
+                                      <button type="button" className="desktop-file-delete" onClick={() => deleteFile(file)}>
+                                        <TrashIcon size={14} /> <span>Delete</span>
+                                      </button>
+                                    </div>
+                                  </details>
+                                </>
                               )}
                             </div>
                           );
@@ -5040,13 +5033,12 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
               {shareMessage && (
                 <p
-                  className={`message ${
-                    shareMessage
+                  className={`message ${shareMessage
                       .toLowerCase()
                       .includes("success")
                       ? "success"
                       : "error"
-                  }`}
+                    }`}
                 >
                   {shareMessage}
                 </p>
@@ -5202,13 +5194,12 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
               {versionMessage && (
                 <p
-                  className={`message ${
-                    versionMessage
+                  className={`message ${versionMessage
                       .toLowerCase()
                       .includes("success")
                       ? "success"
                       : "error"
-                  }`}
+                    }`}
                 >
                   {versionMessage}
                 </p>
@@ -5405,19 +5396,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
               {publicLinkMessage && (
                 <p
-                  className={`message ${
-                    publicLinkMessage
+                  className={`message ${publicLinkMessage
                       .toLowerCase()
                       .includes("success") ||
-                    publicLinkMessage
-                      .toLowerCase()
-                      .includes("copied") ||
-                    publicLinkMessage
-                      .toLowerCase()
-                      .includes("revoked")
+                      publicLinkMessage
+                        .toLowerCase()
+                        .includes("copied") ||
+                      publicLinkMessage
+                        .toLowerCase()
+                        .includes("revoked")
                       ? "success"
                       : "error"
-                  }`}
+                    }`}
                 >
                   {publicLinkMessage}
                 </p>
@@ -6378,7 +6368,6 @@ function formatFileSize(bytes) {
   return `${(
     bytes /
     Math.pow(1024, index)
-  ).toFixed(index === 0 ? 0 : 1)} ${
-    units[index]
-  }`;
+  ).toFixed(index === 0 ? 0 : 1)} ${units[index]
+    }`;
 }
