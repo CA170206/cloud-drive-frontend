@@ -479,7 +479,10 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
 
         {/* Hero Animated Dashboard App Mockup */}
         <AnimatedDashboardMockup />
+      </section>
 
+      {/* Hero Action Buttons & Trust Checks (Visible on Scroll) */}
+      <section className="landing-hero-cta-scroll">
         <div className="landing-hero-cta">
           <button
             type="button"
