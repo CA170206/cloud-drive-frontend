@@ -104,7 +104,7 @@ export default function Home() {
         const data = await safeParseJson(response);
         if (data.user) setUser(data.user);
       } else {
-        try { localStorage.removeItem("cloud-drive-token"); } catch (e) {}
+        try { localStorage.removeItem("cloud-drive-token"); } catch (e) { }
       }
     } catch (error) {
       console.error("Auth check failed:", error);
@@ -663,7 +663,7 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
       }
 
       if (data.token) {
-        try { localStorage.setItem("cloud-drive-token", data.token); } catch (e) {}
+        try { localStorage.setItem("cloud-drive-token", data.token); } catch (e) { }
       }
 
       onLogin(data.user);
@@ -721,7 +721,7 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
       }
 
       if (data.token) {
-        try { localStorage.setItem("cloud-drive-token", data.token); } catch (e) {}
+        try { localStorage.setItem("cloud-drive-token", data.token); } catch (e) { }
       }
 
       if (data.user) {
@@ -2101,6 +2101,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   };
 
   const previewFile = async (file, isShared = false) => {
+    if (!file) return;
+
     setPreviewLoading(true);
     setPreviewFileData({
       ...file,
@@ -2112,58 +2114,78 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setImageZoom(1);
     setImageRotation(0);
 
-    if (previewUrl) {
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("cloud-drive-token")
+        : null;
+
+    const baseDownloadUrl = isShared
+      ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
+      : `${API_URL}/api/files/${file.id}/download`;
+
+    const authQuery = token ? `?token=${encodeURIComponent(token)}` : "";
+    const inlineUrl = `${baseDownloadUrl}${authQuery}${authQuery ? "&" : "?"}disposition=inline`;
+
+    const previewType = getPreviewType(file.name);
+
+    if (previewUrl && previewUrl.startsWith("blob:")) {
       window.URL.revokeObjectURL(previewUrl);
-      setPreviewUrl("");
     }
+    setPreviewUrl("");
 
     try {
-      const url = isShared
-        ? `${API_URL}/api/shares/shared-with-me/${file.id}/download`
-        : `${API_URL}/api/files/${file.id}/download`;
-
-      const response = await authenticatedFetch(url, {
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        alert("Unable to preview file");
-        setPreviewFileData(null);
+      if (
+        previewType === "video" ||
+        previewType === "audio" ||
+        previewType === "pdf" ||
+        previewType === "image"
+      ) {
+        // Direct media streaming / viewing URL!
+        // No need to buffer entire video or PDF into browser RAM!
+        setPreviewUrl(inlineUrl);
+        setPreviewLoading(false);
         return;
       }
 
-      const blob = await response.blob();
-      const previewType = getPreviewType(file.name);
-
       if (previewType === "text") {
-        const text = await blob.text();
-        setPreviewText(text);
-      } else if (
+        const response = await authenticatedFetch(baseDownloadUrl);
+        if (response.ok) {
+          const text = await response.text();
+          setPreviewText(text);
+        }
+        setPreviewLoading(false);
+        return;
+      }
+
+      if (
         previewType === "powerpoint" ||
         previewType === "spreadsheet" ||
         previewType === "document"
       ) {
-        const buffer = await blob.arrayBuffer();
-        setPreviewArrayBuffer(buffer);
-        setPreviewPptxBuffer(buffer);
-      } else {
-        const objectUrl = window.URL.createObjectURL(blob);
-        setPreviewUrl(objectUrl);
+        const response = await authenticatedFetch(baseDownloadUrl);
+        if (response.ok) {
+          const buffer = await response.arrayBuffer();
+          setPreviewArrayBuffer(buffer);
+          setPreviewPptxBuffer(buffer);
+        }
+        setPreviewLoading(false);
+        return;
       }
+
+      // For unsupported/unpreviewed files, set inlineUrl for reference and stop loading
+      setPreviewUrl(inlineUrl);
+      setPreviewLoading(false);
     } catch (error) {
-      console.error("Preview failed:", error);
-      alert("Unable to preview file");
-      setPreviewFileData(null);
-      setPreviewText("");
-      setPreviewArrayBuffer(null);
-      setPreviewPptxBuffer(null);
+      console.warn("Preview load error:", error);
+      // Keep modal open with inlineUrl available
+      setPreviewUrl(inlineUrl);
     } finally {
       setPreviewLoading(false);
     }
   };
 
   const closePreview = () => {
-    if (previewUrl) {
+    if (previewUrl && previewUrl.startsWith("blob:")) {
       window.URL.revokeObjectURL(previewUrl);
     }
 
@@ -2177,74 +2199,38 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setImageRotation(0);
   };
 
-  const downloadFile = async (file) => {
-    try {
-      const response = await authenticatedFetch(
-        `${API_URL}/api/files/${file.id}/download`,
-        {
-          credentials: "include",
-        }
-      );
+  const downloadFile = (file) => {
+    if (!file || !file.id) return;
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("cloud-drive-token")
+        : null;
+    const downloadUrl = `${API_URL}/api/files/${file.id}/download${token ? `?token=${encodeURIComponent(token)}` : ""
+      }`;
 
-      if (!response.ok) {
-        alert("Download failed");
-        return;
-      }
-
-      const blob = await response.blob();
-
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = file.name;
-
-      document.body.appendChild(link);
-
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Download failed:", error);
-      alert("Unable to download file");
-    }
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = file.name || "download";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
-  const downloadSharedFile = async (file) => {
-    try {
-      const response = await authenticatedFetch(
-        `${API_URL}/api/shares/shared-with-me/${file.id}/download`,
-        {
-          credentials: "include",
-        }
-      );
+  const downloadSharedFile = (file) => {
+    if (!file || !file.id) return;
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("cloud-drive-token")
+        : null;
+    const downloadUrl = `${API_URL}/api/shares/shared-with-me/${file.id}/download${token ? `?token=${encodeURIComponent(token)}` : ""
+      }`;
 
-      if (!response.ok) {
-        alert("Download failed");
-        return;
-      }
-
-      const blob = await response.blob();
-
-      const url = window.URL.createObjectURL(blob);
-
-      const link = document.createElement("a");
-
-      link.href = url;
-      link.download = file.name;
-
-      document.body.appendChild(link);
-
-      link.click();
-      link.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error("Shared download failed:", error);
-      alert("Unable to download shared file");
-    }
+    const link = document.createElement("a");
+    link.href = downloadUrl;
+    link.download = file.name || "download";
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
   };
 
 
@@ -2849,49 +2835,23 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     input.click();
   };
 
-  const downloadFileVersion = async (
-    version
-  ) => {
-    if (!versionTarget) return;
+  const downloadFileVersion = (version) => {
+    if (!versionTarget || !version) return;
 
-    try {
-      const response = await authenticatedFetch(
-        `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/download`,
-        {
-          credentials: "include",
-        }
-      );
+    const token =
+      typeof window !== "undefined"
+        ? localStorage.getItem("cloud-drive-token")
+        : null;
+    const downloadUrl = `${API_URL}/api/files/${versionTarget.id}/versions/${version.id}/download${
+      token ? `?token=${encodeURIComponent(token)}` : ""
+    }`;
 
-      if (!response.ok) {
-        const data = await response.json().catch(
-          () => ({})
-        );
-
-        setVersionMessage(
-          data.error?.message ||
-          "Unable to download version"
-        );
-        return;
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-
-      const anchor = document.createElement("a");
-      anchor.href = url;
-      anchor.download = versionTarget.name;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error(
-        "Download version failed:",
-        error
-      );
-      setVersionMessage("Unable to download version");
-    }
+    const anchor = document.createElement("a");
+    anchor.href = downloadUrl;
+    anchor.download = versionTarget.name || "download";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
   };
 
   const restoreVersion = async (version) => {
@@ -2978,7 +2938,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
-      try { localStorage.removeItem("cloud-drive-token"); } catch (e) {}
+      try { localStorage.removeItem("cloud-drive-token"); } catch (e) { }
     }
 
     onLogout();
@@ -3210,8 +3170,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className={`sidebar-item ${activeView === "my-files"
-              ? "active"
-              : ""
+            ? "active"
+            : ""
             }`}
           onClick={() => { openMyFiles(); closeMobileMenu(); }}
         >
@@ -3221,8 +3181,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className={`sidebar-item ${activeView === "shared"
-              ? "active"
-              : ""
+            ? "active"
+            : ""
             }`}
           onClick={() => { openSharedWithMe(); closeMobileMenu(); }}
         >
@@ -3232,8 +3192,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className={`sidebar-item ${activeView === "recent"
-              ? "active"
-              : ""
+            ? "active"
+            : ""
             }`}
           onClick={() => { openRecent(); closeMobileMenu(); }}
         >
@@ -3245,8 +3205,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className={`sidebar-item ${activeView === "starred"
-              ? "active"
-              : ""
+            ? "active"
+            : ""
             }`}
           onClick={() => { openStarred(); closeMobileMenu(); }}
         >
@@ -3256,8 +3216,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className={`sidebar-item ${activeView === "activity"
-              ? "active"
-              : ""
+            ? "active"
+            : ""
             }`}
           onClick={() => { openActivity(); closeMobileMenu(); }}
         >
@@ -3267,8 +3227,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
         <button
           className={`sidebar-item ${activeView === "trash"
-              ? "active"
-              : ""
+            ? "active"
+            : ""
             }`}
           onClick={() => { openTrash(); closeMobileMenu(); }}
         >
@@ -3647,7 +3607,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   aria-label="List view"
                   title="List view"
                 >
-                  ☷
+                  <ListLayoutIcon size={16} />
                 </button>
                 <button
                   type="button"
@@ -3656,7 +3616,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   aria-label="Grid view"
                   title="Grid view"
                 >
-                  ▦
+                  <GridLayoutIcon size={16} />
                 </button>
               </div>
 
@@ -4868,7 +4828,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   aria-label="List view"
                   title="List view"
                 >
-                  ☷
+                  <ListLayoutIcon size={16} />
                 </button>
                 <button
                   type="button"
@@ -4877,7 +4837,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                   aria-label="Grid view"
                   title="Grid view"
                 >
-                  ▦
+                  <GridLayoutIcon size={16} />
                 </button>
               </div>
 
@@ -5434,10 +5394,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               {shareMessage && (
                 <p
                   className={`message ${shareMessage
-                      .toLowerCase()
-                      .includes("success")
-                      ? "success"
-                      : "error"
+                    .toLowerCase()
+                    .includes("success")
+                    ? "success"
+                    : "error"
                     }`}
                 >
                   {shareMessage}
@@ -5595,10 +5555,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               {versionMessage && (
                 <p
                   className={`message ${versionMessage
-                      .toLowerCase()
-                      .includes("success")
-                      ? "success"
-                      : "error"
+                    .toLowerCase()
+                    .includes("success")
+                    ? "success"
+                    : "error"
                     }`}
                 >
                   {versionMessage}
@@ -5797,16 +5757,16 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
               {publicLinkMessage && (
                 <p
                   className={`message ${publicLinkMessage
+                    .toLowerCase()
+                    .includes("success") ||
+                    publicLinkMessage
                       .toLowerCase()
-                      .includes("success") ||
-                      publicLinkMessage
-                        .toLowerCase()
-                        .includes("copied") ||
-                      publicLinkMessage
-                        .toLowerCase()
-                        .includes("revoked")
-                      ? "success"
-                      : "error"
+                      .includes("copied") ||
+                    publicLinkMessage
+                      .toLowerCase()
+                      .includes("revoked")
+                    ? "success"
+                    : "error"
                     }`}
                 >
                   {publicLinkMessage}
@@ -5927,18 +5887,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     {getPreviewType(previewFileData.name) === "pdf"
                       ? "📄 PDF Explorer"
                       : getPreviewType(previewFileData.name) === "image"
-                      ? "🖼️ Photos"
-                      : getPreviewType(previewFileData.name) === "spreadsheet"
-                      ? "📈 Excel Spreadsheet"
-                      : getPreviewType(previewFileData.name) === "powerpoint"
-                      ? "📊 PowerPoint"
-                      : getPreviewType(previewFileData.name) === "document"
-                      ? "📝 Word Document"
-                      : getPreviewType(previewFileData.name) === "video"
-                      ? "🎬 Video Player"
-                      : getPreviewType(previewFileData.name) === "audio"
-                      ? "🎵 Audio Player"
-                      : "📄 File"}
+                        ? "🖼️ Photos"
+                        : getPreviewType(previewFileData.name) === "spreadsheet"
+                          ? "📈 Excel Spreadsheet"
+                          : getPreviewType(previewFileData.name) === "powerpoint"
+                            ? "📊 PowerPoint"
+                            : getPreviewType(previewFileData.name) === "document"
+                              ? "📝 Word Document"
+                              : getPreviewType(previewFileData.name) === "video"
+                                ? "🎬 Video Player"
+                                : getPreviewType(previewFileData.name) === "audio"
+                                  ? "🎵 Audio Player"
+                                  : "📄 File"}
                   </span>
                 </div>
                 <span className="preview-size-meta">
@@ -6202,8 +6162,19 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       </div>
                       <h3>Preview Unavailable</h3>
                       <p>
-                        This file type cannot be displayed directly in the browser.
+                        This file type cannot be displayed directly in the browser. You can download it to open it on your device.
                       </p>
+                      <button
+                        type="button"
+                        className="preview-unpreviewed-download-btn"
+                        onClick={() =>
+                          previewFileData.shared
+                            ? downloadSharedFile(previewFileData)
+                            : downloadFile(previewFileData)
+                        }
+                      >
+                        <DownloadIcon size={16} /> Download {previewFileData.name} ({formatFileSize(previewFileData.size_bytes)})
+                      </button>
                     </div>
                   )}
 
@@ -6216,6 +6187,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     </div>
 
                     <div className="constant-preview-footer-actions">
+                      <button
+                        type="button"
+                        className="file-action primary-download"
+                        onClick={() =>
+                          previewFileData.shared
+                            ? downloadSharedFile(previewFileData)
+                            : downloadFile(previewFileData)
+                        }
+                      >
+                        <DownloadIcon size={15} />
+                        Download File
+                      </button>
                       {getPreviewType(previewFileData.name) === "pdf" && previewUrl && (
                         <button
                           type="button"
@@ -6264,17 +6247,6 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                           📝 Open in Word
                         </button>
                       )}
-                      <button
-                        className="file-action"
-                        onClick={() =>
-                          previewFileData.shared
-                            ? downloadSharedFile(previewFileData)
-                            : downloadFile(previewFileData)
-                        }
-                      >
-                        <DownloadIcon size={15} />
-                        Download File
-                      </button>
                     </div>
                   </div>
                 </div>
@@ -6611,6 +6583,30 @@ function LogoutIcon({ size = 20 }) {
   );
 }
 
+function ListLayoutIcon({ size = 16 }) {
+  return (
+    <Icon size={size}>
+      <line x1="8" y1="6" x2="21" y2="6" />
+      <line x1="8" y1="12" x2="21" y2="12" />
+      <line x1="8" y1="18" x2="21" y2="18" />
+      <line x1="3" y1="6" x2="3.01" y2="6" />
+      <line x1="3" y1="12" x2="3.01" y2="12" />
+      <line x1="3" y1="18" x2="3.01" y2="18" />
+    </Icon>
+  );
+}
+
+function GridLayoutIcon({ size = 16 }) {
+  return (
+    <Icon size={size}>
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+    </Icon>
+  );
+}
+
 function PptxPreviewPane({ arrayBuffer }) {
   const containerRef = useRef(null);
   const [error, setError] = useState("");
@@ -6764,9 +6760,9 @@ function SpreadsheetPreviewPane({ arrayBuffer, fileName }) {
   const query = searchQuery.trim().toLowerCase();
   const displayRows = query
     ? rawRows.filter((row) =>
-        Array.isArray(row) &&
-        row.some((val) => String(val).toLowerCase().includes(query))
-      )
+      Array.isArray(row) &&
+      row.some((val) => String(val).toLowerCase().includes(query))
+    )
     : rawRows;
 
   const getColLetter = (idx) => {
