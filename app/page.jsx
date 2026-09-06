@@ -7,9 +7,7 @@ import { upload } from "@vercel/blob/client";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== "undefined" && window.location.hostname.includes("vercel.app")
-    ? "https://cloud-drive-internship.vercel.app"
-    : "http://localhost:5000");
+  "https://cloud-drive-internship.vercel.app";
 
 const recentGridMenuButtonStyle = {
   width: "100%",
