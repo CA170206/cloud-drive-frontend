@@ -924,6 +924,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
   const [previewText, setPreviewText] = useState("");
   const [previewLoading, setPreviewLoading] = useState(false);
   const [previewPptxBuffer, setPreviewPptxBuffer] = useState(null);
+  const [previewArrayBuffer, setPreviewArrayBuffer] = useState(null);
+  const [imageZoom, setImageZoom] = useState(1);
+  const [imageRotation, setImageRotation] = useState(0);
 
   const [detailsTarget, setDetailsTarget] = useState(null);
 
@@ -1135,7 +1138,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
   useEffect(() => {
     const handler = (event) => {
-      if (event.key === "Escape") { setContextMenu(null); setTagEditor(null); setShortcutHelpOpen(false); return; }
+      if (event.key === "Escape") { setContextMenu(null); setTagEditor(null); setShortcutHelpOpen(false); closePreview(); return; }
       const t = event.target;
       const typing = t instanceof HTMLInputElement || t instanceof HTMLTextAreaElement || t instanceof HTMLSelectElement || t?.isContentEditable;
       if (typing) return;
@@ -2053,6 +2056,22 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setDetailsTarget(null);
   };
 
+  const openInNewTab = (url) => {
+    if (!url) return;
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
+  const openFileItem = (file, isShared = false) => {
+    if (!file) return;
+    const normalized = {
+      ...file,
+      id: file.id || file.resource_id,
+      name: file.name || file.resource_name,
+      size_bytes: file.size_bytes !== undefined ? file.size_bytes : 0,
+    };
+    previewFile(normalized, isShared);
+  };
+
   const previewFile = async (file, isShared = false) => {
     setPreviewLoading(true);
     setPreviewFileData({
@@ -2061,6 +2080,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     });
     setPreviewText("");
     setPreviewPptxBuffer(null);
+    setPreviewArrayBuffer(null);
+    setImageZoom(1);
+    setImageRotation(0);
 
     if (previewUrl) {
       window.URL.revokeObjectURL(previewUrl);
@@ -2083,20 +2105,18 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       }
 
       const blob = await response.blob();
-
-      /*
-       * TEXT FILES:
-       * Read the file directly and render the text in a <pre>.
-       * This intentionally avoids an iframe so the file's own
-       * HTML/background styling cannot affect our preview UI.
-       */
       const previewType = getPreviewType(file.name);
 
       if (previewType === "text") {
         const text = await blob.text();
         setPreviewText(text);
-      } else if (previewType === "powerpoint") {
+      } else if (
+        previewType === "powerpoint" ||
+        previewType === "spreadsheet" ||
+        previewType === "document"
+      ) {
         const buffer = await blob.arrayBuffer();
+        setPreviewArrayBuffer(buffer);
         setPreviewPptxBuffer(buffer);
       } else {
         const objectUrl = window.URL.createObjectURL(blob);
@@ -2107,6 +2127,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
       alert("Unable to preview file");
       setPreviewFileData(null);
       setPreviewText("");
+      setPreviewArrayBuffer(null);
+      setPreviewPptxBuffer(null);
     } finally {
       setPreviewLoading(false);
     }
@@ -2120,8 +2142,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
     setPreviewUrl("");
     setPreviewText("");
     setPreviewPptxBuffer(null);
+    setPreviewArrayBuffer(null);
     setPreviewFileData(null);
     setPreviewLoading(false);
+    setImageZoom(1);
+    setImageRotation(0);
   };
 
   const downloadFile = async (file) => {
@@ -3365,7 +3390,13 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
 
               <div className="dashboard-file-list">
                 {recentFiles.slice(0, 5).map((file) => (
-                  <div className="dashboard-file-row" key={file.id}>
+                  <div
+                    className="dashboard-file-row"
+                    key={file.id}
+                    onDoubleClick={() => openFileItem(file, false)}
+                    style={{ cursor: "pointer" }}
+                    title={`Double-click to open ${file.name}`}
+                  >
                     <div className="dashboard-file-type"><FileIcon fileName={file.name} /></div>
                     <div className="dashboard-file-name">
                       <strong>{file.name}</strong>
@@ -3637,6 +3668,8 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                         <div
                           className={`file-row shared-resource-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                           key={file.id}
+                          onDoubleClick={() => openFileItem(file, false)}
+                          title={`Double-click to open ${file.name}`}
                           style={
                             viewMode === "grid"
                               ? {
@@ -3646,8 +3679,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                   recentGridMenuOpen === file.id
                                     ? 1000
                                     : 1,
+                                cursor: "pointer",
                               }
-                              : undefined
+                              : { cursor: "pointer" }
                           }
                         >
                           <div className="file-icon">
@@ -3998,6 +4032,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                             <div
                               className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.resource_id}
+                              onDoubleClick={() => openFileItem(file, false)}
+                              style={{ cursor: "pointer" }}
+                              title={`Double-click to open ${file.name}`}
                             >
                               <div className="file-icon">
                                 <FileIcon
@@ -4200,6 +4237,26 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                           <div
                             className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                             key={resource.share_id}
+                            onDoubleClick={() => {
+                              if (resource.resource_type === "folder") {
+                                openSharedFolder(resource);
+                              } else {
+                                openFileItem(
+                                  {
+                                    id: resource.resource_id,
+                                    name: resource.resource_name,
+                                    size_bytes: resource.size_bytes,
+                                  },
+                                  true
+                                );
+                              }
+                            }}
+                            style={{ cursor: "pointer" }}
+                            title={
+                              resource.resource_type === "folder"
+                                ? `Double-click to open folder ${resource.resource_name}`
+                                : `Double-click to open ${resource.resource_name}`
+                            }
                           >
                             <div className="file-icon">
                               {resource.resource_type ===
@@ -4215,24 +4272,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               )}
                             </div>
 
-                            <div
-                              className="file-info"
-                              onDoubleClick={() => {
-                                if (
-                                  resource.resource_type ===
-                                  "folder"
-                                ) {
-                                  openSharedFolder(resource);
-                                }
-                              }}
-                              style={{
-                                cursor:
-                                  resource.resource_type ===
-                                    "folder"
-                                    ? "pointer"
-                                    : "default",
-                              }}
-                            >
+                            <div className="file-info">
                               <strong>
                                 {resource.resource_name}
                               </strong>
@@ -4517,6 +4557,9 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                               <div
                                 className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                                 key={file.id}
+                                onDoubleClick={() => openFileItem(file, true)}
+                                style={{ cursor: "pointer" }}
+                                title={`Double-click to open ${file.name}`}
                               >
                                 <div className="file-icon">
                                   <FileIcon
@@ -5113,7 +5156,15 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                             <div
                               className={`file-row ${viewMode === "grid" ? "grid-view-item" : ""}`}
                               key={file.id}
-                              onContextMenu={(e) => openContextMenu(e, file, "file")}>
+                              onContextMenu={(e) => openContextMenu(e, file, "file")}
+                              onDoubleClick={() => {
+                                if (renamingFile?.id !== file.id) {
+                                  openFileItem(file, false);
+                                }
+                              }}
+                              style={{ cursor: "pointer" }}
+                              title={`Double-click to open ${file.name}`}
+                            >
                               {renamingFile?.id === file.id ? (
                                 <form className="rename-file-form" onSubmit={renameFile}>
                                   <div className="rename-file-label">Rename file</div>
@@ -5133,7 +5184,11 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                                 </form>
                               ) : (
                                 <>
-                                  <label className="file-select-checkbox">
+                                  <label
+                                    className="file-select-checkbox"
+                                    onClick={(e) => e.stopPropagation()}
+                                    onDoubleClick={(e) => e.stopPropagation()}
+                                  >
                                     <input
                                       type="checkbox"
                                       checked={selectedFileIds.includes(file.id)}
@@ -5815,19 +5870,115 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="preview-header">
-              <div>
-                <strong>{previewFileData.name}</strong>
-                <span>
+              <div className="preview-header-info">
+                <div className="preview-title-row">
+                  <strong title={previewFileData.name}>{previewFileData.name}</strong>
+                  <span className={`preview-app-badge badge-${getPreviewType(previewFileData.name)}`}>
+                    {getPreviewType(previewFileData.name) === "pdf"
+                      ? "📄 PDF Explorer"
+                      : getPreviewType(previewFileData.name) === "image"
+                      ? "🖼️ Photos"
+                      : getPreviewType(previewFileData.name) === "spreadsheet"
+                      ? "📈 Excel Spreadsheet"
+                      : getPreviewType(previewFileData.name) === "powerpoint"
+                      ? "📊 PowerPoint"
+                      : getPreviewType(previewFileData.name) === "document"
+                      ? "📝 Word Document"
+                      : getPreviewType(previewFileData.name) === "video"
+                      ? "🎬 Video Player"
+                      : getPreviewType(previewFileData.name) === "audio"
+                      ? "🎵 Audio Player"
+                      : "📄 File"}
+                  </span>
+                </div>
+                <span className="preview-size-meta">
                   {formatFileSize(previewFileData.size_bytes)}
                 </span>
               </div>
 
-              <button
-                className="preview-close"
-                onClick={closePreview}
-              >
-                ×
-              </button>
+              <div className="preview-header-actions">
+                {getPreviewType(previewFileData.name) === "pdf" && previewUrl && (
+                  <button
+                    type="button"
+                    className="preview-header-action-btn explorer-btn"
+                    title="Open in Explorer / Browser Window"
+                    onClick={() => openInNewTab(previewUrl)}
+                  >
+                    📄 Open in Explorer
+                  </button>
+                )}
+                {getPreviewType(previewFileData.name) === "image" && previewUrl && (
+                  <button
+                    type="button"
+                    className="preview-header-action-btn photos-btn"
+                    title="Open in Photos / New Tab"
+                    onClick={() => openInNewTab(previewUrl)}
+                  >
+                    🖼️ Open in Photos
+                  </button>
+                )}
+                {getPreviewType(previewFileData.name) === "spreadsheet" && (
+                  <button
+                    type="button"
+                    className="preview-header-action-btn excel-btn"
+                    title="Open in Microsoft Excel (Download)"
+                    onClick={() =>
+                      previewFileData.shared
+                        ? downloadSharedFile(previewFileData)
+                        : downloadFile(previewFileData)
+                    }
+                  >
+                    📈 Open in Excel
+                  </button>
+                )}
+                {getPreviewType(previewFileData.name) === "powerpoint" && (
+                  <button
+                    type="button"
+                    className="preview-header-action-btn ppt-btn"
+                    title="Open in Microsoft PowerPoint (Download)"
+                    onClick={() =>
+                      previewFileData.shared
+                        ? downloadSharedFile(previewFileData)
+                        : downloadFile(previewFileData)
+                    }
+                  >
+                    📊 Open in PowerPoint
+                  </button>
+                )}
+                {getPreviewType(previewFileData.name) === "document" && (
+                  <button
+                    type="button"
+                    className="preview-header-action-btn word-btn"
+                    title="Open in Microsoft Word (Download)"
+                    onClick={() =>
+                      previewFileData.shared
+                        ? downloadSharedFile(previewFileData)
+                        : downloadFile(previewFileData)
+                    }
+                  >
+                    📝 Open in Word
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="preview-header-action-btn"
+                  onClick={() =>
+                    previewFileData.shared
+                      ? downloadSharedFile(previewFileData)
+                      : downloadFile(previewFileData)
+                  }
+                  title="Download file"
+                >
+                  <DownloadIcon size={14} /> Download
+                </button>
+                <button
+                  className="preview-close"
+                  onClick={closePreview}
+                  title="Close (Esc)"
+                >
+                  ×
+                </button>
+              </div>
             </div>
 
             <div className="preview-content">
@@ -5840,34 +5991,127 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     />
                   </div>
                   <h3>Loading Preview</h3>
-                  <p>Preparing your file preview...</p>
+                  <p>Preparing file preview...</p>
                 </div>
               ) : (
                 previewUrl ||
-                getPreviewType(previewFileData.name) === "text" ||
-                getPreviewType(previewFileData.name) === "powerpoint"
+                previewText ||
+                previewArrayBuffer ||
+                previewPptxBuffer
               ) ? (
                 <div className="constant-preview-viewer">
                   {getPreviewType(previewFileData.name) === "image" ? (
-                    <img
-                      src={previewUrl}
-                      alt={previewFileData.name}
-                      className="constant-preview-media"
-                    />
+                    <div className="photos-preview-wrapper">
+                      <div className="photos-toolbar">
+                        <button
+                          type="button"
+                          className="photos-tool-btn"
+                          title="Zoom Out"
+                          onClick={() => setImageZoom((z) => Math.max(0.25, Math.round((z - 0.25) * 100) / 100))}
+                        >
+                          🔍 −
+                        </button>
+                        <button
+                          type="button"
+                          className="photos-tool-btn zoom-indicator"
+                          title="Reset Zoom"
+                          onClick={() => setImageZoom(1)}
+                        >
+                          {Math.round(imageZoom * 100)}%
+                        </button>
+                        <button
+                          type="button"
+                          className="photos-tool-btn"
+                          title="Zoom In"
+                          onClick={() => setImageZoom((z) => Math.min(4, Math.round((z + 0.25) * 100) / 100))}
+                        >
+                          🔍 +
+                        </button>
+                        <button
+                          type="button"
+                          className="photos-tool-btn"
+                          title="Rotate 90° Clockwise"
+                          onClick={() => setImageRotation((r) => (r + 90) % 360)}
+                        >
+                          🔄 Rotate
+                        </button>
+                        <button
+                          type="button"
+                          className="photos-tool-btn"
+                          title="Open in Photos / New Tab"
+                          onClick={() => openInNewTab(previewUrl)}
+                        >
+                          🖼️ Open Tab
+                        </button>
+                      </div>
+                      <div className="photos-viewport">
+                        <img
+                          src={previewUrl}
+                          alt={previewFileData.name}
+                          className="photos-preview-img"
+                          style={{
+                            transform: `scale(${imageZoom}) rotate(${imageRotation}deg)`,
+                          }}
+                        />
+                      </div>
+                    </div>
                   ) : getPreviewType(previewFileData.name) === "pdf" ? (
-                    <iframe
-                      src={previewUrl}
-                      title={previewFileData.name}
-                      className="constant-preview-frame"
-                    />
-                  ) : getPreviewType(previewFileData.name) === "text" ? (
-                    <pre className="constant-preview-text">
-                      {previewText}
-                    </pre>
+                    <div className="pdf-preview-wrapper">
+                      <div className="pdf-toolbar">
+                        <button
+                          type="button"
+                          className="pdf-explorer-btn"
+                          onClick={() => openInNewTab(previewUrl)}
+                        >
+                          📄 Open in Explorer / Browser Window
+                        </button>
+                      </div>
+                      <iframe
+                        src={previewUrl}
+                        title={previewFileData.name}
+                        className="constant-preview-frame"
+                      />
+                    </div>
+                  ) : getPreviewType(previewFileData.name) === "spreadsheet" ? (
+                    <div className="spreadsheet-preview-shell">
+                      {previewArrayBuffer ? (
+                        <SpreadsheetPreviewPane
+                          arrayBuffer={previewArrayBuffer}
+                          fileName={previewFileData.name}
+                        />
+                      ) : (
+                        <div className="constant-preview-placeholder">
+                          <div className="constant-preview-icon">
+                            <FileIcon fileName={previewFileData.name} size={64} />
+                          </div>
+                          <h3>Loading Spreadsheet</h3>
+                          <p>Preparing the Excel spreadsheet...</p>
+                        </div>
+                      )}
+                    </div>
+                  ) : getPreviewType(previewFileData.name) === "document" ? (
+                    <div className="docx-preview-shell">
+                      {previewArrayBuffer ? (
+                        <DocxPreviewPane
+                          arrayBuffer={previewArrayBuffer}
+                          fileName={previewFileData.name}
+                        />
+                      ) : (
+                        <div className="constant-preview-placeholder">
+                          <div className="constant-preview-icon">
+                            <FileIcon fileName={previewFileData.name} size={64} />
+                          </div>
+                          <h3>Loading Word Document</h3>
+                          <p>Preparing the document layout...</p>
+                        </div>
+                      )}
+                    </div>
                   ) : getPreviewType(previewFileData.name) === "powerpoint" ? (
                     <div className="pptx-preview-shell">
-                      {previewPptxBuffer ? (
-                        <PptxPreviewPane arrayBuffer={previewPptxBuffer} />
+                      {previewArrayBuffer || previewPptxBuffer ? (
+                        <PptxPreviewPane
+                          arrayBuffer={previewArrayBuffer || previewPptxBuffer}
+                        />
                       ) : (
                         <div className="constant-preview-placeholder">
                           <div className="constant-preview-icon">
@@ -5878,6 +6122,10 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                         </div>
                       )}
                     </div>
+                  ) : getPreviewType(previewFileData.name) === "text" ? (
+                    <pre className="constant-preview-text">
+                      {previewText}
+                    </pre>
                   ) : getPreviewType(previewFileData.name) === "video" ? (
                     <video
                       src={previewUrl}
@@ -5904,30 +6152,80 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                       </div>
                       <h3>Preview Unavailable</h3>
                       <p>
-                        This file type cannot be displayed in the browser.
+                        This file type cannot be displayed directly in the browser.
                       </p>
                     </div>
                   )}
 
                   <div className="constant-preview-footer">
                     <div className="constant-preview-meta">
-                      <span>{previewFileData.name}</span>
+                      <strong>{previewFileData.name}</strong>
                       <span>
                         {formatFileSize(previewFileData.size_bytes)}
                       </span>
                     </div>
 
-                    <button
-                      className="file-action"
-                      onClick={() =>
-                        previewFileData.shared
-                          ? downloadSharedFile(previewFileData)
-                          : downloadFile(previewFileData)
-                      }
-                    >
-                      <DownloadIcon size={15} />
-                      Download File
-                    </button>
+                    <div className="constant-preview-footer-actions">
+                      {getPreviewType(previewFileData.name) === "pdf" && previewUrl && (
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() => openInNewTab(previewUrl)}
+                        >
+                          📄 Open in Explorer
+                        </button>
+                      )}
+                      {getPreviewType(previewFileData.name) === "spreadsheet" && (
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() =>
+                            previewFileData.shared
+                              ? downloadSharedFile(previewFileData)
+                              : downloadFile(previewFileData)
+                          }
+                        >
+                          📈 Open in Excel
+                        </button>
+                      )}
+                      {getPreviewType(previewFileData.name) === "powerpoint" && (
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() =>
+                            previewFileData.shared
+                              ? downloadSharedFile(previewFileData)
+                              : downloadFile(previewFileData)
+                          }
+                        >
+                          📊 Open in PowerPoint
+                        </button>
+                      )}
+                      {getPreviewType(previewFileData.name) === "document" && (
+                        <button
+                          type="button"
+                          className="file-action"
+                          onClick={() =>
+                            previewFileData.shared
+                              ? downloadSharedFile(previewFileData)
+                              : downloadFile(previewFileData)
+                          }
+                        >
+                          📝 Open in Word
+                        </button>
+                      )}
+                      <button
+                        className="file-action"
+                        onClick={() =>
+                          previewFileData.shared
+                            ? downloadSharedFile(previewFileData)
+                            : downloadFile(previewFileData)
+                        }
+                      >
+                        <DownloadIcon size={15} />
+                        Download File
+                      </button>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -5939,7 +6237,7 @@ function Dashboard({ user, onLogout, theme, setTheme }) {
                     />
                   </div>
                   <h3>Preview Unavailable</h3>
-                  <p>Unable to load this file preview.</p>
+                  <p>Unable to load file preview.</p>
                 </div>
               )}
             </div>
@@ -6329,6 +6627,275 @@ function PptxPreviewPane({ arrayBuffer }) {
   return <div ref={containerRef} className="pptx-preview-container" />;
 }
 
+function SpreadsheetPreviewPane({ arrayBuffer, fileName }) {
+  const [sheetNames, setSheetNames] = useState([]);
+  const [sheets, setSheets] = useState({});
+  const [activeSheet, setActiveSheet] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const parseWorkbook = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const XLSX = await import("xlsx");
+        if (cancelled) return;
+        const workbook = XLSX.read(arrayBuffer, { type: "array" });
+        if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
+          throw new Error("No sheets found in workbook");
+        }
+        const parsedSheets = {};
+        workbook.SheetNames.forEach((name) => {
+          const sheet = workbook.Sheets[name];
+          parsedSheets[name] = XLSX.utils.sheet_to_json(sheet, {
+            header: 1,
+            defval: "",
+          });
+        });
+        if (!cancelled) {
+          setSheetNames(workbook.SheetNames);
+          setSheets(parsedSheets);
+          setActiveSheet(workbook.SheetNames[0]);
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Spreadsheet parse failed:", err);
+        if (!cancelled) {
+          setError("Failed to parse spreadsheet data.");
+          setLoading(false);
+        }
+      }
+    };
+
+    if (arrayBuffer) {
+      parseWorkbook();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [arrayBuffer]);
+
+  if (loading) {
+    return (
+      <div className="constant-preview-placeholder">
+        <div className="constant-preview-icon">
+          <FileIcon fileName={fileName || "spreadsheet.xlsx"} size={64} />
+        </div>
+        <h3>Loading Spreadsheet</h3>
+        <p>Parsing Excel sheets and cells...</p>
+      </div>
+    );
+  }
+
+  if (error || !activeSheet || !sheets[activeSheet]) {
+    return (
+      <div className="constant-preview-placeholder">
+        <div className="constant-preview-icon">
+          <FileIcon fileName={fileName || "spreadsheet.xlsx"} size={64} />
+        </div>
+        <h3>Preview Unavailable</h3>
+        <p>{error || "Unable to display spreadsheet table."}</p>
+      </div>
+    );
+  }
+
+  const rawRows = sheets[activeSheet] || [];
+  let maxCols = 0;
+  rawRows.forEach((r) => {
+    if (Array.isArray(r) && r.length > maxCols) maxCols = r.length;
+  });
+  if (maxCols < 6) maxCols = 6;
+
+  const query = searchQuery.trim().toLowerCase();
+  const displayRows = query
+    ? rawRows.filter((row) =>
+        Array.isArray(row) &&
+        row.some((val) => String(val).toLowerCase().includes(query))
+      )
+    : rawRows;
+
+  const getColLetter = (idx) => {
+    let letter = "";
+    let temp = idx;
+    while (temp >= 0) {
+      letter = String.fromCharCode((temp % 26) + 65) + letter;
+      temp = Math.floor(temp / 26) - 1;
+    }
+    return letter;
+  };
+
+  return (
+    <div className="spreadsheet-preview-container">
+      <div className="spreadsheet-top-bar">
+        <div className="spreadsheet-brand">
+          <span className="excel-brand-badge">EXCEL</span>
+          <span className="spreadsheet-stats">
+            {rawRows.length} rows × {maxCols} columns
+          </span>
+        </div>
+        <div className="spreadsheet-search">
+          <input
+            type="text"
+            placeholder="Search cells..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className="spreadsheet-search-clear"
+              onClick={() => setSearchQuery("")}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      <div className="spreadsheet-table-wrapper">
+        <table className="spreadsheet-grid-table">
+          <thead>
+            <tr>
+              <th className="spreadsheet-corner-cell">#</th>
+              {Array.from({ length: maxCols }).map((_, cIdx) => (
+                <th key={cIdx} className="spreadsheet-col-header">
+                  {getColLetter(cIdx)}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {displayRows.length > 0 ? (
+              displayRows.slice(0, 500).map((row, rIdx) => (
+                <tr key={rIdx}>
+                  <td className="spreadsheet-row-header">{rIdx + 1}</td>
+                  {Array.from({ length: maxCols }).map((_, cIdx) => {
+                    const val = Array.isArray(row) ? row[cIdx] : undefined;
+                    const isMatch =
+                      query &&
+                      val !== undefined &&
+                      String(val).toLowerCase().includes(query);
+                    return (
+                      <td
+                        key={cIdx}
+                        className={`spreadsheet-cell ${isMatch ? "cell-match" : ""}`}
+                        title={val !== undefined ? String(val) : ""}
+                      >
+                        {val !== undefined && val !== null ? String(val) : ""}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={maxCols + 1} className="spreadsheet-empty-msg">
+                  {query
+                    ? "No matching rows found."
+                    : "This sheet contains no data."}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {sheetNames.length > 1 && (
+        <div className="spreadsheet-tabs-bar">
+          <div className="spreadsheet-tabs-scroll">
+            {sheetNames.map((name) => (
+              <button
+                key={name}
+                type="button"
+                className={`spreadsheet-tab-btn ${activeSheet === name ? "active" : ""}`}
+                onClick={() => setActiveSheet(name)}
+              >
+                📊 {name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DocxPreviewPane({ arrayBuffer, fileName }) {
+  const [html, setHtml] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const parseDocx = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const mammoth = await import("mammoth");
+        if (cancelled) return;
+        const result = await mammoth.convertToHtml({ arrayBuffer });
+        if (!cancelled) {
+          setHtml(result.value || "<p>Empty document</p>");
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Docx parse failed:", err);
+        if (!cancelled) {
+          setError("Failed to parse Word document.");
+          setLoading(false);
+        }
+      }
+    };
+
+    if (arrayBuffer) {
+      parseDocx();
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [arrayBuffer]);
+
+  if (loading) {
+    return (
+      <div className="constant-preview-placeholder">
+        <div className="constant-preview-icon">
+          <FileIcon fileName={fileName || "document.docx"} size={64} />
+        </div>
+        <h3>Loading Word Document</h3>
+        <p>Rendering formatted document layout...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="constant-preview-placeholder">
+        <div className="constant-preview-icon">
+          <FileIcon fileName={fileName || "document.docx"} size={64} />
+        </div>
+        <h3>Preview Unavailable</h3>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="docx-preview-container">
+      <div
+        className="docx-page-sheet"
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
+    </div>
+  );
+}
+
 function FileIcon({
   fileName,
   size = 32,
@@ -6534,6 +7101,10 @@ function getPreviewType(fileName) {
       "webp",
       "bmp",
       "svg",
+      "ico",
+      "avif",
+      "tif",
+      "tiff",
     ].includes(extension)
   ) {
     return "image";
@@ -6543,8 +7114,16 @@ function getPreviewType(fileName) {
     return "pdf";
   }
 
-  if (["ppt", "pptx"].includes(extension)) {
+  if (["ppt", "pptx", "odp"].includes(extension)) {
     return "powerpoint";
+  }
+
+  if (["xlsx", "xls", "csv", "ods", "tsv"].includes(extension)) {
+    return "spreadsheet";
+  }
+
+  if (["docx", "doc", "odt", "rtf"].includes(extension)) {
+    return "document";
   }
 
   if (
@@ -6580,12 +7159,23 @@ function getPreviewType(fileName) {
       "json",
       "xml",
       "html",
+      "htm",
       "css",
       "js",
       "jsx",
       "ts",
       "tsx",
-      "csv",
+      "py",
+      "java",
+      "c",
+      "cpp",
+      "cs",
+      "sql",
+      "sh",
+      "yaml",
+      "yml",
+      "ini",
+      "log",
     ].includes(extension)
   ) {
     return "text";
