@@ -22,6 +22,29 @@ const authenticatedFetch = (url, options = {}) => {
   });
 };
 
+const safeParseJson = async (response) => {
+  try {
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.includes("application/json")) {
+      return await response.json();
+    }
+    const text = await response.text();
+    console.error(`Non-JSON response from ${response.url} (${response.status}):`, text.substring(0, 200));
+    return {
+      error: {
+        message: `Server error (${response.status}) from ${response.url}`,
+      },
+    };
+  } catch (err) {
+    console.error("JSON parse error:", err);
+    return {
+      error: {
+        message: "Failed to parse response from server",
+      },
+    };
+  }
+};
+
 const recentGridMenuButtonStyle = {
   width: "100%",
   height: "30px",
@@ -69,8 +92,8 @@ export default function Home() {
       const response = await authenticatedFetch(`${API_URL}/api/auth/me`);
 
       if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
+        const data = await safeParseJson(response);
+        if (data.user) setUser(data.user);
       } else {
         try { localStorage.removeItem("cloud-drive-token"); } catch (e) {}
       }
@@ -378,7 +401,7 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
         }),
       });
 
-      const data = await response.json();
+      const data = await safeParseJson(response);
 
       if (!response.ok) {
         setMessage(data.error?.message || "Login failed");
@@ -436,7 +459,7 @@ function Login({ initialRegistering = false, onBackToLanding, onLogin, theme, se
         }),
       });
 
-      const data = await response.json();
+      const data = await safeParseJson(response);
 
       if (!response.ok) {
         setMessage(data.error?.message || "Registration failed");
