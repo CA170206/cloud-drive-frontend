@@ -144,21 +144,60 @@ export default function Home() {
 }
 
 function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
+  const [activeStep, setActiveStep] = useState(0);
+
+  const steps = [
+    {
+      num: "01",
+      stepTag: "STEP 01",
+      pillTag: "● Smarter way to store",
+      title: "Store any file format.",
+      subtitle: "Upload documents, 4K videos, and archives effortlessly with Vercel Blob direct edge streaming and 15 GB free storage.",
+      tabName: "FILES",
+    },
+    {
+      num: "02",
+      stepTag: "STEP 02",
+      pillTag: "● Complete Version Control",
+      title: "Organize & restore.",
+      subtitle: "Create nested folder trees, search with instant filters, track file revisions, and restore earlier versions in seconds.",
+      tabName: "VERSIONS",
+    },
+    {
+      num: "03",
+      stepTag: "STEP 03",
+      pillTag: "● Public Link Sharing",
+      title: "Share anywhere.",
+      subtitle: "Generate secure public links, set expiration dates, manage download permissions, and collaborate with zero latency.",
+      tabName: "SHARING",
+    },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStep((prev) => (prev + 1) % steps.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [steps.length]);
+
+  const currentStep = steps[activeStep];
+
   return (
     <div className="landing-container">
-      <header className="landing-navbar">
+      {/* Floating Pill Navbar */}
+      <header className="landing-navbar-pill">
         <div className="landing-brand">
           <div className="landing-brand-icon">
-            <CloudIcon size={22} />
+            <CloudIcon size={20} />
           </div>
           <span className="landing-brand-title">Cloud Drive</span>
         </div>
 
-        <nav className="landing-nav-links">
-          <a href="#overview">Overview</a>
-          <a href="#features">Features</a>
-          <a href="#storage">Storage</a>
-          <a href="#security">Security</a>
+        <nav className="landing-pill-nav">
+          <a href="#overview" className="pill-link active">Home</a>
+          <a href="#features" className="pill-link">Features</a>
+          <a href="#how-it-works" className="pill-link">How It Works</a>
+          <a href="#stats" className="pill-link">Stats</a>
         </nav>
 
         <div className="landing-navbar-actions">
@@ -168,40 +207,56 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             aria-label="Toggle theme"
           >
-            {theme === "dark" ? "☀ Light" : "☾ Dark"}
+            {theme === "dark" ? "☀️ Light" : "☾ Dark"}
           </button>
 
           <button
             type="button"
-            className="landing-nav-btn login-btn"
+            className="landing-nav-login-btn"
             onClick={onGoToLogin}
           >
-            Login
+            Sign In
           </button>
 
           <button
             type="button"
-            className="landing-nav-btn register-btn"
+            className="landing-nav-cta-btn"
             onClick={onGoToRegister}
           >
-            Sign In / Sign Up
+            Get Started →
           </button>
         </div>
       </header>
 
+      {/* Hero Section */}
       <section className="landing-hero" id="overview">
-        <div className="landing-badge">
-          <span className="badge-pulse"></span>
-          <span>⚡ High-Performance Storage powered by Vercel Blob & PostgreSQL</span>
+        <div className="landing-badge-pill">
+          <span className="badge-dot"></span>
+          <span>{currentStep.pillTag}</span>
         </div>
 
-        <h1 className="landing-title">
-          Secure, Fast & Seamless <br />
-          <span className="gradient-text">Cloud File Storage</span>
+        <h1 className="landing-hero-title">
+          {currentStep.title}
         </h1>
 
-        <p className="landing-subtitle">
-          Upload large files effortlessly, organize with smart folders, track full version history, and share files instantly with zero latency.
+        <div className="landing-step-indicator">
+          <span className="step-num-badge">{currentStep.num}</span>
+          <span className="step-tag-text">{currentStep.stepTag}</span>
+          <div className="step-dash-dots">
+            {steps.map((_, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => setActiveStep(idx)}
+                className={`dash-dot ${activeStep === idx ? "active" : ""}`}
+                aria-label={`Go to step ${idx + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+
+        <p className="landing-hero-subtitle">
+          {currentStep.subtitle}
         </p>
 
         <div className="landing-hero-cta">
@@ -210,154 +265,204 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
             className="landing-primary-btn"
             onClick={onGoToRegister}
           >
-            Get Started Free →
+            Get Started →
           </button>
           <button
             type="button"
             className="landing-secondary-btn"
             onClick={onGoToLogin}
           >
-            Sign In to Drive
+            Sign In
           </button>
         </div>
 
-        <div className="landing-hero-preview">
-          <div className="preview-top-bar">
-            <div className="dots">
-              <span className="dot red"></span>
-              <span className="dot yellow"></span>
-              <span className="dot green"></span>
+        <div className="landing-trust-checks">
+          <span>✓ High-Speed Edge Uploads</span>
+          <span>✓ Version Control & Restore</span>
+          <span>✓ Instant Public Sharing</span>
+        </div>
+
+        {/* Hero Interactive App Mockup */}
+        <div className="landing-mockup-card">
+          <div className="mockup-header">
+            <div className="mockup-brand">
+              <CloudIcon size={18} />
+              <strong>Cloud Drive</strong>
+              <small>Store. Version. Share.</small>
             </div>
-            <div className="preview-url-bar">https://cloud-drive.app/dashboard</div>
+            <div className="mockup-tabs">
+              {steps.map((s, idx) => (
+                <button
+                  key={s.tabName}
+                  type="button"
+                  onClick={() => setActiveStep(idx)}
+                  className={`mockup-tab ${activeStep === idx ? "active" : ""}`}
+                >
+                  {s.tabName}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="preview-content">
-            <div className="preview-sidebar">
-              <div className="preview-sidebar-item active">📁 My Files</div>
-              <div className="preview-sidebar-item">👥 Shared with me</div>
-              <div className="preview-sidebar-item">🕒 Recent</div>
-              <div className="preview-sidebar-item">⭐ Starred</div>
-              <div className="preview-sidebar-item">⚡ Activity</div>
-              <div className="preview-sidebar-item">🗑️ Trash</div>
-            </div>
-            <div className="preview-main">
-              <div className="preview-header-row">
-                <h3>My Storage Workspace</h3>
-                <span className="preview-badge">15 GB Storage Available</span>
+
+          <div className="mockup-body">
+            <div className="mockup-storage-banner">
+              <div className="banner-info">
+                <span className="banner-title">READY TO STORE FILES</span>
+                <h3>15 GB Free Storage Workspace</h3>
               </div>
-              <div className="preview-cards-row">
-                <div className="mini-card">
-                  <span className="card-icon">📂</span>
-                  <div>
-                    <strong>Projects & Assets</strong>
-                    <small>18 items • 1.4 GB</small>
-                  </div>
+              <div className="banner-stats-pills">
+                <div className="pill-stat">
+                  <strong>15 GB</strong>
+                  <small>Capacity</small>
                 </div>
-                <div className="mini-card">
-                  <span className="card-icon">📄</span>
-                  <div>
-                    <strong>Annual_Report.pdf</strong>
-                    <small>Uploaded 5m ago • Shared</small>
-                  </div>
+                <div className="pill-stat">
+                  <strong>0.01s</strong>
+                  <small>Latency</small>
                 </div>
-                <div className="mini-card">
-                  <span className="card-icon">🖼️</span>
-                  <div>
-                    <strong>Banner_Design.png</strong>
-                    <small>4.2 MB • Version 2</small>
-                  </div>
+                <div className="pill-stat">
+                  <strong>Unlimited</strong>
+                  <small>Revisions</small>
                 </div>
+              </div>
+            </div>
+
+            <div className="mockup-file-grid">
+              <div className="mockup-file-item">
+                <div className="file-icon-box blue">📂</div>
+                <div className="file-meta">
+                  <strong>Project_Assets/</strong>
+                  <span>14 items • 240 MB</span>
+                </div>
+                <span className="file-tag-pill">Folder</span>
+              </div>
+
+              <div className="mockup-file-item">
+                <div className="file-icon-box purple">📄</div>
+                <div className="file-meta">
+                  <strong>Annual_Report_2026.pdf</strong>
+                  <span>3.4 MB • Version 2</span>
+                </div>
+                <span className="file-tag-pill green">Restorable</span>
+              </div>
+
+              <div className="mockup-file-item">
+                <div className="file-icon-box orange">🖼️</div>
+                <div className="file-meta">
+                  <strong>Product_Design_v3.png</strong>
+                  <span>8.1 MB • Shared Link</span>
+                </div>
+                <span className="file-tag-pill blue">Public Link</span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+      {/* Everything You Need / Features Section */}
       <section className="landing-features-section" id="features">
-        <div className="section-header">
-          <h2>Enterprise Features Built for Productivity</h2>
-          <p>Everything you need to store, manage, version, and share digital content securely.</p>
+        <div className="section-centered-header">
+          <span className="section-pill-tag">EVERYTHING YOU NEED</span>
+          <h2>Built for better productivity</h2>
+          <p>Practice, organize, version, and share your cloud files with zero friction.</p>
         </div>
 
-        <div className="landing-features-grid">
-          <div className="landing-feature-card">
-            <div className="feature-icon-wrapper blue">☁️</div>
-            <h3>Vercel Blob Edge Storage</h3>
-            <p>Direct client-to-blob streaming. Zero server buffer delays, multi-part chunk handling for large files.</p>
+        <div className="landing-features-grid-3">
+          <div className="landing-card-item">
+            <div className="card-emoji-box">☁️</div>
+            <h3>Vercel Blob Edge Uploads</h3>
+            <p>Direct client-to-blob chunked uploads. Zero server bottlenecking, maximum throughput for files of all sizes.</p>
           </div>
 
-          <div className="landing-feature-card">
-            <div className="feature-icon-wrapper purple">🔄</div>
-            <h3>Version Control & Restore</h3>
-            <p>Keep track of file revisions. Compare changes, download earlier versions, or restore prior iterations anytime.</p>
+          <div className="landing-card-item">
+            <div className="card-emoji-box">📊</div>
+            <h3>Track Performance & Versions</h3>
+            <p>Review version histories, download earlier revisions, compare file changes, and restore prior iterations with 1 click.</p>
           </div>
 
-          <div className="landing-feature-card">
-            <div className="feature-icon-wrapper green">🔗</div>
-            <h3>Instant Link Sharing</h3>
-            <p>Generate shareable public links with customizable view and download permissions for seamless collaboration.</p>
-          </div>
-
-          <div className="landing-feature-card">
-            <div className="feature-icon-wrapper orange">📁</div>
-            <h3>Smart Organization</h3>
-            <p>Nested folder trees, quick access, starred files, instant live search filtering, and grid/list view toggles.</p>
-          </div>
-
-          <div className="landing-feature-card">
-            <div className="feature-icon-wrapper red">📊</div>
-            <h3>Real-Time Audit Activity</h3>
-            <p>Track every upload, rename, deletion, and share event with detailed timestamped activity audit logs.</p>
-          </div>
-
-          <div className="landing-feature-card">
-            <div className="feature-icon-wrapper cyan">🛡️</div>
-            <h3>Security & Role Control</h3>
-            <p>HTTP-only session cookie protection, encrypted file access keys, and secure metadata verification in PostgreSQL.</p>
+          <div className="landing-card-item">
+            <div className="card-emoji-box">🏆</div>
+            <h3>Public Link Sharing</h3>
+            <p>Generate shareable links with customizable expiration times, instant downloads, and public access controls.</p>
           </div>
         </div>
       </section>
 
-      <section className="landing-stats-section" id="storage">
-        <div className="landing-stats-grid">
-          <div className="stat-box">
+      {/* How It Works Section */}
+      <section className="landing-steps-section" id="how-it-works">
+        <div className="section-centered-header">
+          <span className="section-pill-tag">HOW IT WORKS</span>
+          <h2>Three simple steps to control your cloud</h2>
+        </div>
+
+        <div className="landing-steps-grid">
+          <div className="step-card">
+            <div className="step-badge-num">01</div>
+            <h3>Create Account</h3>
+            <p>Sign up in seconds to claim your 15 GB high-performance storage workspace.</p>
+          </div>
+
+          <div className="step-card">
+            <div className="step-badge-num">02</div>
+            <h3>Upload & Organize</h3>
+            <p>Drag and drop files, organize nested folders, add tag labels, and star key items.</p>
+          </div>
+
+          <div className="step-card">
+            <div className="step-badge-num">03</div>
+            <h3>Share & Restore</h3>
+            <p>Generate public links for your team or restore past version revisions anytime.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Platform Stats Section */}
+      <section className="landing-stats-banner" id="stats">
+        <div className="stats-pill-container">
+          <div className="stat-unit">
+            <h4>15 GB</h4>
+            <p>Free Storage Per Account</p>
+          </div>
+          <div className="stat-unit">
+            <h4>&lt;10ms</h4>
+            <p>Direct Vercel Edge Response</p>
+          </div>
+          <div className="stat-unit">
             <h4>100%</h4>
-            <p>Vercel Edge Streaming</p>
+            <p>Zero Disk Byte Waste</p>
           </div>
-          <div className="stat-box">
-            <h4>&lt;50ms</h4>
-            <p>Direct Edge Latency</p>
-          </div>
-          <div className="stat-box">
-            <h4>256-bit</h4>
-            <p>AES Access Security</p>
-          </div>
-          <div className="stat-box">
+          <div className="stat-unit">
             <h4>Unlimited</h4>
-            <p>File Versioning</p>
+            <p>Public Share Links</p>
           </div>
         </div>
       </section>
 
-      <section className="landing-cta-banner" id="security">
-        <h2>Start Storing & Sharing Your Files Today</h2>
-        <p>Experience ultra-fast cloud file management powered by Vercel Blob.</p>
-        <div className="cta-banner-buttons">
-          <button type="button" className="landing-primary-btn" onClick={onGoToRegister}>
-            Create Free Account
-          </button>
-          <button type="button" className="landing-secondary-btn" onClick={onGoToLogin}>
-            Sign In to Existing Account
-          </button>
+      {/* CTA Banner */}
+      <section className="landing-cta-banner">
+        <div className="cta-content">
+          <h2>Ready to transform your cloud storage experience?</h2>
+          <p>Join thousands of users organizing and sharing files effortlessly.</p>
+          <div className="cta-button-group">
+            <button type="button" className="landing-primary-btn" onClick={onGoToRegister}>
+              Get Started Free →
+            </button>
+            <button type="button" className="landing-secondary-btn" onClick={onGoToLogin}>
+              Sign In to Account
+            </button>
+          </div>
         </div>
       </section>
 
+      {/* Footer */}
       <footer className="landing-footer">
-        <div className="footer-content">
-          <div className="footer-brand">
-            <CloudIcon size={20} />
+        <div className="footer-inner">
+          <div className="footer-brand-row">
+            <CloudIcon size={22} />
             <span>Cloud Drive</span>
           </div>
-          <p>© 2026 Cloud Drive. All rights reserved. Ultra-fast Cloud File Storage System.</p>
+          <p className="footer-copy">
+            © 2026 Cloud Drive. All rights reserved. Built for modern cloud productivity.
+          </p>
         </div>
       </footer>
     </div>
