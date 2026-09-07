@@ -9096,7 +9096,7 @@ html[data-theme="light"] .pulse-dot {
   font-weight: 900 !important;
   letter-spacing: -0.8px !important;
   line-height: 1.15 !important;
-  margin: 0 0 5px !important;
+  margin: 18px 0 6px !important;
   background: linear-gradient(135deg, #ffffff 0%, #a1a1aa 100%) !important;
   -webkit-background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -9113,7 +9113,7 @@ html[data-theme="light"] .landing-hero-title {
   align-items: center !important;
   justify-content: center !important;
   gap: 12px !important;
-  margin-bottom: 12px !important;
+  margin-bottom: 10px !important;
 }
 
 .step-num-pill {
@@ -9167,7 +9167,7 @@ html[data-theme="light"] .dash-dot-btn.active {
   font-size: 13.5px !important;
   line-height: 1.45 !important;
   max-width: 640px !important;
-  margin: 0 auto 12px !important;
+  margin: 0 auto 2px !important;
   color: #a1a1aa !important;
 }
 
@@ -9180,7 +9180,7 @@ html[data-theme="light"] .landing-hero-subtitle {
   width: 100% !important;
   max-width: 1100px !important;
   margin: 0 auto !important;
-  padding: 12px 24px 28px !important;
+  padding: 4px 24px 28px !important;
   display: flex !important;
   flex-direction: column !important;
   align-items: center !important;
@@ -9195,7 +9195,7 @@ html[data-theme="light"] .landing-hero-subtitle {
   align-items: center !important;
   justify-content: center !important;
   gap: 18px !important;
-  margin: 0 0 18px !important;
+  margin: -14px 0 20px !important;
 }
 
 .landing-hero-cta-scroll .landing-trust-checks {
@@ -9840,7 +9840,7 @@ html[data-theme="light"] .landing-footer {
 .hero-browser-mockup {
   max-width: 1280px;
   width: min(1280px, 94vw);
-  margin: 8px auto 0 !important;
+  margin: 0 auto 0 !important;
   flex: 1 1 auto !important;
   display: flex !important;
   flex-direction: column !important;
