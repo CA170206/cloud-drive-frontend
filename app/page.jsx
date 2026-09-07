@@ -446,11 +446,6 @@ function LandingPage({ onGoToLogin, onGoToRegister, theme, setTheme }) {
 
       {/* Hero Section */}
       <section className="landing-hero" id="overview">
-        <div className="landing-badge-pill">
-          <span className="pulse-dot"></span>
-          <span>{currentStep.pillTag}</span>
-        </div>
-
         <h1 className="landing-hero-title">
           {currentStep.title}
         </h1>
